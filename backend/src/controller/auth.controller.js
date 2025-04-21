@@ -1,0 +1,135 @@
+import { models } from '../models/index.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
+
+const { User, Role } = models;
+
+
+const loginController = async (req, res) => {
+  const { emailOrContact, password } = req.body;
+
+  console.log(emailOrContact, password, "@@@@@@@@@@@@");
+
+
+  try {
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [
+          { email: emailOrContact },
+          { contact: emailOrContact },
+        ],
+      },
+    });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const userRole = await Role.findOne(
+      {
+        where: {
+          id: user.roleId
+        }
+      }
+    )
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: userRole.name },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 5 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        contact: user.contact,
+        role: userRole.name,
+        companyId: user.companyId,
+        branchId:user.branchId
+      },
+    });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+
+
+const registerController = async (req, res) => {
+
+  const { email, password, firstName, lastName, roleId, companyId, branchId,contact } = req.body;
+
+  try {
+    // Check if user already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const newUser = await User.create({
+      email,
+      password: hashedPassword,
+      firstName,
+      lastName,
+      contact,
+      roleId,
+      companyId,
+      branchId,
+    });
+
+    res.status(201).json({ message: 'User registered successfully', userId: newUser.id });
+  } catch (error) {
+    console.error('Error registering user:', error);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+}
+
+const getUserDataController = async (req, res) => {
+
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' }); 
+    }
+
+    return res.status(200).json(
+      {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        contact: user.contact,
+        role: req.user.role,
+        companyId: user.companyId
+      }
+    );
+
+
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+
+}
+
+export { loginController, registerController, getUserDataController };

@@ -1,0 +1,58 @@
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { sequelize } from './models/index.js';
+import dotenv from 'dotenv';
+import authRoutes from './routes/auth.routes.js';
+import companyRoutes from './routes/company.routes.js';
+import branchRoutes from './routes/branch.route.js';
+import roleRouter from './routes/role.route.js';
+import featureRouter from './routes/feature.route.js';
+import settingRoutes from './routes/settings.router.js';
+import userRouter from './routes/user.routes.js';
+import imageRouter from './routes/images.routes.js'; 
+
+dotenv.config();
+
+const app = express();
+
+app.use(cors({
+  origin: "http://103.165.118.71:3020",
+  credentials: true,
+}));
+app.use(express.json());
+app.use(cookieParser())
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/company', companyRoutes);
+app.use('/api/branch', branchRoutes);
+app.use('/api/settings', settingRoutes);
+app.use('/api/role', roleRouter);
+app.use('/api/feature',featureRouter)
+app.use('/api/user',userRouter)
+app.use('/api/image',imageRouter)
+
+
+
+
+const PORT = process.env.PORT || 3000;
+
+async function start() {
+  try {
+    await sequelize.authenticate();
+    console.log('Database connection established.');
+    
+    await sequelize.sync();
+    console.log('Database synchronized.');
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Unable to start server:', error);
+    process.exit(1);
+  }
+}
+
+start();
