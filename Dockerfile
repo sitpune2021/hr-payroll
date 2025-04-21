@@ -18,11 +18,11 @@
  COPY . .
 #
 # # Change to the backend directory
- WORKDIR /app/backend
+ WORKDIR /app/backend/src/
 #
 # # Exposing the port (match with the PORT env variable)
   EXPOSE 3020
 #
 # # Start the app using npm and node
-CMD ["node", "app.js"]
+CMD ["node", "index.js"]
 #
