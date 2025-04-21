@@ -3,7 +3,7 @@
 #
 # # Declaring environment variables
  ENV NODE_ENV=development
- ENV PORT=3015
+ ENV PORT=3020
 #
 # # Setting up the working directory
  WORKDIR /app
@@ -21,7 +21,7 @@
  WORKDIR /app/backend
 #
 # # Exposing the port (match with the PORT env variable)
-  EXPOSE 3015
+  EXPOSE 3020
 #
 # # Start the app using npm and node
 CMD ["node", "app.js"]
