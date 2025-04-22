@@ -45,9 +45,9 @@ const RolesPermission = () => {
             dataIndex: "actions",
             render: () => (
                 <div className="action-icon d-inline-flex">
-                    <Link to={all_routes.permissionpage} className="me-2">
+                    {/* <Link to={all_routes.permissionpage} className="me-2">
                         <i className="ti ti-shield" />
-                    </Link>
+                    </Link> */}
                     <Link
                         to="#"
                         className="me-2"

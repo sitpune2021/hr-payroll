@@ -12,6 +12,7 @@ export interface User {
   maritalStatus: string | null;
   companyId: number | null;
   branchId: number | null;
+  departmentId: number;
   roleId: number;
   createdAt: string;
 }

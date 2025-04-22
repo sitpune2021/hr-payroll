@@ -103,7 +103,6 @@ import ResetPasswordSuccess2 from "../auth/resetPasswordSuccess/resetPasswordSuc
 import ResetPasswordSuccess3 from "../auth/resetPasswordSuccess/resetPasswordSuccess-3";
 
 import RolesPermissions from "../userManagement/rolesPermissions";
-import Permission from "../userManagement/permission";
 import Manageusers from "../userManagement/manageusers";
 import Profilesettings from "../settings/generalSettings/profile-settings";
 import Securitysettings from "../settings/generalSettings/security-settings";
@@ -1203,6 +1202,7 @@ export const publicRoutes = [
   {
     path: routes.permissionpage,
     element: <PermissionPage />,
+    label:"Permission"
   },
   {
     path: routes.expensesreport,
@@ -1299,10 +1299,7 @@ export const publicRoutes = [
   {
     path: routes.rolePermission,
     element: <RolesPermission />,
-  },
-  {
-    path: routes.permissionpage,
-    element: <Permission />,
+    label:"Roles"
   },
   {
     path: routes.invoiceDetails,
