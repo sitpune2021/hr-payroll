@@ -6,7 +6,7 @@ const routes = all_routes;
 
 export const SidebarDataTest = [
   {
-    // tittle: 'Dashboard main',
+    tittle: 'Dashboard main',
     icon: 'airplay',
     showAsTab: true,
     separateRoute: false,
@@ -52,6 +52,18 @@ export const SidebarDataTest = [
             base: 'roles-permissions',
           },
         ],
+      },
+      {
+        label: 'Features',
+        icon: 'layout-grid-add',
+        link: routes.adminFeatures,
+        base: 'ranches',
+      },
+      {
+        label: 'Departments',
+        icon: 'layout-grid-add',
+        link: routes.departments,
+        base: 'ranches',
       },
     ]
   },

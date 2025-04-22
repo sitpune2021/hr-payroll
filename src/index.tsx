@@ -5,8 +5,9 @@ import { base_path } from "./environment";
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import "../src/style/css/feather.css";
 import "../src/index.scss";
-import store from "./core/data/redux/store";
+import store, { persistor } from "./core/data/redux/store"; // ⬅️ import persistor
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react"; // ⬅️ import PersistGate
 import "../src/style/icon/boxicons/boxicons/css/boxicons.min.css";
 import "../src/style/icon/weather/weathericons.css";
 import "../src/style/icon/typicons/typicons.css";
@@ -22,15 +23,17 @@ import GlobalToast from "./utils/GlobalToast";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 const AppWrapper = () => {
-  const [ready, setReady] = useState(false); 
+  const [ready, setReady] = useState(false);
 
   return (
     <Provider store={store}>
-      <GlobalToast />
-      <BrowserRouter basename={base_path}>
-        <AppInitializer onReady={() => setReady(true)} />
-        {ready ? <ALLRoutes /> : <div>Loading...</div>}
-      </BrowserRouter>
+      <PersistGate loading={<div>Loading persisted state...</div>} persistor={persistor}>
+        <GlobalToast />
+        <BrowserRouter basename={base_path}>
+          <AppInitializer onReady={() => setReady(true)} />
+          {ready ? <ALLRoutes /> : <div>Loading...</div>}
+        </BrowserRouter>
+      </PersistGate>
     </Provider>
   );
 };

@@ -13,6 +13,8 @@ const seedPermissions = async (models) => {
       { name: 'Branches', description: 'Permission to manage branches' },
       { name: 'AddBranch', description: 'Permission to add a new branch' },
       { name: 'EditBranch', description: 'Permission to edit branch details' },
+      { name: 'Features', description: 'Permission to access features details' },
+      { name: 'AddFeature', description: 'Permission to add new Feature' },
     ];
   
     try {

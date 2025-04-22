@@ -16,11 +16,17 @@ import { AxiosError } from 'axios'
 import { useAppDispatch, useAppSelector } from '../../../core/data/redux/hooks'
 import { CompanyTableItem, mapCompanyDataToTable } from '../../../utils/CompanyTableDataMapper'
 import { Company, fetchCompanies } from '../../../core/data/redux/companySlice'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../../core/data/redux/store'
 type PasswordField = "password" | "confirmPassword";
 
 const Companies = () => {
   // const data = companies_details;
   const dispatch = useAppDispatch();
+
+
+  const userAllowedLabels = useSelector((state: RootState) => state.feature.allowedFeatures);
+  const filteredLabels = userAllowedLabels.map((feature: any) => feature.name);
 
   const companyList = useAppSelector((state) => state.companies.list);
   const [tableData, setTableData] = useState<CompanyTableItem[]>([]);
@@ -594,17 +600,21 @@ const Companies = () => {
                   </ul>
                 </div>
               </div>
-              <div className="mb-2">
-                <Link
-                  to="#"
-                  data-bs-toggle="modal"
-                  data-bs-target="#add_company"
-                  className="btn btn-primary d-flex align-items-center"
-                >
-                  <i className="ti ti-circle-plus me-2" />
-                  Add Company
-                </Link>
-              </div>
+              {
+                filteredLabels.includes('AddCompany') &&
+                <div className="mb-2">
+                  <Link
+                    to="#"
+                    data-bs-toggle="modal"
+                    data-bs-target="#add_company"
+                    className="btn btn-primary d-flex align-items-center"
+                  >
+                    <i className="ti ti-circle-plus me-2" />
+                    Add Company
+                  </Link>
+                </div>
+              }
+
               <div className="ms-2 head-icons">
                 <CollapseHeader />
               </div>
@@ -624,7 +634,7 @@ const Companies = () => {
                       <p className="fs-12 fw-medium mb-1 text-truncate">
                         Total Companies
                       </p>
-                      <h4>950</h4>
+                      <h4>{companyList.length}</h4>
                     </div>
                   </div>
                   <ReactApexChart
@@ -985,7 +995,7 @@ const Companies = () => {
                         value={addCompanyFormData.companyName}
                         onChange={(e) => handleAddCompanyChange(e)}
                         className={`form-control ${formErrors.companyName ? 'is-invalid' : ''}`} />
-                        {formErrors.companyName && <div className="text-danger mt-1">{formErrors.companyName}</div>}
+                      {formErrors.companyName && <div className="text-danger mt-1">{formErrors.companyName}</div>}
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -997,7 +1007,7 @@ const Companies = () => {
                         value={addCompanyFormData.companyEmail}
                         onChange={(e) => handleAddCompanyChange(e)}
                         className={`form-control ${formErrors.companyEmail ? 'is-invalid' : ''}`} />
-                        {formErrors.companyEmail && <div className="text-danger mt-1">{formErrors.companyEmail}</div>}
+                      {formErrors.companyEmail && <div className="text-danger mt-1">{formErrors.companyEmail}</div>}
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -1013,9 +1023,9 @@ const Companies = () => {
                         value={addCompanyFormData.companyPhone}
                         onChange={(e) => handleAddCompanyChange(e)}
                         pattern="[0-9]{10}"
-                        title="Enter a 10-digit number" 
+                        title="Enter a 10-digit number"
                         className={`form-control ${formErrors.companyPhone ? 'is-invalid' : ''}`} />
-                        {formErrors.companyPhone && <div className="text-danger mt-1">{formErrors.companyPhone}</div>}
+                      {formErrors.companyPhone && <div className="text-danger mt-1">{formErrors.companyPhone}</div>}
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -1430,9 +1440,9 @@ const Companies = () => {
                       <p>{viewCompanyData?.Email}</p>
                     </div>
                   </div>
-                  <span className="badge badge-success">
+                  <span className={`badge ${viewCompanyData?.Status === 'Active' ? "badge-success" : "badge-danger"} `}>
                     <i className="ti ti-point-filled" />
-                    Active
+                    {viewCompanyData?.Status === "Active" ? "Active" : "Inactive"}
                   </span>
                 </div>
               </div>

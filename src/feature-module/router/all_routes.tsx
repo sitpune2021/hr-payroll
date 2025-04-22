@@ -24,6 +24,8 @@ export const all_routes = {
 
   //addedRoutes
   adminBranches:"/admin/branch",
+  adminFeatures:"/admin/features",
+
 
   //super admin module
   superAdminDashboard: "/super-admin/dashboard",

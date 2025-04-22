@@ -295,6 +295,7 @@ import DynamicDashboard from "../../utils/DynamicDashboard";
 import Branches from "../Branches/Branches";
 import NotAllowed from "../pages/NotAllowed";
 import { label } from "yet-another-react-lightbox/*";
+import Features from "../features/Features";
 const routes = all_routes;
 
 export const publicRoutes = [
@@ -1293,6 +1294,7 @@ export const publicRoutes = [
   {
     path: routes.users,
     element: <Users />,
+    label:"User Management"
   },
   {
     path: routes.rolePermission,
@@ -1502,6 +1504,7 @@ export const publicRoutes = [
     path: routes.departments,
     element: <Department />,
     route: Route,
+    label:'Departments'
   },
   {
     path: routes.designations,
@@ -1660,7 +1663,14 @@ export const publicRoutes = [
     path: routes.adminBranches,
     element: <Branches />,
     route: Route,
-  }
+    label:"Branches"
+  },
+  {
+    path: routes.adminFeatures,
+    element: <Features />,
+    route: Route,
+    label:"Features"
+  },
 ];
 
 export const authRoutes = [
