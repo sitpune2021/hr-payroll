@@ -11,6 +11,7 @@ interface User {
   role: string;
   companyId: number | null;
   branchId: number | null;
+  departmentId: number | null;
 
 }
 

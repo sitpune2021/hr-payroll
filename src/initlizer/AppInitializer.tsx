@@ -10,6 +10,7 @@ import { fetchCompanies } from "../core/data/redux/companySlice";
 import { fetchBranches } from "../core/data/redux/branchesSlice";
 import { fetchUsers } from "../core/data/redux/usersSlice";
 import { useNavigate } from "react-router-dom"; // Import useNavigate to redirect
+import { fetchDepartments } from "../core/data/redux/departmentsSlice";
 
 const AppInitializer = ({ onReady }: { onReady: () => void }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -57,6 +58,7 @@ const AppInitializer = ({ onReady }: { onReady: () => void }) => {
         await dispatch(fetchRoles());
         await dispatch(fetchCompanies());
         await dispatch(fetchBranches());
+        await dispatch(fetchDepartments());
         await dispatch(fetchUsers({
           companyId: undefined,
           branchId: undefined,

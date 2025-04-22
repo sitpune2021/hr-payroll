@@ -11,9 +11,11 @@ export const FETCH_BRANCHES_LIST  =  "/api/branch/getlist"
 export const FETCH_USERS_LIST  =  "/api/user/getlist"
 export const EDIT_COMPANY  =  "/api/company/updatecompany/"
 export const EDIT_BRANCH  =  "/api/branch/updatebranch/"
-export const EDIT_USER  =  "/api/user/editUser/"
+export const EDIT_USER  =  "/api/user/editUser/"  
 export const UPLOAD_USERS_EXCEL  =  "/api/user/uploaduserexcel"
 export const ADD_NEW_FEATURE  =  "/api/feature/addfeature"
+export const FETCH_ALL_DEPARTMENTS  =  "/api/department/getlist"
+
 
 
 

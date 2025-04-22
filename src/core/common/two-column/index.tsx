@@ -419,7 +419,7 @@ const TwoColumnSidebar = () => {
                                     </Link>
                                     <ul>
                                         <li><Link to="users.html">Users</Link></li>
-                                        <li><Link to="roles-permissions.html">Roles & Permissions</Link></li>
+                                        <li><Link to="roles-permissions.html">Roles</Link></li>
                                     </ul>
                                 </li>
                                 <li className="submenu">

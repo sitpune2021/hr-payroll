@@ -20,6 +20,8 @@ import rolesReducer from './rolesSlice';
 import companyReducer from './companySlice';
 import branchesReducer from './branchesSlice';
 import usersReducer from './usersSlice';
+import departmentsReducer from './departmentsSlice';
+
 
 // 👇 Combine all reducers
 const rootReducer = combineReducers({
@@ -32,6 +34,7 @@ const rootReducer = combineReducers({
   companies: companyReducer,
   branches: branchesReducer,
   users: usersReducer,
+  departments:departmentsReducer
 });
 
 // 👇 Persist config: Choose what to persist
