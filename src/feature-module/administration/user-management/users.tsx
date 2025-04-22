@@ -15,6 +15,7 @@ import { Branch } from '../../../core/data/redux/branchesSlice';
 import { fetchUsers, setSort, User } from '../../../core/data/redux/usersSlice';
 import { formatDate } from '../../../utils/dateformatter1';
 import { generateErrorExcelUserUpload } from '../../../utils/generateErrorExcelUploadUser';
+import { Department } from '../../../core/data/redux/departmentsSlice';
 type PasswordField = "password" | "confirmPassword";
 
 const Users = () => {
@@ -23,6 +24,7 @@ const Users = () => {
 
     const [viewUserDetails, setViewUserDetails] = useState<User>();
     const [editUserData, setEditUserData] = useState<Partial<User>>();
+    const [filteredDepartments, setFilteredDepartments] = useState<Department[]>([]);
 
     const handleEditUserSubmit = async (e: any) => {
         e.preventDefault();
@@ -78,7 +80,23 @@ const Users = () => {
     const user = useSelector((state: RootState) => state.auth.user);
     const companyList = useAppSelector((state) => state.companies.list);
     const branchList: Branch[] = useSelector((state: RootState) => state.branches.branches);
+    const departmentList = useSelector((state: RootState) => state.departments.data)
     const roleList = useAppSelector((state: RootState) => state.roles.list);
+
+ 
+
+    useEffect(() => {
+        if(user && user.departmentId===1){
+            setFilteredDepartments(departmentList)
+        }else if (user && user.departmentId !== null) {
+          const filtered = departmentList.filter(dept => dept.id > user.departmentId!);
+          setFilteredDepartments(filtered);
+        } else {
+          setFilteredDepartments([]);
+        }
+      }, [user, departmentList]);
+
+
 
     const { list: users, loading, error, page, totalPages, sortField, sortOrder } = useSelector((state: RootState) => state.users);
 
@@ -97,24 +115,6 @@ const Users = () => {
             );
         }
     }, [dispatch, user, loggedInRoleId, page,limit]);
-
-    const handleSort = (field: string) => {
-        const newSortOrder = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
-        dispatch(setSort({ sortField: field, sortOrder: newSortOrder }));
-
-        // if(user){
-        //     dispatch(fetchUsers({
-        //         companyId: user.companyId ?? undefined, // replace as needed
-        //         branchId: user.branchId ?? undefined,
-        //         roleId: loggedInRoleId,
-        //         page: page, // current page
-        //         limit: 10, // or from state
-        //         sortField: field,
-        //         sortOrder: newSortOrder,
-        //       }));
-        // }
-        
-    };
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -146,7 +146,10 @@ const Users = () => {
         maritalStatus: '',
         companyId: '',
         branchId: '',
+        departmentId:''
     });
+
+
 
 
     useEffect(() => {
@@ -221,6 +224,7 @@ const Users = () => {
             maritalStatus,
             companyId,
             branchId,
+            departmentId
         } = formDactaAddUser;
 
         if (!companyId) {
@@ -244,7 +248,11 @@ const Users = () => {
             toast('Error', 'Password did not match.', 'danger');
             return;
         }
-        console.log("Form valid. Submitting user:", formDactaAddUser);
+
+        if (!departmentId) {
+            toast('Error', 'Department is mendatory.', 'danger');
+            return;
+        }
 
 
         try {
@@ -259,6 +267,7 @@ const Users = () => {
                 maritalStatus,
                 companyId,
                 branchId,
+                departmentId
             }
             )
             if (response.status === 200) {
@@ -673,6 +682,7 @@ const Users = () => {
                                             <th className='py-3'>Contact</th>
                                             <th className='py-3'>Company</th>
                                             <th className='py-3'>Branch</th>
+                                            <th className='py-3'>Department</th>
                                             <th className='py-3'>Role</th>
                                             <th className='py-3'>Actions</th>
                                         </tr>
@@ -686,6 +696,7 @@ const Users = () => {
                                                     <td>{user.contact}</td>
                                                     <td>{getCompanyNameById(user.companyId)}</td>
                                                     <td>{geBranchNameById(user.branchId)}</td>
+                                                    <td>{user.departmentId}</td>
                                                     <td>{getRoleNameByRoleId(user.roleId) || "**"}</td>
                                                     <td>
                                                         <div className="action-icon d-inline-flex">
@@ -976,6 +987,23 @@ const Users = () => {
                                             </select>
                                         </div>
                                     </div>
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">Department</label>
+                                            <select
+                                                className='form-control'
+                                                value={formDactaAddUser.departmentId}
+                                                onChange={(e) => setFormDataAddUser({ ...formDactaAddUser, departmentId: e.target.value })}
+                                            >
+                                                <option value="">---Select ---</option>
+                                                {
+                                                    filteredDepartments.map(dept => (
+                                                        <option key={dept.id} value={dept.id}>{dept.name}</option>
+                                                    ))
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className="modal-footer">
@@ -1145,6 +1173,24 @@ const Users = () => {
                                                         {branch.name}
                                                     </option>
                                                 ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">Department</label>
+                                            <select
+                                                className='form-control'
+                                                name='departmentId'
+                                                value={editUserData?.departmentId}
+                                                onChange={(e)=>handleEditDataChange(e)}
+                                            >
+                                                <option value="">---Select ---</option>
+                                                {
+                                                    filteredDepartments.map(dept => (
+                                                        <option key={dept.id} value={dept.id}>{dept.name}</option>
+                                                    ))
+                                                }
                                             </select>
                                         </div>
                                     </div>

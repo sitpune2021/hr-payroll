@@ -4,7 +4,7 @@ import { where,Op } from 'sequelize';
 import * as XLSX from 'xlsx'
 import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js';
 
-const { Permission, Role, User, Company } = models;
+const { Permission, Role, User, Company,Department } = models;
 
 const addNewUser = async (req, res) => {
 
@@ -20,7 +20,10 @@ const addNewUser = async (req, res) => {
       maritalStatus,
       companyId,
       branchId,
+      departmentId
     } = req.body;
+    console.log(departmentId,"!!!!!!!!!!!!!!!!!!!!!!!");
+    
 
 
     const userExists = await User.findOne({
@@ -29,6 +32,14 @@ const addNewUser = async (req, res) => {
     });
     if (userExists) {
       return res.status(400).json({ message: "User already exists with this email." });
+    }
+
+    const deptExist = await Department.findOne({
+      where:
+        { id:departmentId}
+    });
+    if (!deptExist) {
+      return res.status(400).json({ message: "Department not found." });
     }
 
     const userExists2 = await User.findOne({
@@ -53,6 +64,7 @@ const addNewUser = async (req, res) => {
       maritalStatus,
       companyId,
       branchId: cleanBranchId,
+      departmentId
     });
     const savedUser = await newUser.save();
 
@@ -90,7 +102,7 @@ const getUsersList = async (req, res) => {
       offset,
       limit: parseInt(limit),
       order: [[sortField, sortOrder]],
-      attributes: ['id','contact', 'companyId','firstName', 'branchId', 'roleId', 'birthDate', 'maritalStatus', 'lastName', 'email', 'createdAt'],
+      attributes: ['id','contact', 'companyId','firstName', 'branchId', 'roleId', 'birthDate', 'maritalStatus','departmentId', 'lastName', 'email', 'createdAt'],
     });
 
     return res.status(200).json({
@@ -108,7 +120,9 @@ const getUsersList = async (req, res) => {
 const updateUserCOntrller = async (req, res) => {
   try {
     const id = req.params.userId;
-    const { firstName, lastName, email, contact, birthDate, maritalStatus, companyId, branchId, roleId } = req.body;
+    const { firstName, lastName, email, contact, birthDate, maritalStatus, companyId, branchId, roleId,departmentId } = req.body;
+    console.log(departmentId,"AAAAAAAAAAAAAAAAAAAAA");
+    
     const user = await User.findOne({
       where: {
         id
@@ -128,6 +142,7 @@ const updateUserCOntrller = async (req, res) => {
     user.companyId = cleanCompanyId;
     user.branchId = cleanBranchId;
     user.roleId = roleId;
+    user.departmentId = departmentId;
     await user.save();
     return res.status(200).json({ message: "User updated successfully" });
 

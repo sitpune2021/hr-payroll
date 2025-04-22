@@ -61,7 +61,8 @@ const loginController = async (req, res) => {
         contact: user.contact,
         role: userRole.name,
         companyId: user.companyId,
-        branchId:user.branchId
+        branchId:user.branchId,
+        departmentId:user.departmentId
       },
     });
   } catch (error) {
@@ -121,7 +122,10 @@ const getUserDataController = async (req, res) => {
         email: user.email,
         contact: user.contact,
         role: req.user.role,
-        companyId: user.companyId
+        companyId: user.companyId,
+        roleId:user.roleId,
+        departmentId:user.departmentId,
+        branchId:user.branchId
       }
     );
 

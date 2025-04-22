@@ -10,7 +10,8 @@ import roleRouter from './routes/role.route.js';
 import featureRouter from './routes/feature.route.js';
 import settingRoutes from './routes/settings.router.js';
 import userRouter from './routes/user.routes.js';
-import imageRouter from './routes/images.routes.js'; 
+import imageRouter from './routes/images.routes.js';
+import depaermentRouter from './routes/department.routes.js' 
 
 dotenv.config();
 
@@ -32,6 +33,8 @@ app.use('/api/role', roleRouter);
 app.use('/api/feature',featureRouter)
 app.use('/api/user',userRouter)
 app.use('/api/image',imageRouter)
+app.use('/api/department',depaermentRouter)
+
 
 
 

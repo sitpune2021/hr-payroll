@@ -395,7 +395,7 @@ export const all_routes = {
   knowledgebase: "/knowledgebase",
   activity: "/activity",
   users: "/users",
-  rolePermission: "/roles-permissions",
+  rolePermission: "/roles",
   permissionpage: "/permission",
   assetCategories: "/asset-categories",
   assetList: "/assets",

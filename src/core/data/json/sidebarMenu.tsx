@@ -35,29 +35,28 @@ export const SidebarDataTest = [
         base: 'ranches',
       },
       {
-        label: 'User Management',
-        base: 'user-management',
-        submenu: true,
-        showSubRoute: false,
+        label: 'Users',
         icon: 'user-star',
-        submenuItems: [
-          {
-            label: 'Users',
-            link: routes.users,
-            base: 'users',
-          },
-          {
-            label: 'Roles & Permissions',
-            link: routes.rolePermission,
-            base: 'roles-permissions',
-          },
-        ],
+        link: routes.users,
+        base: 'users',
       },
       {
         label: 'Features',
         icon: 'layout-grid-add',
         link: routes.adminFeatures,
         base: 'ranches',
+      },
+      {
+        label: 'Roles',
+        icon: 'layout-grid-add',
+        link: routes.rolePermission,
+        base: 'roles-permissions',
+      },
+      {
+        label: 'Permission',
+        icon: 'layout-grid-add',
+        link: routes.permissionpage,
+        base: 'roles-permissions',
       },
       {
         label: 'Departments',
