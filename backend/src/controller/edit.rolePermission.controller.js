@@ -41,7 +41,21 @@ const updatePermissionsForRole = async (req, res) => {
   }
 };
 
+const fetchRolesPermissionsLinking = async (req, res) => {
+  try {
+    const rolesPermissions = await RolePermission.findAll({
+      attributes: ['roleId', 'permissionId'], 
+      raw: true 
+    });
+
+      return res.status(200).json(rolesPermissions);
+  } catch (error) {
+      return res.status(500).json({ message: error.message });
+  }
+};
 
 
 
-export { updatePermissionsForRole }
+
+
+export { updatePermissionsForRole,fetchRolesPermissionsLinking }

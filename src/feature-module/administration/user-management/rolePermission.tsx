@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { status } from '../../../core/common/selectoption/selectoption'
 import CommonSelect from '../../../core/common/commonSelect'
 import { all_routes } from '../../router/all_routes'
@@ -7,8 +7,13 @@ import PredefinedDateRanges from '../../../core/common/datePicker'
 import Table from "../../../core/common/dataTable/index";
 import { rolesDetails } from '../../../core/data/json/rolesDetails'
 import CollapseHeader from '../../../core/common/collapse-header/collapse-header'
+import { Role } from '../../../core/data/redux/rolesSlice'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../../core/data/redux/store'
 
 const RolesPermission = () => {
+
+const roles= useSelector((state: RootState)=>state.roles.list)
 
     const data = rolesDetails;
     const columns = [
@@ -133,7 +138,7 @@ const RolesPermission = () => {
                                 </Link>
                             </div>
                             <div className="head-icons ms-2">
-                            <CollapseHeader />
+                                <CollapseHeader />
                             </div>
                         </div>
                     </div>
@@ -232,7 +237,26 @@ const RolesPermission = () => {
                             </div>
                         </div>
                         <div className="card-body p-0">
-                            <Table dataSource={data} columns={columns} Selection={true} />
+                            <div className="table-responsive p-2" style={{ height: '300px' }}>
+                                <table className="table datanew table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th className='py-3'>Id</th>
+                                            <th className='py-3'>Role</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            roles.map(role=>(
+                                                <tr key={role.id}>
+                                                    <td>{role.id}</td>
+                                                    <td>{role.name}</td>
+                                                </tr>
+                                            ))
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

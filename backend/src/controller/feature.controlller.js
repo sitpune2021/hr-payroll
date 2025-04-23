@@ -64,6 +64,30 @@ const getFeaturesByRole = async (req, res) => {
     }
 };
 
+const editFeatureCOntroller = async (req,res) => {
+    try {
+        const id=req.params.featureId;
+        const {name, description} = req.body;
+        console.log(id);
+
+        const feature= await Permission.findOne({
+            where: { id }
+        })
+
+        if(!feature){
+            return res.status(400).json({message:"Feature not found"})
+        }
+
+        feature.description=description;
+         await feature.save(); 
+         return res.status(200).json(feature);
+        
+    } catch (error) {
+        return res.status(500).json({message:error.message})
+    }
+
+}
 
 
-export { addNewFeature, getAllFeatures,getFeaturesByRole };
+
+export { addNewFeature, getAllFeatures,getFeaturesByRole, editFeatureCOntroller };
