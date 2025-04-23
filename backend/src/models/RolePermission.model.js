@@ -20,5 +20,17 @@ export default (sequelize) => {
         timestamps: true
     });
 
+    RolePermission.associate = (models) => {
+        RolePermission.belongsTo(models.Role, {
+            foreignKey: 'roleId',
+            as: 'role'
+        });
+
+        RolePermission.belongsTo(models.Permission, {
+            foreignKey: 'permissionId',
+            as: 'permission'
+        });
+    };
+
     return RolePermission;
 };

@@ -7,31 +7,59 @@ import CommonSelect from '../../core/common/commonSelect'
 import ImageWithBasePath from '../../core/common/imageWithBasePath'
 import { toast } from '../../utils/toastUtil'
 import axiosClient from '../../axiosConfig/axiosClient'
-import { ADD_NEW_FEATURE } from '../../axiosConfig/apis'
+import { ADD_NEW_FEATURE, EDIT_FEATURE } from '../../axiosConfig/apis'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../core/data/redux/store'
 import { f } from 'react-router/dist/development/fog-of-war-Cm1iXIp7'
+import { Feature } from '../../core/data/redux/featureSlice'
 
 function Features() {
 
-        const features = useSelector((state: RootState) => state.feature.allFeatures);
+    const [editFeatureData, setEditFeatureData] = useState<Feature>({
+        id: 0,
+        name: '',
+        description: ''
+      });
+
+      const handleEditFeatureSubmit = async (e:any) => {
+        e.preventDefault();
+        const {name,description}= editFeatureData;
+
+        try {
+            const response= await axiosClient.put(`${EDIT_FEATURE}${editFeatureData.id}`,{
+                name,
+                description
+            });
+            if(response.status===200){
+                toast('Info',"Feature updated Successfully", 'success')
+            }
+        } catch (error) {
+            toast('Error', 'Failed to update feature', 'danger')
+            console.log(error);
+            
+        }
+        
+      }
+      
+
+    const features = useSelector((state: RootState) => state.feature.allFeatures);
 
 
-    const [addFeatureData,setAddFeatureData] = useState(
+    const [addFeatureData, setAddFeatureData] = useState(
         {
-            name:"",
-            description:""
+            name: "",
+            description: ""
         }
     )
-    const handleAddFeatureSubmit=async (e:any) =>{
+    const handleAddFeatureSubmit = async (e: any) => {
         e.preventDefault();
-        if(!addFeatureData.name.trim() && !addFeatureData.description.trim()){
-            toast('Info','Enter all fields','danger')
+        if (!addFeatureData.name.trim() && !addFeatureData.description.trim()) {
+            toast('Info', 'Enter all fields', 'danger')
         }
 
-        const response= await axiosClient.post(ADD_NEW_FEATURE,addFeatureData);
-        if(response.status===201){
-            toast('Success', `${response.data.message} | Feature added Successfully`,'success')
+        const response = await axiosClient.post(ADD_NEW_FEATURE, addFeatureData);
+        if (response.status === 201) {
+            toast('Success', `${response.data.message} | Feature added Successfully`, 'success')
         }
 
 
@@ -96,7 +124,7 @@ function Features() {
                                 <Link
                                     to="#"
                                     data-bs-toggle="modal"
-                                    data-bs-target="#add_company"
+                                    data-bs-target="#add_feature"
                                     className="btn btn-primary d-flex align-items-center"
                                 >
                                     <i className="ti ti-circle-plus me-2" />
@@ -238,22 +266,40 @@ function Features() {
                             </div>
                         </div>
                         <div className="card-body p-2">
-                            <div className="table-responsive p-2" style={{height:'300px'}}>
+                            <div className="table-responsive p-2" style={{ height: '300px' }}>
                                 <table className="table datanew table-bordered">
                                     <thead>
                                         <tr>
                                             <th className='py-3'>Id</th>
                                             <th className='py-3'>Feature Name</th>
                                             <th className='py-3'>Description</th>
+                                            <th className='py-3'>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {
-                                            features.map(feature=>(
+                                            features.map(feature => (
                                                 <tr key={feature.id}>
                                                     <td>{feature.id}</td>
                                                     <td>{feature.name}</td>
                                                     <td>{feature.description}</td>
+                                                    <td>
+                                                        <div className="action-icon d-inline-flex">
+                                                            <Link
+                                                                to="#"
+                                                                className="me-2"
+                                                                data-bs-toggle="modal"
+                                                                onClick={()=>setEditFeatureData(feature)}
+                                                                data-inert={true}
+                                                                data-bs-target="#edit_feature"
+                                                            >
+                                                                <i className="ti ti-edit" />
+                                                            </Link>
+                                                            <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
+                                                                <i className="ti ti-trash" />
+                                                            </Link>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             ))
                                         }
@@ -276,8 +322,8 @@ function Features() {
             </div>
             {/* /Page Wrapper */}
             {/* Add Feature */}
-            <form onSubmit={(e)=>handleAddFeatureSubmit(e)}>
-                <div className="modal fade" id="add_company">
+            <form onSubmit={(e) => handleAddFeatureSubmit(e)}>
+                <div className="modal fade" id="add_feature">
                     <div className="modal-dialog modal-dialog-centered modal-md">
                         <div className="modal-content">
                             <div className="modal-header">
@@ -339,13 +385,13 @@ function Features() {
                     </div>
                 </div>
             </form>
-            {/* /Add Company */}
-            {/* Edit Company */}
-            <div className="modal fade" id="edit_company">
-                <div className="modal-dialog modal-dialog-centered modal-lg">
+            {/* /Add Feature */}
+            {/* Edit Feature */}
+            <div className="modal fade" id="edit_feature">
+                <div className="modal-dialog modal-dialog-centered modal-md">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h4 className="modal-title">Edit Company</h4>
+                            <h4 className="modal-title">Edit Feature</h4>
                             <button
                                 type="button"
                                 className="btn-close custom-btn-close"
@@ -355,58 +401,37 @@ function Features() {
                                 <i className="ti ti-x" />
                             </button>
                         </div>
-                        <form>
+                        <form onSubmit={(e)=>handleEditFeatureSubmit(e)}>
                             <div className="modal-body pb-0">
                                 <div className="row">
-                                    <div className="col-md-6">
+                                    <div className="col-md-12">
                                         <div className="mb-3">
                                             <label className="form-label">
                                                 Name <span className="text-danger"> *</span>
                                             </label>
                                             <input
                                                 type="text"
+                                                value={editFeatureData?.name}
+                                                readOnly
                                                 name='name'
                                                 className="form-control"
-                                                defaultValue="Stellar Dynamics"
                                             />
                                         </div>
                                     </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Email Address</label>
-                                            <input
-                                                type="email"
-                                                name='email'
-                                                className="form-control"
-                                                defaultValue="sophie@example.com"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
+                                    <div className="col-md-12">
                                         <div className="mb-3">
                                             <label className="form-label">
-                                                Phone Number <span className="text-danger"> *</span>
+                                                Descrption
                                             </label>
                                             <input
                                                 type="text"
-                                                name='phone'
+                                                value={editFeatureData?.description}
+                                                onChange={(e)=>setEditFeatureData({...editFeatureData,description:e.target.value})}
+                                                name='description'
                                                 className="form-control"
-                                                defaultValue="+1 895455450"
                                             />
                                         </div>
                                     </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Address</label>
-                                            <input
-                                                type="text"
-                                                name='address'
-                                                className="form-control"
-                                                defaultValue="Admin Website"
-                                            />
-                                        </div>
-                                    </div>
-
                                 </div>
                             </div>
                             <div className="modal-footer">
@@ -425,89 +450,7 @@ function Features() {
                     </div>
                 </div>
             </div>
-            {/* /Edit Company */}
-            {/* branch Detail */}
-            <div className="modal fade" id="company_detail">
-                <div className="modal-dialog modal-dialog-centered modal-lg">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h4 className="modal-title">Branch Detail</h4>
-                            <button
-                                type="button"
-                                className="btn-close custom-btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"
-                            >
-                                <i className="ti ti-x" />
-                            </button>
-                        </div>
-                        <div className="moday-body">
-                            <div className="p-3">
-                                <div className="d-flex justify-content-between align-items-center rounded bg-light p-3">
-                                    <div className="file-name-icon d-flex align-items-center">
-                                        <Link
-                                            to="#"
-                                            className="avatar avatar-md border rounded-circle flex-shrink-0 me-2"
-                                        >
-                                            <ImageWithBasePath
-                                                src="assets/img/company/company-01.svg"
-                                                className="img-fluid"
-                                                alt="img"
-                                            />
-                                        </Link>
-                                        <div>
-                                            <p className="text-gray-9 fw-medium mb-0">
-                                                enter name
-                                            </p>
-                                            <p>enter email</p>
-                                        </div>
-                                    </div>
-                                    <span className="badge badge-success">
-                                        <i className="ti ti-point-filled" />
-                                        Active
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="p-3">
-                                <p className="text-gray-9 fw-medium">Basic Info</p>
-                                <div className="pb-1 border-bottom mb-4">
-                                    <div className="row align-items-center">
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Phone Number</p>
-                                                <p className="text-gray-9">enter phone</p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Created Date</p>
-                                                <p className="text-gray-9">enter date</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="row align-items-center">
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Address</p>
-                                                <p className="text-gray-9">enter address</p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Company Name</p>
-                                                <p className="text-gray-9">
-                                                    Enter company name
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {/* /branch Detail */}
+            {/* /Edit Feature */}
         </>
     )
 }

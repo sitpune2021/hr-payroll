@@ -15,10 +15,12 @@ const seedPermissions = async (models) => {
       { name: 'EditBranch', description: 'Permission to edit branch details' },
       { name: 'Features', description: 'Permission to access features details' },
       { name: 'AddFeature', description: 'Permission to add new Feature' },
+      { name: 'editFeature', description: 'Permission to edit existing feature' },
       { name: 'Departments', description: 'Permission to access departments' },
       { name: 'AddDepartments', description: 'Permission to add new Departments' },
       { name: 'Roles', description: 'Permission to access Roles' },
       { name: 'Permission', description: 'Permission to edit System Permissions' },
+      { name: 'fetchRolesPermissions', description: 'Permission to access Role wise permissions' },
 
 
     ];
