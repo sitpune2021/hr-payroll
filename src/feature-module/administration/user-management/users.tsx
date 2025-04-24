@@ -22,6 +22,9 @@ const Users = () => {
 
     const dispatch = useAppDispatch();
 
+     const userAllowedLabels = useSelector((state: RootState) => state.feature.allowedFeatures);
+      const filteredLabels = userAllowedLabels.map((feature: any) => feature.name);
+
     const [viewUserDetails, setViewUserDetails] = useState<User>();
     const [editUserData, setEditUserData] = useState<Partial<User>>();
     const [filteredDepartments, setFilteredDepartments] = useState<Department[]>([]);
@@ -329,12 +332,13 @@ const Users = () => {
                     roleId,
                     maritalStatus,
                     companyId,
-                    branchId
+                    branchId,
+                    departmentId
                 } = row;
 
                 let error = '';
 
-                if (!firstName || !lastName || !email || !password || !confirmPassword) {
+                if (!firstName || !lastName || !email || !password || !confirmPassword || !departmentId) {
                     error = 'Required fields missing.';
                 } else if (password !== confirmPassword) {
                     error = 'Passwords do not match.';
@@ -356,6 +360,11 @@ const Users = () => {
                     error = `You cannot assign another branch.`;
                 }
 
+                if (!error && loggedInUser?.departmentId && parseInt(departmentId) <= loggedInUser.departmentId) {
+                    error = `You cannot assign add user with higher Authority.`;
+                }
+
+
                 if (error) {
                     errorRows.push({
                         Row: index + 2,
@@ -367,6 +376,7 @@ const Users = () => {
                         roleId,
                         companyId,
                         branchId,
+                        departmentId,
                         Error: error,
                     });
                 } else {
@@ -381,6 +391,7 @@ const Users = () => {
                         maritalStatus,
                         companyId,
                         branchId: branchId || null,
+                        departmentId
                     });
                 }
             });
@@ -515,8 +526,9 @@ const Users = () => {
                                         onChange={handleExcelUpload}
                                     />
                                 </label>
-
-                                <Link
+                                {
+                                    filteredLabels.includes('AddUser') && 
+                                    <Link
                                     to="#"
                                     data-bs-toggle="modal"
                                     data-inert={true}
@@ -526,6 +538,8 @@ const Users = () => {
                                     <i className="ti ti-circle-plus me-2" />
                                     Add New User
                                 </Link>
+                                }
+                               
                             </div>
 
 

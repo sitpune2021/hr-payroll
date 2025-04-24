@@ -21,7 +21,7 @@ const validateUsersFromExcel = async (buffer, loggedInUser) => {
       const row = data[i];
       const rowErrors = [];
   
-      const requiredFields = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'roleId', 'companyId'];
+      const requiredFields = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'roleId', 'companyId','departmentId'];
       requiredFields.forEach(field => {
         if (!row[field]) rowErrors.push(`${field} is required`);
       });
@@ -70,6 +70,7 @@ const validateUsersFromExcel = async (buffer, loggedInUser) => {
           maritalStatus: row.maritalStatus,
           companyId: row.companyId,
           branchId: row.branchId || null,
+          departmentId:row.departmentId
         });
       }
     }
