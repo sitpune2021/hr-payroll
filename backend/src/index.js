@@ -12,6 +12,7 @@ import settingRoutes from './routes/settings.router.js';
 import userRouter from './routes/user.routes.js';
 import imageRouter from './routes/images.routes.js';
 import depaermentRouter from './routes/department.routes.js' 
+import { PORT } from './envvariablesdata.js';
 
 dotenv.config();
 
@@ -39,7 +40,7 @@ app.use('/api/department',depaermentRouter)
 
 
 
-const PORT = process.env.PORT || 3000;
+
 
 async function start() {
   try {

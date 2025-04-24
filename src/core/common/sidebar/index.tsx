@@ -233,7 +233,7 @@ const Sidebar = () => {
           <div className="sidebar-inner slimscroll">
             <div id="sidebar-menu" className="sidebar-menu">
               <ul>
-                {SidebarDataTest?.map((mainLabel, index) => (
+                {filteredSidebar?.map((mainLabel, index) => (
                   <React.Fragment key={`main-${index}`}>
                     <li className="menu-title">
                       <span>{mainLabel?.tittle}</span>
