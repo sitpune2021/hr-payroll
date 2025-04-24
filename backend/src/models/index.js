@@ -12,16 +12,30 @@ import seedRoles from '../config/roleSeeder.js';
 import seedRolePermissions from '../config/rolePermissionSeeder.js';
 import departmentModel from './department.model.js';
 import seedPermissions from '../config/permissionSeeder.js';
+import { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER } from '../envvariablesdata.js';
 
-dotenv.config();
+// dotenv.config();
+
+// const sequelize = new Sequelize(
+//   process.env.DB_NAME,
+//   process.env.DB_USER,
+//   process.env.DB_PASSWORD,
+//   {
+//     host: process.env.DB_HOST,
+//     port: process.env.DB_PORT || 5432,
+//     dialect: 'postgres',
+//     logging: false,
+//   }
+// );
+
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
+  DB_NAME,
+  DB_USER,
+  DB_PASSWORD,
   {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 5432,
+    host: DB_HOST,
+    port: DB_PORT || 5432,
     dialect: 'postgres',
     logging: false,
   }
@@ -32,8 +46,8 @@ const models = {
   Company: CompanyModel(sequelize),
   Branch: BranchModel(sequelize),
   Role: RoleModel(sequelize),
-  Permission:PermissionModel(sequelize),
-  RolePermission:RolePermissionModel(sequelize),
+  Permission: PermissionModel(sequelize),
+  RolePermission: RolePermissionModel(sequelize),
   Department: departmentModel(sequelize),
 };
 
@@ -44,11 +58,11 @@ const models = {
 await sequelize.authenticate();
 console.log('Database connected successfully.');
 
-// await sequelize.sync();
+await sequelize.sync({alter:true});
 // console.log('Database synchronized successfully.');
 
 await seedRoles(models.Role);
-await initSuperAdmin(models); 
+await initSuperAdmin(models);
 await seedPermissions(models)
 // await seedRolePermissions(models);
 
