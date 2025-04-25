@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import models from '../models/index.js';
+import { JWT_SECRET } from '../envvariablesdata.js';
 
 export const verifyToken = async (req, res, next) => {
   const token = req.cookies.token; 
@@ -9,7 +10,7 @@ export const verifyToken = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     
     const user = await models.User.findByPk(decoded.id, {

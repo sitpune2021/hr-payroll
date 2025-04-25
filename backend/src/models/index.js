@@ -35,7 +35,7 @@ const sequelize = new Sequelize(
   DB_PASSWORD,
   {
     host: DB_HOST,
-    port: DB_PORT || 5432,
+    port: 5432,
     dialect: 'postgres',
     logging: false,
   }
