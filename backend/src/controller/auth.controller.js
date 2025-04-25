@@ -45,9 +45,11 @@ const loginController = async (req, res) => {
       { expiresIn: '8h' }
     );
 
+    // secure: NODE_ENV === 'production',
+
     res.cookie('token', token, {
       httpOnly: true,
-      secure: NODE_ENV === 'production',
+      secure:false,
       sameSite: 'None',
       maxAge: 10 * 60 * 60 * 1000,
     });
