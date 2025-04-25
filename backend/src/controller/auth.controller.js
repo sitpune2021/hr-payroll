@@ -2,6 +2,7 @@ import { models } from '../models/index.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
+import { JWT_SECRET, NODE_ENV } from '../envvariablesdata.js';
 
 const { User, Role } = models;
 
@@ -40,15 +41,15 @@ const loginController = async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, email: user.email, role: userRole.name },
-      process.env.JWT_SECRET,
+      JWT_SECRET,
       { expiresIn: '8h' }
     );
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 5 * 60 * 60 * 1000,
+      maxAge: 10 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
