@@ -1,32 +1,42 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import moment from 'moment';
 import { all_routes } from '../../router/all_routes'
 import PredefinedDateRanges from '../../../core/common/datePicker'
-import { companies_details } from '../../../core/data/json/companiesdetails'
 import ImageWithBasePath from '../../../core/common/imageWithBasePath';
-import Table from "../../../core/common/dataTable/index";
-import CommonSelect from '../../../core/common/commonSelect'
-import { DatePicker } from 'antd'
 import ReactApexChart from 'react-apexcharts'
 import CollapseHeader from '../../../core/common/collapse-header/collapse-header'
 import axiosClient, { baseURL } from '../../../axiosConfig/axiosClient'
 import { ADD_NEW_COMPANY, EDIT_COMPANY } from '../../../axiosConfig/apis'
 import { toast } from '../../../utils/toastUtil'
-import { AxiosError } from 'axios'
 import { useAppDispatch, useAppSelector } from '../../../core/data/redux/hooks'
 import { CompanyTableItem, mapCompanyDataToTable } from '../../../utils/CompanyTableDataMapper'
 import { Company, fetchCompanies } from '../../../core/data/redux/companySlice'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../../core/data/redux/store'
-type PasswordField = "password" | "confirmPassword";
 
 const Companies = () => {
-  // const data = companies_details;
   const dispatch = useAppDispatch();
+  
+  const [sortOption, setSortOption] = useState('Last 7 Days');
+  const [statusFilter, setStatusFilter] = useState('All');
+
+
+  const [dateRange, setDateRange] = useState({
+    start: moment().subtract(6, 'days'),
+    end: moment(),
+  });
+  
+
+    const handleDateRangeChange = (start: moment.Moment, end: moment.Moment) => {
+      setDateRange({ start, end });
+    };
+    
 
 
   const userAllowedLabels = useSelector((state: RootState) => state.feature.allowedFeatures);
   const filteredLabels = userAllowedLabels.map((feature: any) => feature.name);
+  const { start, end } = useSelector((state: any) => state.dateRange);
 
   const companyList = useAppSelector((state) => state.companies.list);
   const [tableData, setTableData] = useState<CompanyTableItem[]>([]);
@@ -34,10 +44,51 @@ const Companies = () => {
   const [editCompanyData, setEditCompanyData] = useState<Company>()
   const [selectedImageEdit, setSelectedImageEdit] = useState<File | null>(null);
 
+
+  const getSortedFilteredData = () => {
+    let data = [...companyList];
+
+    if (start && end) {
+      data = data.filter(company =>
+        moment(company.createdAt).isBetween(start, end, 'day', '[]')
+      );
+    }
+
+    if (statusFilter === 'Active') {
+      data = data.filter(company => company.isActive === true);
+    } else if (statusFilter === 'Inactive') {
+      data = data.filter(company => company.isActive === false);
+    }
+
+    if (sortOption === 'Recently Added') {
+      data.sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
+    } else if (sortOption === 'Ascending') {
+      data.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortOption === 'Descending') {
+      data.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (sortOption === 'Last Month') {
+      const startOfLastMonth = moment().subtract(1, 'month').startOf('month');
+      const endOfLastMonth = moment().subtract(1, 'month').endOf('month');
+      data = data.filter((company) =>
+        moment(company.createdAt).isBetween(startOfLastMonth, endOfLastMonth, 'day', '[]')
+      );
+    } else if (sortOption === 'Last 7 Days') {
+      const last7Days = moment().subtract(6, 'days');
+      data = data.filter((company) =>
+        moment(company.createdAt).isSameOrAfter(last7Days, 'day')
+      );
+    }
+
+    return data;
+  };
+
+  const handleSortChange = (option: string) => {
+    setSortOption(option);
+  };
+
   const handleSetEditCompany = async (keyId: any) => {
     const companyEdit = companyList.find((company) => company.id === parseInt(keyId));
     setEditCompanyData(companyEdit);
-    console.log(companyEdit, ":::::::::::::::::::;;");
 
   }
 
@@ -99,8 +150,8 @@ const Companies = () => {
 
 
   useEffect(() => {
-    setTableData(mapCompanyDataToTable(companyList))
-  }, [companyList])
+    setTableData(mapCompanyDataToTable(getSortedFilteredData()))
+  }, [companyList,sortOption,start,end,statusFilter])
 
 
 
@@ -179,6 +230,14 @@ const Companies = () => {
       if (response.status === 201) {
         dispatch(fetchCompanies());
         toast('Info', response.data.message, 'success');
+        setAddCompanyFormData({
+          companyName: "",
+          companyEmail: "",
+          companyPhone: "",
+          companyWebsite: "",
+          companyAddress: "",
+        })
+        setAddCompanyImage(null)
       }
 
     } catch (error: any) {
@@ -186,34 +245,6 @@ const Companies = () => {
     }
   };
 
-
-
-  const planName = [
-    { value: "Advanced", label: "Advanced" },
-    { value: "Basic", label: "Basic" },
-    { value: "Enterprise", label: "Enterprise" },
-  ];
-  const planType = [
-    { value: "Monthly", label: "Monthly" },
-    { value: "Yearly", label: "Yearly" },
-  ];
-  const currency = [
-    { value: "USD", label: "USD" },
-    { value: "Euro", label: "Euro" },
-  ];
-  const language = [
-    { value: "English", label: "English" },
-    { value: "Arabic", label: "Arabic" },
-  ];
-  const statusChoose = [
-    { value: "Active", label: "Active" },
-    { value: "Inactive", label: "Inactive" },
-  ];
-
-  const getModalContainer = () => {
-    const modalElement = document.getElementById('modal-datepicker');
-    return modalElement ? modalElement : document.body; // Fallback to document.body if modalElement is null
-  };
 
   const [totalChart] = React.useState<any>({
     series: [{
@@ -741,48 +772,23 @@ const Companies = () => {
                     className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
                     data-bs-toggle="dropdown"
                   >
-                    Select Plan
-                  </Link>
-                  <ul className="dropdown-menu  dropdown-menu-end p-3">
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Advanced
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Basic
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Enterprise
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="dropdown me-3">
-                  <Link
-                    to="#"
-                    className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                    data-bs-toggle="dropdown"
-                  >
                     Select Status
                   </Link>
                   <ul className="dropdown-menu  dropdown-menu-end p-3">
+                  <li>
+                      <Link
+                        to="#"
+                        className="dropdown-item rounded-1"
+                        onClick={()=>setStatusFilter('All')}
+                      >
+                        All
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         to="#"
                         className="dropdown-item rounded-1"
+                        onClick={()=>setStatusFilter('Active')}
                       >
                         Active
                       </Link>
@@ -791,6 +797,7 @@ const Companies = () => {
                       <Link
                         to="#"
                         className="dropdown-item rounded-1"
+                        onClick={()=>setStatusFilter('Inactive')}
                       >
                         Inactive
                       </Link>
@@ -803,51 +810,23 @@ const Companies = () => {
                     className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
                     data-bs-toggle="dropdown"
                   >
-                    Sort By : Last 7 Days
+                    Sort By : {sortOption}
                   </Link>
-                  <ul className="dropdown-menu  dropdown-menu-end p-3">
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Recently Added
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Ascending
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Desending
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Last Month
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Last 7 Days
-                      </Link>
-                    </li>
+                  <ul className="dropdown-menu dropdown-menu-end p-3">
+                    {['Recently Added', 'Ascending', 'Descending', 'Last Month', 'Last 7 Days'].map((option) => (
+                      <li key={option}>
+                        <Link
+                          to="#"
+                          className="dropdown-item rounded-1"
+                          onClick={() => handleSortChange(option)}
+                        >
+                          {option}
+                        </Link>
+                      </li>
+                    ))}
                   </ul>
                 </div>
+
               </div>
             </div>
             <div className="card-body p-2">
@@ -1064,7 +1043,6 @@ const Companies = () => {
                   Add Company
                 </button>
               </div>
-
             </div>
           </div>
         </div>
@@ -1226,184 +1204,6 @@ const Companies = () => {
         </div>
       </div>
       {/* /Edit Company */}
-      {/* Upgrade Information */}
-      <div className="modal fade" id="upgrade_info">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">Upgrade Package</h4>
-              <button
-                type="button"
-                className="btn-close custom-btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
-                <i className="ti ti-x" />
-              </button>
-            </div>
-            <div className="p-3 mb-1">
-              <div className="rounded bg-light p-3">
-                <h5 className="mb-3">Current Plan Details</h5>
-                <div className="row align-items-center">
-                  <div className="col-md-4">
-                    <div className="mb-3">
-                      <p className="fs-12 mb-0">Company Name</p>
-                      <p className="text-gray-9">BrightWave Innovations</p>
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="mb-3">
-                      <p className="fs-12 mb-0">Plan Name</p>
-                      <p className="text-gray-9">Advanced</p>
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="mb-3">
-                      <p className="fs-12 mb-0">Plan Type</p>
-                      <p className="text-gray-9">Monthly</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="row align-items-center">
-                  <div className="col-md-4">
-                    <div className="mb-3">
-                      <p className="fs-12 mb-0">Price</p>
-                      <p className="text-gray-9">200</p>
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="mb-3">
-                      <p className="fs-12 mb-0">Register Date</p>
-                      <p className="text-gray-9">12 Sep 2024</p>
-                    </div>
-                  </div>
-                  <div className="col-md-4">
-                    <div className="mb-3">
-                      <p className="fs-12 mb-0">Expiring On</p>
-                      <p className="text-gray-9">11 Oct 2024</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <form action="companies.html">
-              <div className="modal-body pb-0">
-                <h5 className="mb-4">Change Plan</h5>
-                <div className="row">
-                  <div className="col-md-6">
-                    <div className="mb-3 ">
-                      <label className="form-label">
-                        Plan Name <span className="text-danger">*</span>
-                      </label>
-                      <CommonSelect
-                        className='select'
-                        options={planName}
-                        defaultValue={planName[0]}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3 ">
-                      <label className="form-label">
-                        Plan Type <span className="text-danger">*</span>
-                      </label>
-                      <CommonSelect
-                        className='select'
-                        options={planType}
-                        defaultValue={planType[0]}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Ammount<span className="text-danger">*</span>
-                      </label>
-                      <input type="text" className="form-control" />
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Payment Date <span className="text-danger">*</span>
-                      </label>
-                      <div className="input-icon-end position-relative">
-                        <DatePicker
-                          className="form-control datetimepicker"
-                          format={{
-                            format: "DD-MM-YYYY",
-                            type: "mask",
-                          }}
-                          getPopupContainer={getModalContainer}
-                          placeholder="DD-MM-YYYY"
-                        />
-                        <span className="input-icon-addon">
-                          <i className="ti ti-calendar text-gray-7" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Next Payment Date <span className="text-danger">*</span>
-                      </label>
-                      <div className="input-icon-end position-relative">
-                        <DatePicker
-                          className="form-control datetimepicker"
-                          format={{
-                            format: "DD-MM-YYYY",
-                            type: "mask",
-                          }}
-                          getPopupContainer={getModalContainer}
-                          placeholder="DD-MM-YYYY"
-                        />
-                        <span className="input-icon-addon">
-                          <i className="ti ti-calendar text-gray-7" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Expiring On <span className="text-danger">*</span>
-                      </label>
-                      <div className="input-icon-end position-relative">
-                        <DatePicker
-                          className="form-control datetimepicker"
-                          format={{
-                            format: "DD-MM-YYYY",
-                            type: "mask",
-                          }}
-                          getPopupContainer={getModalContainer}
-                          placeholder="DD-MM-YYYY"
-                        />
-                        <span className="input-icon-addon">
-                          <i className="ti ti-calendar text-gray-7" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-light me-2"
-                  data-bs-dismiss="modal"
-                >
-                  Cancel
-                </button>
-                <button type="button" data-bs-dismiss="modal" className="btn btn-primary">
-                  Save Changes
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      {/* /Upgrade Information */}
       {/* Company Detail */}
       <div className="modal fade" id="company_detail">
         <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -1483,43 +1283,6 @@ const Companies = () => {
                     </div>
                   </div>
                 </div>
-                {/* <p className="text-gray-9 fw-medium">Plan Details</p>
-                <div>
-                  <div className="row align-items-center">
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <p className="fs-12 mb-0">Plan Name</p>
-                        <p className="text-gray-9">Advanced</p>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <p className="fs-12 mb-0">Plan Type</p>
-                        <p className="text-gray-9">Monthly</p>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <p className="fs-12 mb-0">Price</p>
-                        <p className="text-gray-9">$200</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row align-items-center">
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <p className="fs-12 mb-0">Register Date</p>
-                        <p className="text-gray-9">12 Sep 2024</p>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <p className="fs-12 mb-0">Expiring On</p>
-                        <p className="text-gray-9">11 Oct 2024</p>
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>

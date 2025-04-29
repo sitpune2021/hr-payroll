@@ -1,26 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { DateRangePicker } from 'react-bootstrap-daterangepicker';
 import moment from 'moment';
 import 'bootstrap-daterangepicker/daterangepicker.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDateRange } from '../data/redux/dateRangeSlice';
 
 const PredefinedDateRanges: React.FC = () => {
-  const [state, setState] = useState({
-    start: moment().subtract(6, 'days'),
-    end: moment(),
-  });
+  const dispatch = useDispatch();
+  const { start, end } = useSelector((state: any) => state.dateRange); // Access the date range from the Redux state
 
-  const { start, end } = state;
-
-  const handleCallback = (start: moment.Moment, end: moment.Moment) => {
-    setState({ start, end });
+  const handleCallback = (newStart: moment.Moment, newEnd: moment.Moment) => {
+    dispatch(setDateRange({ start: newStart, end: newEnd })); // Dispatch the new date range to the Redux store
   };
 
-  // Format to "MM/DD/YYYY"
+  useEffect(() => {
+    // Ensure the initial date range is set
+    dispatch(setDateRange({ start, end }));
+  }, [start, end, dispatch]);
+
   const label = `${start.format('MM/DD/YYYY')} - ${end.format('MM/DD/YYYY')}`;
 
   return (
     <DateRangePicker
-  
       initialSettings={{
         startDate: start.toDate(),
         endDate: end.toDate(),
@@ -38,10 +39,7 @@ const PredefinedDateRanges: React.FC = () => {
       }}
       onCallback={handleCallback}
     >
-      <div
-        id="reportrange daterangepicker"
-        className='new-date'
-      >
+      <div className="new-date">
         <span>{label}</span>
       </div>
     </DateRangePicker>

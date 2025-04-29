@@ -13,17 +13,44 @@ const addnewcompany = async (req, res) => {
     companyEmail,
     companyWebsite
   } = req.body;
-
   const transaction = await sequelize.transaction();
+
+  const nameExists = await Company.findOne({ where: { name: companyName } });
+  if (nameExists) {
+    await transaction.rollback();
+    return res.status(400).json({ message: "Company with this name already exists." });
+  }
+
+  const emailExists = await Company.findOne({ where: { email: companyEmail } });
+  if (emailExists) {
+    await transaction.rollback();
+    return res.status(400).json({ message: "Company with this email already exists." });
+  }
+
+  const phoneExists = await Company.findOne({ where: { phone: companyPhone } });
+  if (phoneExists) {
+    await transaction.rollback();
+    return res.status(400).json({ message: "Company with this phone number already exists." });
+  }
+
+  if (companyWebsite) {
+    const websiteExists = await Company.findOne({ where: { website: companyWebsite } });
+    if (websiteExists) {
+      await transaction.rollback();
+      return res.status(400).json({ message: "Company with this website already exists." });
+    }
+  }
+
 
   try {
     // Upload and save company image if provided
     let imageFileName = null;
-    
+
     if (req.file) {
-      
+
       imageFileName = await saveImageFile(req.file);
     }
+
 
     // Create the company
     const company = await Company.create(
@@ -51,7 +78,7 @@ const addnewcompany = async (req, res) => {
   }
 };
 
-const fetchListOfCompanies =async(req,res)=>{
+const fetchListOfCompanies = async (req, res) => {
   try {
     const companies = await Company.findAll();
     res.status(200).json(companies);
@@ -62,7 +89,7 @@ const fetchListOfCompanies =async(req,res)=>{
 
 
 
- const updatecompany = async (req, res) => {
+const updatecompany = async (req, res) => {
   try {
     const { companyId } = req.params;
     const {
@@ -108,4 +135,4 @@ const fetchListOfCompanies =async(req,res)=>{
 };
 
 
-export { addnewcompany, updatecompany,fetchListOfCompanies }
+export { addnewcompany, updatecompany, fetchListOfCompanies }

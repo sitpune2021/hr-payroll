@@ -22,6 +22,7 @@ import branchesReducer from './branchesSlice';
 import usersReducer from './usersSlice';
 import departmentsReducer from './departmentsSlice';
 import rolePermissionReducer from './rolePermissionSlice';
+import dateRangeReducer from './dateRangeSlice';
 
 
 
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
   users: usersReducer,
   departments:departmentsReducer,
   rolePermission: rolePermissionReducer,
+  dateRange: dateRangeReducer,
 });
 
 // 👇 Persist config: Choose what to persist
