@@ -7,68 +7,92 @@ import PredefinedDateRanges from '../../../core/common/datePicker'
 import Table from "../../../core/common/dataTable/index";
 import { rolesDetails } from '../../../core/data/json/rolesDetails'
 import CollapseHeader from '../../../core/common/collapse-header/collapse-header'
-import { Role } from '../../../core/data/redux/rolesSlice'
-import { useSelector } from 'react-redux'
-import { RootState } from '../../../core/data/redux/store'
+import { fetchRoles, Role } from '../../../core/data/redux/rolesSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '../../../core/data/redux/store'
+import { toast } from '../../../utils/toastUtil'
+import axiosClient from '../../../axiosConfig/axiosClient'
+import { ADD_NEW_ROLES } from '../../../axiosConfig/apis'
 
 const RolesPermission = () => {
 
-const roles= useSelector((state: RootState)=>state.roles.list)
+    const dispatch = useDispatch<AppDispatch>();
 
-    const data = rolesDetails;
-    const columns = [
-        {
-            title: "Role",
-            dataIndex: "role",
-            sorter: (a: any, b: any) => a.role.length - b.role.length,
-        },
-        {
-            title: "Created Date",
-            dataIndex: "created_date",
-            sorter: (a: any, b: any) => a.created_date.length - b.created_date.length,
-        },
-        {
-            title: "Status",
-            dataIndex: "status",
-            render: (text: string, record: any) => (
-                <>
-                    <span
-                        className={`badge d-inline-flex align-items-center badge-xs ${text === 'Active'
-                            ? 'badge-success'
-                            : 'badge-danger'
-                            }`}
-                    >
-                        <i className="ti ti-point-filled me-1"></i>
-                        {text}
-                    </span>
-                </>
-            ),
-            sorter: (a: any, b: any) => a.status.length - b.status.length,
-        },
-        {
-            title: "",
-            dataIndex: "actions",
-            render: () => (
-                <div className="action-icon d-inline-flex">
-                    {/* <Link to={all_routes.permissionpage} className="me-2">
-                        <i className="ti ti-shield" />
-                    </Link> */}
-                    <Link
-                        to="#"
-                        className="me-2"
-                        data-bs-toggle="modal" data-inert={true}
-                        data-bs-target="#edit_role"
-                    >
-                        <i className="ti ti-edit" />
-                    </Link>
-                    <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
-                        <i className="ti ti-trash" />
-                    </Link>
-                </div>
 
-            ),
-        },
-    ]
+    const [name, setName] = useState('')
+    const roles = useSelector((state: RootState) => state.roles.list)
+
+    const handleAddRoleSubmit = async (e: any) => {
+        e.preventDefault();
+        if (!name) {
+            toast('Info', 'Name is required.', 'danger')
+            return;
+        }
+        try {
+            const response = await axiosClient.post(ADD_NEW_ROLES, { name })
+            if (response.status === 201) {
+                toast('Success', 'Role added Successfully', 'success')
+                await dispatch(fetchRoles());
+            }
+        } catch (error) {
+            toast('Info', "Error while adding Role", 'danger')
+        }
+    }
+
+    // const data = rolesDetails;
+    // const columns = [
+    //     {
+    //         title: "Role",
+    //         dataIndex: "role",
+    //         sorter: (a: any, b: any) => a.role.length - b.role.length,
+    //     },
+    //     {
+    //         title: "Created Date",
+    //         dataIndex: "created_date",
+    //         sorter: (a: any, b: any) => a.created_date.length - b.created_date.length,
+    //     },
+    //     {
+    //         title: "Status",
+    //         dataIndex: "status",
+    //         render: (text: string, record: any) => (
+    //             <>
+    //                 <span
+    //                     className={`badge d-inline-flex align-items-center badge-xs ${text === 'Active'
+    //                         ? 'badge-success'
+    //                         : 'badge-danger'
+    //                         }`}
+    //                 >
+    //                     <i className="ti ti-point-filled me-1"></i>
+    //                     {text}
+    //                 </span>
+    //             </>
+    //         ),
+    //         sorter: (a: any, b: any) => a.status.length - b.status.length,
+    //     },
+    //     {
+    //         title: "",
+    //         dataIndex: "actions",
+    //         render: () => (
+    //             <div className="action-icon d-inline-flex">
+    //                 {/* <Link to={all_routes.permissionpage} className="me-2">
+    //                     <i className="ti ti-shield" />
+    //                 </Link> */}
+    //                 <Link
+    //                     to="#"
+    //                     className="me-2"
+    //                     data-bs-toggle="modal" data-inert={true}
+    //                     data-bs-target="#edit_role"
+    //                 >
+    //                     <i className="ti ti-edit" />
+    //                 </Link>
+    //                 <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
+    //                     <i className="ti ti-trash" />
+    //                 </Link>
+    //             </div>
+
+    //         ),
+    //     },
+    // ]
 
     return (
         <>
@@ -247,7 +271,7 @@ const roles= useSelector((state: RootState)=>state.roles.list)
                                     </thead>
                                     <tbody>
                                         {
-                                            roles.map(role=>(
+                                            roles.map(role => (
                                                 <tr key={role.id}>
                                                     <td>{role.id}</td>
                                                     <td>{role.name}</td>
@@ -286,23 +310,17 @@ const roles= useSelector((state: RootState)=>state.roles.list)
                                 <i className="ti ti-x" />
                             </button>
                         </div>
-                        <form action="roles-permissions.html">
+                        <form onSubmit={(e) => handleAddRoleSubmit(e)}>
                             <div className="modal-body pb-0">
                                 <div className="row">
                                     <div className="col-md-12">
                                         <div className="mb-3">
                                             <label className="form-label">Role Name</label>
-                                            <input type="text" className="form-control" />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-12">
-                                        <div className="mb-3 ">
-                                            <label className="form-label">Status</label>
-                                            <CommonSelect
-                                                className='select'
-                                                options={status}
-                                                defaultValue={status[0]}
-                                            />
+                                            <input
+                                                type="text"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                className="form-control" />
                                         </div>
                                     </div>
                                 </div>
@@ -315,7 +333,7 @@ const roles= useSelector((state: RootState)=>state.roles.list)
                                 >
                                     Cancel
                                 </button>
-                                <button type="button" data-bs-dismiss="modal" className="btn btn-primary">
+                                <button type="submit" data-bs-dismiss="modal" className="btn btn-primary">
                                     Add Role
                                 </button>
                             </div>
