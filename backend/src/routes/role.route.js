@@ -6,7 +6,7 @@ import { checkPermission, verifyToken } from "../config/authMiddleware.js";
 const router= Router();
 
 
-router.route("/addrole").post([verifyToken, checkPermission('ADD_ROLE')], addNewRole);
+router.route("/addrole").post([verifyToken, checkPermission('AddRole')], addNewRole);
 router.route("/getlist").get([verifyToken], getRolesList);
 
 

@@ -5,6 +5,14 @@ export const DB_HOST="103.165.118.71"
 export const DB_PORT=5432
 export const DB_DIALECT="postgres"
 
+
+// export const DB_NAME="employeemangesystem"
+// export const DB_USER="postgres"
+// export const DB_PASSWORD="Omkar@123"
+// export const DB_HOST="localhost"
+// export const DB_PORT=5432
+// export const DB_DIALECT="postgres"
+
 //  Server Configuration
 export const PORT=8087
 

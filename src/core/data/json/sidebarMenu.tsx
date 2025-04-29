@@ -27,7 +27,7 @@ export const SidebarDataTest = [
         link: routes.superAdminCompanies,
         base: 'companies',
       },
-      
+
       {
         label: 'Branches',
         icon: 'layout-grid-add',
@@ -434,7 +434,11 @@ export const SidebarDataTest = [
             base2: 'project-list',
             base3: 'project-details',
           },
-          { label: 'Tasks', link: 'tasks', base: 'tasks' },
+          {
+            label: 'Tasks',
+            link: 'tasks',
+            base: 'tasks'
+          },
           {
             label: 'Task Board',
             link: routes.taskboard,
@@ -1657,7 +1661,11 @@ export const SidebarDataTest = [
             link: routes.breadcrums,
             base: 'ui-breadcrumb',
           },
-          { label: 'Cards', link: routes.cards, base: 'ui-cards' },
+          {
+            label: 'Cards',
+            link: routes.cards,
+            base: 'ui-cards'
+          },
           {
             label: 'Carousel',
             link: routes.carousel,
@@ -1715,7 +1723,11 @@ export const SidebarDataTest = [
             base: 'ui-rangeslider',
           },
 
-          { label: 'Toasts', link: routes.toasts, base: 'ui-toasts' },
+          {
+            label: 'Toasts',
+            link: routes.toasts,
+            base: 'ui-toasts'
+          },
           {
             label: 'Tooltip',
             link: routes.tooltip,
@@ -1726,9 +1738,21 @@ export const SidebarDataTest = [
             link: routes.typography,
             base: 'ui-typography',
           },
-          { label: 'Videos', link: routes.video, base: 'ui-video' },
-          { label: 'Sortable', link: routes.sortable, base: 'ui-sortable' },
-          { label: 'SwiperJs', link: routes.swiperjs, base: 'ui-swiperjs' },
+          {
+            label: 'Videos',
+            link: routes.video,
+            base: 'ui-video'
+          },
+          {
+            label: 'Sortable',
+            link: routes.sortable,
+            base: 'ui-sortable'
+          },
+          {
+            label: 'SwiperJs',
+            link: routes.swiperjs,
+            base: 'ui-swiperjs'
+          },
         ],
       },
       {
@@ -1739,7 +1763,11 @@ export const SidebarDataTest = [
         icon: 'hierarchy-3',
         materialicons: 'sync_alt',
         submenuItems: [
-          { label: 'Ribbon', link: routes.ribbon, base: 'ui-ribbon' },
+          {
+            label: 'Ribbon',
+            link: routes.ribbon,
+            base: 'ui-ribbon'
+          },
           {
             label: 'Clipboard',
             link: routes.clipboard,
@@ -1840,7 +1868,11 @@ export const SidebarDataTest = [
             link: routes.materialIcon,
             base: 'icon-material',
           },
-          { label: 'pe7 Icons', link: routes.pe7icon, base: 'icon-pe7' },
+          {
+            label: 'pe7 Icons',
+            link: routes.pe7icon,
+            base: 'icon-pe7'
+          },
           {
             label: 'Simpleline Icons',
             link: routes.simpleLineIcon,
@@ -1861,7 +1893,11 @@ export const SidebarDataTest = [
             link: routes.typicon,
             base: 'icon-typicon',
           },
-          { label: 'Flag Icons', link: routes.FlagIcons, base: 'icon-flag' },
+          {
+            label: 'Flag Icons',
+            link: routes.FlagIcons,
+            base: 'icon-flag'
+          },
         ],
       },
       {
