@@ -14,31 +14,31 @@ import { fetchRolePermissions } from '../../../core/data/redux/rolePermissionSli
 import axiosClient from '../../../axiosConfig/axiosClient'
 
 const PermissionPage = () => {
-    const dispatch= useDispatch<AppDispatch>();
+    const dispatch = useDispatch<AppDispatch>();
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(fetchRolePermissions());
-    },[dispatch])
+    }, [dispatch])
 
 
     const roles = useSelector((state: RootState) => state.roles.list)
     const features = useSelector((state: RootState) => state.feature.allFeatures)
-    const rolePermissions= useSelector((state:RootState)=>state.rolePermission.list)
+    const rolePermissions = useSelector((state: RootState) => state.rolePermission.list)
 
     const isChecked = (roleId: number, permissionId: number) => {
         return rolePermissions.some(
-          (rp) => rp.roleId === roleId && rp.permissionId === permissionId
+            (rp) => rp.roleId === roleId && rp.permissionId === permissionId
         );
-      };
+    };
 
-    const handlePermissionToggle =async (roleId:number,permissionId: number) =>{
-       const response = await axiosClient.post(`/api/settings/roles/${roleId}/permissions/${permissionId}/toggle`)
-       if (response.status===200) {
-           dispatch(fetchRolePermissions());
-       }
+    const handlePermissionToggle = async (roleId: number, permissionId: number) => {
+        const response = await axiosClient.post(`/api/settings/roles/${roleId}/permissions/${permissionId}/toggle`)
+        if (response.status === 200) {
+            dispatch(fetchRolePermissions());
+        }
     }
-      
-      
+
+
 
     const data = rolesDetails;
     const columns = [
@@ -126,19 +126,16 @@ const PermissionPage = () => {
                     <div className="card">
                         <div className="card-body p-0">
 
-                            <div className="table-responsive">
+                            <div className="table-responsive" style={{ maxHeight: "600px", overflowY: "auto" }}>
                                 <table className="table">
-                                    <thead className="thead-light">
+                                    <thead className="thead-light" style={{ position: "sticky", top: 0, zIndex: 1, backgroundColor: "#fff" }}>
                                         <tr>
                                             <th>Features\Roles</th>
-                                            {
-                                                roles.map(role => (
-                                                    <th key={role.id}>{role.name}</th>
-                                                ))
-                                            }
+                                            {roles.map(role => (
+                                                <th key={role.id}>{role.name}</th>
+                                            ))}
                                         </tr>
                                     </thead>
-
                                     <tbody>
                                         {features.map((feature) => (
                                             <tr key={feature.id}>
@@ -158,7 +155,6 @@ const PermissionPage = () => {
                                             </tr>
                                         ))}
                                     </tbody>
-
                                 </table>
                             </div>
                         </div>

@@ -333,18 +333,22 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Estimates',
     path: routes.estimate,
     element: <Extimates />,
   },
   {
+    label: 'Termination',
     path: routes.termination,
     element: <Termination />,
   },
   {
+    label: 'Resignation',
     path: routes.resignation,
     element: <Resignation />,
   },
   {
+    label: 'Promotion',
     path: routes.promotion,
     element: <Promotion />,
   },
@@ -364,62 +368,74 @@ export const publicRoutes = [
 
   //Application
   {
+    label: 'Chat',
     path: routes.chat,
     element: <Chat />,
     route: Route,
   },
   {
+    label: 'Calls',
     path: routes.voiceCall,
     element: <VoiceCall />,
     route: Route,
   },
 
   {
+    label: 'Video Call',
     path: routes.videoCall,
     element: <Videocallss />,
     route: Route,
   },
   {
+    label: 'Outgoing Call',
     path: routes.outgoingCall,
     element: <OutgoingCalls />,
     route: Route,
   },
   {
+    label: 'Incoming Call',
     path: routes.incomingCall,
     element: <IncomingCall />,
     route: Route,
   },
   {
+    label: 'Call History',
     path: routes.callHistory,
     element: <CallHistory />,
     route: Route,
   },
   {
+    label: 'Social Feed',
     path: routes.socialFeed,
     element: <SocialFeed />,
     route: Route,
   },
   {
+    label: 'Kanban',
     path: routes.kanbanView,
     element: <KanbanView />,
     route: Route,
   },
   {
+    label: 'Countries',
     path: routes.countries,
     element: <Countries />,
     route: Route,
   },
   {
+    label: 'Starter',
     path: routes.starter,
     element: <StarterPage />,
     route: Route,
   },
   {
+    label: 'Calendar',
     path: routes.calendar,
     element: <Calendars />,
     route: Route,
   },
   {
+    label: 'Dashboard',
     path: routes.superAdminDashboard,
     element: <SuperAdminDashboard />,
     route: Route,
@@ -438,10 +454,12 @@ export const publicRoutes = [
     element: <MembershipTransaction />,
   },
   {
+    label: 'Notes',
     path: routes.notes,
     element: <Notes />,
   },
   {
+    label: 'Countries',
     path: routes.countries,
     element: <Countries />,
     route: Route,
@@ -468,87 +486,104 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Cities',
     path: routes.cities,
     element: <Cities />,
     route: Route,
   },
 
   {
+    label: 'Accordions',
     path: routes.accordion,
     element: <Accordion />,
     route: Route,
   },
   {
+    label: 'Avatar',
     path: routes.avatar,
     element: <Avatar />,
     route: Route,
   },
   {
+    label: 'Badges',
     path: routes.badges,
     element: <Badges />,
     route: Route,
   },
   {
+    label: 'Borders',
     path: routes.border,
     element: <Borders />,
     route: Route,
   },
   {
+    label: 'Breadcrumb',
     path: routes.breadcrums,
     element: <Breadcrumb />,
     route: Route,
   },
   {
+    label: 'Buttons',
     path: routes.button,
     element: <Buttons />,
     route: Route,
   },
   {
+    label: 'Button Group',
     path: routes.buttonGroup,
     element: <ButtonsGroup />,
     route: Route,
   },
   {
+    label: 'Cards',
     path: routes.cards,
     element: <Cards />,
     route: Route,
   },
   {
+    label: 'Carousel',
     path: routes.carousel,
     element: <Carousel />,
     route: Route,
   },
   {
+    label: 'Colors',
     path: routes.colors,
     element: <Colors />,
     route: Route,
   },
   {
+    label: 'Dropdowns',
     path: routes.dropdowns,
     element: <Dropdowns />,
     route: Route,
   },
   {
+    label: 'Grid',
     path: routes.grid,
     element: <Grid />,
     route: Route,
   },
   {
+    label: 'Images',
     path: routes.images,
     element: <Images />,
     route: Route,
   },
   {
+    label: 'Lightbox',
     path: routes.lightbox,
     element: <Lightboxes />,
     route: Route,
   },
   {
+    label: 'Media',
     path: routes.media,
     element: <Media />,
     route: Route,
   },
   {
+    label: 'Modals',
     path: routes.modals,
     element: <Modals />,
     route: Route,
@@ -559,11 +594,13 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Offcanvas',
     path: routes.offcanvas,
     element: <Offcanvas />,
     route: Route,
   },
   {
+    label: 'Pagination',
     path: routes.pagination,
     element: <Pagination />,
     route: Route,
@@ -574,72 +611,85 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Range Slider',
     path: routes.rangeSlider,
     element: <RangeSlides />,
     route: Route,
   },
   {
+    label: 'Progress Bars',
     path: routes.progress,
     element: <Progress />,
     route: Route,
   },
   {
+    label: 'Spinner',
     path: routes.spinner,
     element: <Spinner />,
     route: Route,
   },
-
   {
+    label: 'Typography',
     path: routes.typography,
     element: <Typography />,
     route: Route,
   },
   {
+    label: 'Videos',
     path: routes.video,
     element: <Video />,
     route: Route,
   },
   {
+    label: 'Sortable',
     path: routes.sortable,
     element: <Sortable />,
     route: Route,
   },
   {
+    label: 'SwiperJs',
     path: routes.swiperjs,
     element: <Swiperjs />,
     route: Route,
   },
   {
+    label: 'Bootstrap Icons',
     path: routes.bootstrapIcons,
     element: <BootstrapIcons />,
     route: Route,
   },
   {
+    label: 'Toasts',
     path: routes.toasts,
     element: <Toasts />,
     route: Route,
   },
   {
+    label: 'Leaflets',
     path: routes.mapLeaflet,
     element: <Leaflet />,
     route: Route,
   },
   {
+    label: 'Remix Icons',
     path: routes.RemixIcons,
     element: <RemixIcons />,
     route: Route,
   },
   {
+    label: 'Flag Icons',
     path: routes.FlagIcons,
     element: <FlagIcons />,
     route: Route,
   },
   {
+    label: 'Ban IP Address',
     path: routes.banIpAddress,
     element: <BanIpAddress />,
     route: Route,
   },
   {
+    label: 'To Do',
     path: routes.todo,
     element: <Todo />,
     route: Route,
@@ -650,6 +700,7 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Email',
     path: routes.email,
     element: <Email />,
     route: Route,
@@ -665,48 +716,57 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Pages',
     path: routes.pages,
     element: <Page />,
     route: Route,
   },
 
   {
+    label: 'File Manager',
     path: routes.fileManager,
     element: <FileManager />,
     route: Route,
   },
   {
+    label: 'FAQ’S',
     path: routes.faq,
     element: <Faq />,
     route: Route,
   },
 
   {
+    label: 'States',
     path: routes.states,
     element: <States />,
     route: Route,
   },
   {
+    label: 'Testimonials',
     path: routes.testimonials,
     element: <Testimonials />,
     route: Route,
   },
   {
+    label: 'Clipboard',
     path: routes.clipboard,
     element: <ClipBoard />,
     route: Route,
   },
   {
+    label: 'Counter',
     path: routes.counter,
     element: <Counter />,
     route: Route,
   },
   {
+    label: 'Drag & Drop',
     path: routes.dragandDrop,
     element: <DragAndDrop />,
     route: Route,
   },
   {
+    label: 'Rating',
     path: routes.rating,
     element: <Rating />,
     route: Route,
@@ -717,126 +777,151 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Text Editor',
     path: routes.textEditor,
     element: <TextEditor />,
     route: Route,
   },
   {
+    label: 'Timeline',
     path: routes.timeLine,
     element: <Timeline />,
     route: Route,
   },
   {
+    label: 'Scrollbar',
     path: routes.scrollBar,
     element: <Scrollbar />,
     route: Route,
   },
   {
+    label: 'Apex Charts',
     path: routes.apexChart,
     element: <Apexchart />,
     route: Route,
   },
   {
+    label: 'Prime Charts',
     path: routes.primeChart,
     element: <PrimeReactChart />,
     route: Route,
   },
   {
+    label: 'Chart JS',
     path: routes.chartJs,
     element: <ChartJSExample />,
     route: Route,
   },
   {
+  label: 'Feather Icons',
     path: routes.featherIcons,
     element: <FeatherIcons />,
     route: Route,
   },
   {
+    label: 'Fontawesome Icons',
     path: routes.fontawesome,
     element: <FontawesomeIcons />,
     route: Route,
   },
   {
+    label: 'Material Icons',
     path: routes.materialIcon,
     element: <MaterialIcons />,
     route: Route,
   },
   {
+    label: 'pe7 Icons',
     path: routes.pe7icon,
     element: <PE7Icons />,
     route: Route,
   },
   {
+    label: 'Simpleline Icons',
     path: routes.simpleLineIcon,
     element: <SimplelineIcons />,
     route: Route,
   },
   {
+    label: 'Themify Icons',
     path: routes.themifyIcon,
     element: <ThemifyIcons />,
     route: Route,
   },
   {
+    label: 'Typicon Icons',
     path: routes.typicon,
     element: <TypiconIcons />,
     route: Route,
   },
   {
+    label: 'Basic Inputs',
     path: routes.basicInput,
     element: <BasicInputs />,
     route: Route,
   },
   {
+    label: 'Weather Icons',
     path: routes.weatherIcon,
     element: <WeatherIcons />,
     route: Route,
   },
   {
+    label: 'Checkbox & Radios',
     path: routes.checkboxandRadion,
     element: <CheckboxRadios />,
     route: Route,
   },
   {
+    label: 'Input Groups',
     path: routes.inputGroup,
     element: <InputGroup />,
     route: Route,
   },
   {
+    label: 'Grid & Gutters',
     path: routes.gridandGutters,
     element: <GridGutters />,
     route: Route,
   },
   {
+    label: 'Form Select',
     path: routes.formSelect,
     element: <FormSelect />,
     route: Route,
   },
   {
+    label: 'Input Masks',
     path: routes.formMask,
     element: <FormMask />,
     route: Route,
   },
   {
+    label: 'File Uploads',
     path: routes.fileUpload,
     element: <FileUpload />,
     route: Route,
   },
   {
+    label: 'Horizontal Form',
     path: routes.horizontalForm,
     element: <FormHorizontal />,
     route: Route,
   },
   {
+    label: 'Vertical Form',
     path: routes.verticalForm,
     element: <FormVertical />,
     route: Route,
   },
   {
+    label: 'Floating Labels',
     path: routes.floatingLable,
     element: <FloatingLabel />,
     route: Route,
   },
   {
+    label: 'Form Validation',
     path: routes.formValidation,
     element: <FormValidation />,
     route: Route,
@@ -847,26 +932,31 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Form Wizard',
     path: routes.formWizard,
     element: <FormWizard />,
     route: Route,
   },
   {
+    label: 'Form Picker',
     path: routes.formPicker,
     element: <FormPikers />,
     route: Route,
   },
   {
+    label: 'Data Tables',
     path: routes.dataTables,
     element: <DataTables />,
     route: Route,
   },
   {
+    label: 'Basic Tables',
     path: routes.tablesBasic,
     element: <TablesBasic />,
     route: Route,
   },
   {
+    label: 'Ionic Icons',
     path: routes.iconicIcon,
     element: <IonicIcons />,
     route: Route,
@@ -878,6 +968,7 @@ export const publicRoutes = [
   // },
 
   {
+    label: 'Placeholders',
     path: routes.placeholder,
     element: <Placeholder />,
     route: Route,
@@ -888,41 +979,49 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Alerts',
     path: routes.alert,
     element: <AlertUi />,
     route: Route,
   },
   {
+    label: 'Tooltip',
     path: routes.tooltip,
     element: <Tooltips />,
     route: Route,
   },
   {
+    label: 'Ribbon',
     path: routes.ribbon,
     element: <Ribbon />,
     route: Route,
   },
   {
+    label: 'Categories',
     path: routes.categories,
     element: <Categories />,
     route: Route,
   },
   {
+    label: 'Budgets',
     path: routes.budgets,
     element: <Budgets />,
     route: Route,
   },
   {
+    label: 'Budget Expenses',
     path: routes.budgetexpenses,
     element: <BudgetExpenses />,
     route: Route,
   },
   {
+    label: 'Budget Revenues',
     path: routes.budgetrevenues,
     element: <BudgetRevenues />,
     route: Route,
   },
   {
+    label: 'Tickets',
     path: routes.tickets,
     element: <Tickets />,
     route: Route,
@@ -933,109 +1032,133 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Tickets Detail',
     path: routes.ticketDetails,
     element: <TicketDetails />,
     route: Route,
   },
   {
+    label: 'Performance Indicator',
     path: routes.performanceIndicator,
     element: <PerformanceIndicator />,
     route: Route,
   },
   {
+    label: 'Holidays',
     path: routes.holidays,
     element: <Holidays />,
     route: Route,
   },
   {
+    label: 'Performance Review',
     path: routes.performanceReview,
     element: <PerformanceReview />,
     route: Route,
   },
   {
     path: routes.performanceAppraisal,
+    label: 'Performance Appraisal',
     element: <PerformanceAppraisal />,
     route: Route,
   },
   {
+    label: 'Goal List',
     path: routes.goalTracking,
     element: <GoalTracking />,
     route: Route,
   },
   {
+    label: 'Goal Type',
     path: routes.goalType,
     element: <GoalType />,
     route: Route,
   },
   {
+    label: 'Training List',
     path: routes.trainingList,
     element: <TrainingList />,
     route: Route,
   },
   {
+    label: 'Trainers',
     path: routes.trainers,
     element: <Trainers />,
     route: Route,
   },
   {
+    label: 'Training Type',
     path: routes.trainingType,
     element: <TrainingType />,
     route: Route,
   },
 
   {
+    label: 'Horizontal',
     path: routes.Horizontal,
     element: <LayoutDemo />,
   },
   {
+    label: 'Detached',
     path: routes.Detached,
     element: <LayoutDemo />,
   },
   {
+    label: 'Modern',
     path: routes.Modern,
     element: <LayoutDemo />,
   },
   {
+    label: 'Two Column',
     path: routes.TwoColumn,
     element: <LayoutDemo />,
   },
   {
+    label: 'Hovered',
     path: routes.Hovered,
     element: <LayoutDemo />,
   },
   {
+    label: 'Boxed',
     path: routes.layoutBox,
     element: <LayoutDemo />,
   },
   {
+    label: 'Horizontal Single',
     path: routes.HorizontalSingle,
     element: <LayoutDemo />,
   },
   {
+    label: 'Horizontal Overlay',
     path: routes.HorizontalOverlay,
     element: <LayoutDemo />,
   },
   {
+    label: 'Horizontal Box',
     path: routes.HorizontalBox,
     element: <LayoutDemo />,
   },
   {
+    label: 'Menu Aside',
     path: routes.MenuAside,
     element: <LayoutDemo />,
   },
   {
+    label: 'Transparent',
     path: routes.Transparent,
     element: <LayoutDemo />,
   },
   {
+    label: 'Without Header',
     path: routes.WithoutHeader,
     element: <LayoutDemo />,
   },
   {
+    label: 'RTL',
     path: routes.layoutRtl,
     element: <LayoutDemo />,
   },
   {
+    label: 'Dark',
     path: routes.layoutDark,
     element: <LayoutDemo />,
   },
@@ -1043,26 +1166,32 @@ export const publicRoutes = [
   //Settings
 
   {
+    label: 'Profile',
     path: routes.profilesettings,
     element: <Profilesettings />,
   },
   {
+    label: 'Security',
     path: routes.securitysettings,
     element: <Securitysettings />,
   },
   {
+    label: 'Notifications',
     path: routes.notificationssettings,
     element: <Notificationssettings />,
   },
   {
+    label: 'Connected Apps',
     path: routes.connectedApps,
     element: <ConnectedApps />,
   },
   {
+    label: 'Business Settings',
     path: routes.bussinessSettings,
     element: <Bussinesssettings />,
   },
   {
+    label: 'SEO Settings',
     path: routes.seoSettings,
     element: <Seosettings />,
   },
@@ -1071,38 +1200,47 @@ export const publicRoutes = [
     element: <CompanySettings />,
   },
   {
+    label: 'Localization',
     path: routes.localizationSettings,
     element: <Localizationsettings />,
   },
   {
+    label: 'Prefixes',
     path: routes.prefixes,
     element: <Prefixes />,
   },
   {
+    label: 'Preferences',
     path: routes.preference,
     element: <Preference />,
   },
   {
+    label: 'Authentication',
     path: routes.authenticationSettings,
     element: <Authenticationsettings />,
   },
   {
+    label: 'AI Settings',
     path: routes.aiSettings,
     element: <Aisettings />,
   },
   {
+    label: 'Salary Settings',
     path: routes.salarySettings,
     element: <Salarysettings />,
   },
   {
+    label: 'Approval Settings',
     path: routes.approvalSettings,
     element: <Approvalsettings />,
   },
   {
+    label: 'Appearance',
     path: routes.appearance,
     element: <Appearance />,
   },
   {
+    label: 'Language',
     path: routes.language,
     element: <Languagesettings />,
   },
@@ -1115,75 +1253,93 @@ export const publicRoutes = [
     element: <Addlanguage />,
   },
   {
+    label: 'Invoice Settings',
     path: routes.invoiceSettings,
     element: <InvoiceSettings />,
   },
   {
+    label: 'Custom Fields',
     path: routes.customFields,
     element: <CustomFields />,
   },
   {
+    label: 'Leave Type',
     path: routes.leaveType,
     element: <LeaveType />,
   },
   {
+    label: 'Email Settings',
     path: routes.emailSettings,
     element: <EmailSettings />,
   },
   {
+    label: 'Email Templates',
     path: routes.emailTemplates,
     element: <Emailtemplates />,
   },
   {
+    label: 'SMS Settings',
     path: routes.smsSettings,
     element: <SmsSettings />,
   },
   {
+    label: 'SMS Templates',
     path: routes.smsTemplate,
     element: <SmsTemplate />,
   },
   {
+    label: 'OTP',
     path: routes.otpSettings,
     element: <OtpSettings />,
   },
   {
+    label: 'GDPR Cookies',
     path: routes.gdprCookies,
     element: <GdprCookies />,
   },
   {
+    label: 'Maintenance Mode',
     path: routes.maintenanceMode,
     element: <Maintenancemode />,
   },
 
   {
+    label: 'Payment Gateways',
     path: routes.paymentGateways,
     element: <PaymentGateways />,
   },
   {
+    label: 'Tax Rate',
     path: routes.taxRates,
     element: <TaxRates />,
   },
   {
+    label: 'Currencies',
     path: routes.currencies,
     element: <Currencies />,
   },
   {
+    label: 'Backup',
     path: routes.backup,
     element: <Backup />,
   },
   {
+    label: 'Clear Cache',
     path: routes.clearcache,
     element: <Clearcache />,
   },
   {
+    label: 'Custom CSS',
     path: routes.customCss,
     element: <Customcss />,
   },
   {
+    label: 'Custom JS',
     path: routes.customJs,
     element: <Customjs />,
   },
   {
+    label: 'Cronjob',
     path: routes.cronjob,
     element: <Cronjob />,
   },
@@ -1192,6 +1348,7 @@ export const publicRoutes = [
     element: <Cronjobschedule />,
   },
   {
+    label: 'Storage',
     path: routes.storage,
     element: <Storage />,
   },
@@ -1202,21 +1359,25 @@ export const publicRoutes = [
   {
     path: routes.permissionpage,
     element: <PermissionPage />,
-    label:"Permission"
+    label: "Permission"
   },
   {
+    label: 'Expense Report',
     path: routes.expensesreport,
     element: <ExpensesReport />,
   },
   {
     path: routes.invoicereport,
+    label: 'Invoice Report',
     element: <InvoiceReport />,
   },
   {
     path: routes.paymentreport,
+    label: 'Payment Report',
     element: <PaymentReport />,
   },
   {
+    label: 'Project Report',
     path: routes.projectreport,
     element: <ProjectReport />,
   },
@@ -1225,124 +1386,149 @@ export const publicRoutes = [
     element: <Manageusers />,
   },
   {
+    label: 'All Blogs',
     path: routes.blogs,
     element: <Blogs />,
   },
   {
+    label: 'Categories',
     path: routes.blogCategories,
     element: <BlogCategories />,
     route: Route,
   },
   {
+    label: 'Comments',
     path: routes.blogComments,
     element: <BlogComments />,
   },
   {
+    label: 'Blog Tags',
     path: routes.blogTags,
     element: <BlogTags />,
   },
 
   {
+    label: 'Profile',
     path: routes.profile,
     element: <Profile />,
   },
   {
+    label: 'Gallery',
     path: routes.gallery,
     element: <Gallery />,
   },
   {
+    label: 'Search Results',
     path: routes.searchresult,
     element: <SearchResult />,
   },
   {
+    label: 'Timeline',
     path: routes.timeline,
     element: <TimeLines />,
   },
   {
+    label: 'Pricing',
     path: routes.pricing,
     element: <Pricing />,
   },
   {
+    label: 'API Keys',
     path: routes.apikey,
     element: <ApiKeys />,
   },
 
   {
+    label: 'Privacy Policy',
     path: routes.privacyPolicy,
     element: <PrivacyPolicy />,
   },
   {
+    label: 'Terms & Conditions',
     path: routes.termscondition,
     element: <TermsCondition />,
   },
   {
+    label: 'Assets',
     path: routes.assetList,
     element: <Assets />,
   },
   {
+    label: 'Asset Categories',
     path: routes.assetCategories,
     element: <AssetsCategory />,
   },
   {
+    label: 'Knowledge Base',
     path: routes.knowledgebase,
     element: <Knowledgebase />,
   },
   {
+    label: 'Activities',
     path: routes.activity,
     element: <Activity />,
   },
   {
     path: routes.users,
     element: <Users />,
-    label:"User Management"
+    label: "User Management"
   },
   {
     path: routes.rolePermission,
     element: <RolesPermission />,
-    label:"Roles"
+    label: "Roles"
   },
   {
     path: routes.invoiceDetails,
     element: <InvoiceDetails />,
   },
   {
+    label: 'Task Report',
     path: routes.taskreport,
     element: <TaskReport />,
   },
   {
+    label: 'User Report',
     path: routes.userreport,
     element: <UserReports />,
   },
   {
+    label: 'Employee Report',
     path: routes.employeereport,
     element: <EmployeeReports />,
   },
   {
+    label: 'Employees Details',
     path: routes.employeedetails,
     element: <EmployeeDetails />,
     route: Route,
   },
   {
+    label: 'Payslip Report',
     path: routes.payslipreport,
     element: <PayslipReport />,
     route: Route,
   },
   {
+    label: 'Attendance Report',
     path: routes.attendancereport,
     element: <AttendanceReport />,
     route: Route,
   },
   {
+    label: 'Leave Report',
     path: routes.leavereport,
     element: <LeaveReport />,
     route: Route,
   },
   {
+    label: 'Daily Report',
     path: routes.dailyreport,
     element: <DailyReport />,
     route: Route,
   },
   {
+    label: 'Jobs',
     path: routes.jobgrid,
     element: <JobGrid />,
     route: Route,
@@ -1353,6 +1539,7 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Candidates',
     path: routes.candidatesGrid,
     element: <CandidateGrid />,
     route: Route,
@@ -1368,11 +1555,13 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Refferals',
     path: routes.refferal,
     element: <RefferalList />,
     route: Route,
   },
   {
+    label: 'Clients',
     path: routes.clientgrid,
     element: <ClienttGrid />,
     route: Route,
@@ -1388,6 +1577,7 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Projects',
     path: routes.project,
     element: <Project />,
     route: Route,
@@ -1403,6 +1593,7 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Tasks',
     path: routes.tasks,
     element: <Task />,
     route: Route,
@@ -1413,16 +1604,19 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Task Board',
     path: routes.taskboard,
     element: <TaskBoard />,
     route: Route,
   },
   {
+    label: 'Invoices',
     path: routes.invoices,
     element: <Invoices />,
     route: Route,
   },
   {
+    label: 'Invoices',
     path: routes.invoice,
     element: <Invoices />,
     route: Route,
@@ -1443,36 +1637,43 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Payments',
     path: routes.payments,
     element: <Payments />,
     route: Route,
   },
   {
+    label: 'Expenses',
     path: routes.expenses,
     element: <Expenses />,
     route: Route,
   },
   {
+    label: 'Provident Fund',
     path: routes.providentfund,
     element: <ProvidentFund />,
     route: Route,
   },
   {
+    label: 'Taxes',
     path: routes.taxes,
     element: <Taxes />,
     route: Route,
   },
   {
+    label: 'Employee Salary',
     path: routes.employeesalary,
     element: <EmployeeSalary />,
     route: Route,
   },
   {
+    label: 'Payslip',
     path: routes.payslip,
     element: <PaySlip />,
     route: Route,
   },
   {
+    label: 'Payroll Items',
     path: routes.payrollAddition,
     element: <PayRoll />,
     route: Route,
@@ -1488,11 +1689,13 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Employees',
     path: routes.employeeList,
     element: <EmployeeList />,
     route: Route,
   },
   {
+    label: 'Employees Grid',
     path: routes.employeeGrid,
     element: <EmployeesGrid />,
     route: Route,
@@ -1501,54 +1704,64 @@ export const publicRoutes = [
     path: routes.departments,
     element: <Department />,
     route: Route,
-    label:'Departments'
+    label: 'Departments'
   },
   {
+    label: 'Designations',
     path: routes.designations,
     element: <Designations />,
     route: Route,
   },
   {
+    label: 'Policies',
     path: routes.policy,
     element: <Policy />,
     route: Route,
   },
   {
+    label: 'Leaves',
     path: routes.leaveadmin,
     element: <LeaveAdmin />,
     route: Route,
   },
   {
+    label: 'Leaves (Employee)',
     path: routes.leaveemployee,
     element: <LeaveEmployee />,
     route: Route,
   },
   {
+    label: 'Leave Settings',
     path: routes.leavesettings,
     element: <LeaveSettings />,
     route: Route,
   },
   {
+    label: 'Attendance (Admin)',
     path: routes.attendanceadmin,
     element: <AttendanceAdmin />,
     route: Route,
   },
   {
+    label: 'Attendance (Employee)',
     path: routes.attendanceemployee,
     element: <AttendanceEmployee />,
     route: Route,
   },
   {
+    label: 'Timesheet',
     path: routes.timesheet,
     element: <TimeSheet />,
     route: Route,
   },
   {
+    label: 'Shift & Schedule',
     path: routes.scheduletiming,
     element: <ScheduleTiming />,
     route: Route,
   },
   {
+    label: 'Overtime',
     path: routes.overtime,
     element: <OverTime />,
     route: Route,
@@ -1561,6 +1774,7 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Contacts',
     path: routes.contactGrid,
     element: <ContactGrid />,
     route: Route,
@@ -1571,6 +1785,7 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Companies',
     path: routes.companiesGrid,
     element: <CompaniesGrid />,
     route: Route,
@@ -1586,6 +1801,7 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Leads',
     path: routes.leadsGrid,
     element: <LeadsGrid />,
     route: Route,
@@ -1601,6 +1817,7 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Deals',
     path: routes.dealsGrid,
     element: <DealsGrid />,
     route: Route,
@@ -1616,11 +1833,13 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Pipeline',
     path: routes.pipeline,
     element: <Pipeline />,
     route: Route,
   },
   {
+    label: 'Analytics',
     path: routes.analytics,
     element: <Analytics />,
     route: Route,
@@ -1629,14 +1848,16 @@ export const publicRoutes = [
     path: routes.superAdminCompanies,
     element: <Companies />,
     route: Route,
-    label:"Companies"
+    label: "Companies"
   },
   {
+    label: 'Subscriptions',
     path: routes.superAdminSubscriptions,
     element: <Subscription />,
     route: Route,
   },
   {
+    label: 'Packages',
     path: routes.superAdminPackages,
     element: <Packages />,
     route: Route,
@@ -1647,11 +1868,13 @@ export const publicRoutes = [
     route: Route,
   },
   {
+    label: 'Domain',
     path: routes.superAdminDomain,
     element: <Domain />,
     route: Route,
   },
   {
+    label: 'Purchase Transaction',
     path: routes.superAdminPurchaseTransaction,
     element: <PurchaseTransaction />,
     route: Route,
@@ -1660,18 +1883,19 @@ export const publicRoutes = [
     path: routes.adminBranches,
     element: <Branches />,
     route: Route,
-    label:"Branches"
+    label: "Branches"
   },
   {
     path: routes.adminFeatures,
     element: <Features />,
     route: Route,
-    label:"Features"
+    label: "Features"
   },
 ];
 
 export const authRoutes = [
   {
+    label: 'Coming Soon',
     path: routes.comingSoon,
     element: <ComingSoon />,
     route: Route,
@@ -1680,118 +1904,141 @@ export const authRoutes = [
     path: routes.login,
     element: <Login />,
     route: Route,
-    label:'login'
+    label: 'login'
   },
   {
+    label: 'Illustration',
     path: routes.login2,
     element: <Login2 />,
     route: Route,
   },
   {
+    label: 'Basic',
     path: routes.login3,
     element: <Login3 />,
     route: Route,
   },
   {
+    label: 'Cover',
     path: routes.register,
     element: <Register />,
     route: Route,
   },
   {
+    label: 'Cover',
     path: routes.twoStepVerification,
     element: <TwoStepVerification />,
     route: Route,
   },
   {
+    label: 'Illustration',
     path: routes.twoStepVerification2,
     element: <TwoStepVerification2 />,
     route: Route,
   },
   {
+    label: 'Basic',
     path: routes.twoStepVerification3,
     element: <TwoStepVerification3 />,
     route: Route,
   },
   {
+    label: 'Cover',
     path: routes.emailVerification,
     element: <EmailVerification />,
     route: Route,
   },
   {
+    label: 'Illustration',
     path: routes.emailVerification2,
     element: <EmailVerification2 />,
     route: Route,
   },
   {
+    label: 'Basic',
     path: routes.emailVerification3,
     element: <EmailVerification3 />,
     route: Route,
   },
   {
+    label: 'Cover',
     path: routes.register,
     element: <Register />,
     route: Route,
   },
   {
+    label: 'Illustration',
     path: routes.register2,
     element: <Register2 />,
     route: Route,
   },
   {
+    label: 'Basic',
     path: routes.register3,
     element: <Register3 />,
     route: Route,
   },
   {
+    label: 'Cover',
     path: routes.resetPassword,
     element: <ResetPassword />,
     route: Route,
   },
   {
+    label: 'Illustration',
     path: routes.resetPassword2,
     element: <ResetPassword2 />,
     route: Route,
   },
   {
+    label: 'Basic',
     path: routes.resetPassword3,
     element: <ResetPassword3 />,
     route: Route,
   },
   {
+    label: 'Cover',
     path: routes.forgotPassword,
     element: <ForgotPassword />,
     route: Route,
   },
   {
+    label: 'Illustration',
     path: routes.forgotPassword2,
     element: <ForgotPassword2 />,
     route: Route,
   },
   {
+    label: 'Basic',
     path: routes.forgotPassword3,
     element: <ForgotPassword3 />,
     route: Route,
   },
   {
+    label: '404 Error',
     path: routes.error404,
     element: <Error404 />,
     route: Route,
   },
   {
+    label: '500 Error',
     path: routes.error500,
     element: <Error500 />,
     route: Route,
   },
   {
+    label: 'Under Maintenance',
     path: routes.underMaintenance,
     element: <UnderMaintenance />,
     route: Route,
   },
   {
+    label: 'Under Construction',
     path: routes.underConstruction,
     element: <UnderConstruction />,
   },
   {
+    label: 'Lock Screen',
     path: routes.lockScreen,
     element: <LockScreen />,
   },

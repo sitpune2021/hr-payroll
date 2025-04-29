@@ -3,67 +3,15 @@ import { all_routes } from '../../router/all_routes'
 import { Link } from 'react-router-dom'
 import Table from "../../../core/common/dataTable/index";
 import CommonSelect from '../../../core/common/commonSelect';
-import { department_details } from '../../../core/data/json/department_details';
 import CollapseHeader from '../../../core/common/collapse-header/collapse-header';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../core/data/redux/store';
 type PasswordField = "password" | "confirmPassword";
 
 const Department = () => {
 
-  const data = department_details;
-  const columns = [
-    {
-      title: "Department",
-      dataIndex: "Department",
-      render: (text: String, record: any) => (
-        <h6 className="fw-medium">
-          <Link to="#">{text}</Link>
-        </h6>
 
-      ),
-      sorter: (a: any, b: any) => a.Department.length - b.Department.length,
-    },
-    {
-      title: "No of Employees",
-      dataIndex: "NoOfEmployees",
-      sorter: (a: any, b: any) => a.NoOfEmployees.length - b.NoOfEmployees.length,
-    },
-    {
-      title: "Status",
-      dataIndex: "Status",
-      render: (text: string, record: any) => (
-        <span className={`badge ${text === 'Active' ? 'badge-success' : 'badge-danger'} d-inline-flex align-items-center badge-xs`}>
-          <i className="ti ti-point-filled me-1" />
-          {text}
-        </span>
-
-      ),
-      sorter: (a: any, b: any) => a.Status.length - b.Status.length,
-    },
-    {
-      title: "",
-      dataIndex: "actions",
-      render: () => (
-        <div className="action-icon d-inline-flex">
-          <Link
-            to="#"
-            className="me-2"
-            data-bs-toggle="modal" data-inert={true}
-            data-bs-target="#edit_department"
-          >
-            <i className="ti ti-edit" />
-          </Link>
-          <Link
-            to="#"
-            data-bs-toggle="modal" data-inert={true}
-            data-bs-target="#delete_modal"
-          >
-            <i className="ti ti-trash" />
-          </Link>
-        </div>
-
-      ),
-    },
-  ]
+  const departmentList = useSelector((state: RootState) => state.departments.data)
   const statusChoose = [
     { value: "Select", label: "Select" },
     { value: "All Department", label: "All Department" },
@@ -230,7 +178,52 @@ const Department = () => {
               </div>
             </div>
             <div className="card-body p-0">
-              <Table dataSource={data} columns={columns} Selection={true} />
+              {/* <Table dataSource={data} columns={columns} Selection={true} /> */}
+
+              <div className="table-responsive" style={{ maxHeight: "600px", overflowY: "auto" }}>
+                <table className="table">
+                  <thead className="thead-light" style={{ position: "sticky", top: 0, zIndex: 1, backgroundColor: "#fff" }}>
+                    <tr>
+                      <th>Sr.No</th>
+                      <th>Department Name</th>
+                      <th>Description</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      departmentList.map((department, index) => (
+                        <tr key={department.id}>
+                          <td>{index + 1}</td>
+                          <td>{department.name}</td>
+                          <td>{department.description}</td>
+                          <td>{department.isActive ? 'Active' : 'Inactive'}</td>
+                          <td>
+                            <div className="action-icon d-inline-flex">
+                              <Link
+                                to="#"
+                                className="me-2"
+                                data-bs-toggle="modal" data-inert={true}
+                                data-bs-target="#edit_department"
+                              >
+                                <i className="ti ti-edit" />
+                              </Link>
+                              <Link
+                                to="#"
+                                data-bs-toggle="modal" data-inert={true}
+                                data-bs-target="#delete_modal"
+                              >
+                                <i className="ti ti-trash" />
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
           {/* /Performance Indicator list */}
