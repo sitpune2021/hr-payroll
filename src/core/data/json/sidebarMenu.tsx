@@ -67,7 +67,7 @@ export const SidebarDataTest = [
     ]
   },
   {
-    tittle: 'Main Menu',
+    // tittle: 'Main Menu',
     icon: 'airplay',
     showAsTab: true,
     separateRoute: false,
@@ -210,52 +210,52 @@ export const SidebarDataTest = [
           },
         ],
       },
-      {
-        label: 'Super Admin',
-        link: 'index',
-        submenu: true,
-        showSubRoute: false,
-        icon: 'user-star',
-        base: 'super-admin',
-        materialicons: '',
-        submenuItems: [
-          {
-            label: 'Dashboard',
-            link: routes.superAdminDashboard,
-            base: 'super-admin-dashboard',
-          },
-          {
-            label: 'Companies',
-            link: routes.superAdminCompanies,
-            base: 'companies',
-          },
-          {
-            label: 'Subscriptions',
-            link: routes.superAdminSubscriptions,
-            base: 'subscriptions',
-          },
-          {
-            label: 'Packages',
-            link: routes.superAdminPackages,
-            base: 'packages',
-            base2: 'packages-grid',
-          },
-          {
-            label: 'Domain',
-            link: routes.superAdminDomain,
-            base: 'domain',
-          },
-          {
-            label: 'Purchase Transaction',
-            link: routes.superAdminPurchaseTransaction,
-            base: 'purchase-transaction',
-          },
-        ],
-      },
+      // {
+      //   label: 'Super Admin',
+      //   link: 'index',
+      //   submenu: true,
+      //   showSubRoute: false,
+      //   icon: 'user-star',
+      //   base: 'super-admin',
+      //   materialicons: '',
+      //   submenuItems: [
+      //     {
+      //       label: 'Dashboard',
+      //       link: routes.superAdminDashboard,
+      //       base: 'super-admin-dashboard',
+      //     },
+      //     {
+      //       label: 'Companies',
+      //       link: routes.superAdminCompanies,
+      //       base: 'companies',
+      //     },
+      //     {
+      //       label: 'Subscriptions',
+      //       link: routes.superAdminSubscriptions,
+      //       base: 'subscriptions',
+      //     },
+      //     {
+      //       label: 'Packages',
+      //       link: routes.superAdminPackages,
+      //       base: 'packages',
+      //       base2: 'packages-grid',
+      //     },
+      //     {
+      //       label: 'Domain',
+      //       link: routes.superAdminDomain,
+      //       base: 'domain',
+      //     },
+      //     {
+      //       label: 'Purchase Transaction',
+      //       link: routes.superAdminPurchaseTransaction,
+      //       base: 'purchase-transaction',
+      //     },
+      //   ],
+      // },
     ],
   },
   {
-    tittle: 'LAYOUT',
+    // tittle: 'LAYOUT',
     icon: 'file',
     showAsTab: false,
     separateRoute: false,
@@ -403,7 +403,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'PROJECTS',
+    // tittle: 'PROJECTS',
     icon: 'layers',
     showAsTab: false,
     separateRoute: false,
@@ -449,7 +449,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'CRM',
+    // tittle: 'CRM',
     icon: 'file',
     showAsTab: false,
     separateRoute: false,
@@ -464,16 +464,16 @@ export const SidebarDataTest = [
         materialicons: 'confirmation_number',
         submenuItems: [],
       },
-      {
-        label: 'Companies',
-        link: routes.companiesGrid,
-        submenu: false,
-        showSubRoute: false,
-        icon: 'building',
-        base: 'company',
-        materialicons: 'shopping_bag',
-        submenuItems: [],
-      },
+      // {
+      //   label: 'Companies',
+      //   link: routes.companiesGrid,
+      //   submenu: false,
+      //   showSubRoute: false,
+      //   icon: 'building',
+      //   base: 'company',
+      //   materialicons: 'shopping_bag',
+      //   submenuItems: [],
+      // },
       {
         label: 'Deals',
         link: routes.dealsGrid,
@@ -527,7 +527,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'HRM',
+    // tittle: 'HRM',
     icon: 'file',
     showAsTab: false,
     separateRoute: false,
@@ -762,7 +762,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'RECRUITMENT',
+    // tittle: 'RECRUITMENT',
     icon: 'file',
     showAsTab: false,
     separateRoute: false,
@@ -801,7 +801,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'Finance & Accounts',
+    // tittle: 'Finance & Accounts',
     icon: 'file',
     showAsTab: false,
     separateRoute: false,
@@ -901,7 +901,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'Administration',
+    // tittle: 'Administration',
     showAsTab: false,
     separateRoute: false,
     submenuItems: [
@@ -1266,7 +1266,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'Content',
+    // tittle: 'Content',
     showAsTab: false,
     separateRoute: false,
     submenuItems: [
@@ -1353,7 +1353,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'Pages',
+    // tittle: 'Pages',
     showAsTab: false,
     separateRoute: false,
     submenuItems: [
@@ -1468,7 +1468,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'Authentication',
+    // tittle: 'Authentication',
     showAsTab: false,
     separateRoute: false,
     submenuItems: [
@@ -1481,15 +1481,7 @@ export const SidebarDataTest = [
           {
             label: 'Cover',
             link: routes.login,
-          },
-          {
-            label: 'Illustration',
-            link: routes.login2,
-          },
-          {
-            label: 'Basic',
-            link: routes.login3,
-          },
+          }
         ],
       },
       {
@@ -1619,7 +1611,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'UI Interface',
+    // tittle: 'UI Interface',
     icon: 'file',
     showAsTab: false,
     separateRoute: false,
@@ -2066,7 +2058,7 @@ export const SidebarDataTest = [
     ],
   },
   {
-    tittle: 'Extras',
+    // tittle: 'Extras',
     icon: 'file',
     showAsTab: false,
     separateRoute: false,

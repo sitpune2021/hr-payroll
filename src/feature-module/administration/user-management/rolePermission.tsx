@@ -4,8 +4,6 @@ import CommonSelect from '../../../core/common/commonSelect'
 import { all_routes } from '../../router/all_routes'
 import { Link } from 'react-router-dom'
 import PredefinedDateRanges from '../../../core/common/datePicker'
-import Table from "../../../core/common/dataTable/index";
-import { rolesDetails } from '../../../core/data/json/rolesDetails'
 import CollapseHeader from '../../../core/common/collapse-header/collapse-header'
 import { fetchRoles, Role } from '../../../core/data/redux/rolesSlice'
 import { useDispatch, useSelector } from 'react-redux'
@@ -38,62 +36,7 @@ const RolesPermission = () => {
             toast('Info', "Error while adding Role", 'danger')
         }
     }
-
-    // const data = rolesDetails;
-    // const columns = [
-    //     {
-    //         title: "Role",
-    //         dataIndex: "role",
-    //         sorter: (a: any, b: any) => a.role.length - b.role.length,
-    //     },
-    //     {
-    //         title: "Created Date",
-    //         dataIndex: "created_date",
-    //         sorter: (a: any, b: any) => a.created_date.length - b.created_date.length,
-    //     },
-    //     {
-    //         title: "Status",
-    //         dataIndex: "status",
-    //         render: (text: string, record: any) => (
-    //             <>
-    //                 <span
-    //                     className={`badge d-inline-flex align-items-center badge-xs ${text === 'Active'
-    //                         ? 'badge-success'
-    //                         : 'badge-danger'
-    //                         }`}
-    //                 >
-    //                     <i className="ti ti-point-filled me-1"></i>
-    //                     {text}
-    //                 </span>
-    //             </>
-    //         ),
-    //         sorter: (a: any, b: any) => a.status.length - b.status.length,
-    //     },
-    //     {
-    //         title: "",
-    //         dataIndex: "actions",
-    //         render: () => (
-    //             <div className="action-icon d-inline-flex">
-    //                 {/* <Link to={all_routes.permissionpage} className="me-2">
-    //                     <i className="ti ti-shield" />
-    //                 </Link> */}
-    //                 <Link
-    //                     to="#"
-    //                     className="me-2"
-    //                     data-bs-toggle="modal" data-inert={true}
-    //                     data-bs-target="#edit_role"
-    //                 >
-    //                     <i className="ti ti-edit" />
-    //                 </Link>
-    //                 <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
-    //                     <i className="ti ti-trash" />
-    //                 </Link>
-    //             </div>
-
-    //         ),
-    //     },
-    // ]
-
+    
     return (
         <>
             {/* Page Wrapper */}
@@ -169,99 +112,8 @@ const RolesPermission = () => {
                     {/* /Breadcrumb */}
                     {/* Assets Lists */}
                     <div className="card">
-                        <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-                            <h5>Roles List</h5>
-                            <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-                                <div className="me-3">
-                                    <div className="input-icon-end position-relative">
-                                        <PredefinedDateRanges />
-                                        <span className="input-icon-addon">
-                                            <i className="ti ti-chevron-down" />
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className="dropdown me-3">
-                                    <Link
-                                        to="#"
-                                        className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                                        data-bs-toggle="dropdown"
-                                    >
-                                        Status
-                                    </Link>
-                                    <ul className="dropdown-menu  dropdown-menu-end p-3">
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Active
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Inactive
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div className="dropdown">
-                                    <Link
-                                        to="#"
-                                        className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                                        data-bs-toggle="dropdown"
-                                    >
-                                        Sort By : Last 7 Days
-                                    </Link>
-                                    <ul className="dropdown-menu  dropdown-menu-end p-3">
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Recently Added
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Ascending
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Desending
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Last Month
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Last 7 Days
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
                         <div className="card-body p-0">
-                            <div className="table-responsive p-2" style={{ height: '300px' }}>
+                            <div className="table-responsive p-2" style={{ height: '400px' }}>
                                 <table className="table datanew table-bordered">
                                     <thead>
                                         <tr>
