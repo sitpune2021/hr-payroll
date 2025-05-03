@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '../../core/data/redux/store'
 import { Branch, fetchBranches } from '../../core/data/redux/branchesSlice';
 import { formatDate } from '../../utils/dateformatter1';
+import moment from 'moment'
 type PasswordField = "password" | "confirmPassword";
 
 const Branches = () => {
@@ -22,6 +23,8 @@ const Branches = () => {
 
     // const data = companies_details;
     const dispatch = useAppDispatch();
+    const [statusFilter, setStatusFilter] = useState('All');
+    const [sortOption, setSortOption] = useState('Last 7 Days');
 
     const [allcompany, setAllCompany] = useState<Company[]>([])
     const [allBranches, setAllBranches] = useState<Branch[]>([])
@@ -29,6 +32,7 @@ const Branches = () => {
     const [editBranchData, setEditBranchData] = useState<Branch>()
 
     const user = useSelector((state: RootState) => state.auth.user);
+    const { start, end } = useSelector((state: any) => state.dateRange);
 
     const companyList = useAppSelector((state) => state.companies.list);
     const branchList: Branch[] = useSelector((state: RootState) => state.branches.branches);
@@ -44,6 +48,47 @@ const Branches = () => {
             };
         });
     };
+
+    const getSortedFilteredData = () => {
+        let data = [...branchList];
+
+        if (start && end) {
+            data = data.filter(branch =>
+                moment(branch.createdAt).isBetween(start, end, 'day', '[]')
+            );
+        }
+
+        // if (statusFilter === 'Active') {
+        //     data = data.filter(branch => branch.isActive === true);
+        // } else if (statusFilter === 'Inactive') {
+        //     data = data.filter(branch => branch.isActive === false);
+        // }
+
+        if (sortOption === 'Recently Added') {
+            data.sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
+        } else if (sortOption === 'Ascending') {
+            data.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortOption === 'Descending') {
+            data.sort((a, b) => b.name.localeCompare(a.name));
+        } else if (sortOption === 'Last Month') {
+            const startOfLastMonth = moment().subtract(1, 'month').startOf('month');
+            const endOfLastMonth = moment().subtract(1, 'month').endOf('month');
+            data = data.filter((company) =>
+                moment(company.createdAt).isBetween(startOfLastMonth, endOfLastMonth, 'day', '[]')
+            );
+        } else if (sortOption === 'Last 7 Days') {
+            const last7Days = moment().subtract(6, 'days');
+            data = data.filter((company) =>
+                moment(company.createdAt).isSameOrAfter(last7Days, 'day')
+            );
+        }
+
+        return data;
+    };
+
+    const handleSortChange = (option: string) => {
+        setSortOption(option);
+      };
 
     const handleEditBranchSubmit = async (e: any) => {
         e.preventDefault();
@@ -63,10 +108,9 @@ const Branches = () => {
 
     }
 
-    // const tableData = mapCompanyDataToTable(companyList);
     useEffect(() => {
         if (companyList.length > 0) {
-            const activeCompany= companyList.filter(company=>company.isActive);
+            const activeCompany = companyList.filter(company => company.isActive);
             const loggedUsersCompany = companyList.find(
                 (company) => company.id === user?.companyId
             );
@@ -86,20 +130,16 @@ const Branches = () => {
             if (loggedUsersBranches.length > 0) {
                 setAllBranches(loggedUsersBranches);
             } else {
-                setAllBranches(branchList);
+                setAllBranches(getSortedFilteredData());
             }
         }
 
-    }, [branchList, companyList, user?.companyId]);
+    }, [branchList, companyList, user?.companyId,sortOption,statusFilter,start,end]);
 
     const getCompanyNameById = (companyId: number | undefined): string => {
         const company = companyList.find((comp) => comp.id === companyId);
         return company ? company.name : 'Unknown Company';
     };
-
-
-
-
 
     const [addBranchFormData, setAddBranchFormData] = useState({
         name: "",
@@ -158,141 +198,6 @@ const Branches = () => {
 
     }
 
-    // const columns = [
-    //     {
-    //         title: "Company Name",
-    //         dataIndex: "CompanyName",
-    //         render: (text: String, record: any) => (
-    //             <div className="d-flex align-items-center file-name-icon">
-    //                 <Link to="#" className="avatar avatar-md border rounded-circle">
-    //                     <ImageWithBasePath
-    //                         src={`assets/img/company/${record.Image}`}
-    //                         className="img-fluid"
-    //                         alt="img"
-    //                     />
-    //                 </Link>
-    //                 <div className="ms-2">
-    //                     <h6 className="fw-medium">
-    //                         <Link to="#">{record.CompanyName}</Link>
-    //                     </h6>
-    //                 </div>
-    //             </div>
-
-    //         ),
-    //         sorter: (a: any, b: any) => a.CompanyName.length - b.CompanyName.length,
-    //     },
-    //     {
-    //         title: "Email",
-    //         dataIndex: "Email",
-    //         sorter: (a: any, b: any) => a.Email.length - b.Email.length,
-    //     },
-    //     {
-    //         title: "Account URL",
-    //         dataIndex: "AccountURL",
-    //         sorter: (a: any, b: any) => a.AccountURL.length - b.AccountURL.length,
-    //     },
-    //     // {
-    //     //   title: "Plan",
-    //     //   dataIndex: "Plan",
-    //     //   render: (text: String, record: any) => (
-    //     //     <div className="d-flex align-items-center justify-content-between">
-    //     //       <p className="mb-0 me-2">{record.Plan}</p>
-    //     //       <Link
-    //     //         to="#"
-    //     //         data-bs-toggle="modal"
-    //     //         className="badge badge-purple badge-xs"
-    //     //         data-bs-target="#upgrade_info"
-    //     //       >
-    //     //         Upgrade
-    //     //       </Link>
-    //     //     </div>
-
-    //     //   ),
-    //     //   sorter: (a: any, b: any) => a.Plan.length - b.Plan.length,
-    //     // },
-    //     {
-    //         title: "Created Date",
-    //         dataIndex: "CreatedDate",
-    //         sorter: (a: any, b: any) => a.CreatedDate.length - b.CreatedDate.length,
-    //     },
-    //     {
-    //         title: "Status",
-    //         dataIndex: "Status",
-    //         render: (text: string, record: any) => (
-    //             <span className={`badge ${text === 'Active' ? 'badge-success' : 'badge-danger'} d-inline-flex align-items-center badge-xs`}>
-    //                 <i className="ti ti-point-filled me-1" />
-    //                 {text}
-    //             </span>
-
-    //         ),
-    //         sorter: (a: any, b: any) => a.Status.length - b.Status.length,
-    //     },
-    //     {
-    //         title: "Actions",
-    //         dataIndex: "actions",
-    //         render: () => (
-    //             <div className="action-icon d-inline-flex">
-    //                 <Link
-    //                     to="#"
-    //                     className="me-2"
-    //                     data-bs-toggle="modal"
-    //                     data-bs-target="#company_detail"
-    //                 >
-    //                     <i className="ti ti-eye" />
-    //                 </Link>
-    //                 <Link
-    //                     to="#"
-    //                     className="me-2"
-    //                     data-bs-toggle="modal"
-    //                     data-bs-target="#edit_company"
-    //                 >
-    //                     <i className="ti ti-edit" />
-    //                 </Link>
-    //                 <Link
-    //                     to="#"
-    //                     data-bs-toggle="modal"
-    //                     data-bs-target="#delete_modal"
-    //                 >
-    //                     <i className="ti ti-trash" />
-    //                 </Link>
-    //             </div>
-
-    //         ),
-    //     },
-    // ]
-    const [passwordVisibility, setPasswordVisibility] = useState({
-        password: false,
-        confirmPassword: false,
-    });
-
-    const togglePasswordVisibility = (field: PasswordField) => {
-        setPasswordVisibility((prevState) => ({
-            ...prevState,
-            [field]: !prevState[field],
-        }));
-    };
-
-    const planName = [
-        { value: "Advanced", label: "Advanced" },
-        { value: "Basic", label: "Basic" },
-        { value: "Enterprise", label: "Enterprise" },
-    ];
-    const planType = [
-        { value: "Monthly", label: "Monthly" },
-        { value: "Yearly", label: "Yearly" },
-    ];
-    const currency = [
-        { value: "USD", label: "USD" },
-        { value: "Euro", label: "Euro" },
-    ];
-    const language = [
-        { value: "English", label: "English" },
-        { value: "Arabic", label: "Arabic" },
-    ];
-    const statusChoose = [
-        { value: "Active", label: "Active" },
-        { value: "Inactive", label: "Inactive" },
-    ];
 
     const getModalContainer = () => {
         const modalElement = document.getElementById('modal-datepicker');
@@ -758,10 +663,20 @@ const Branches = () => {
                                         Select Status
                                     </Link>
                                     <ul className="dropdown-menu  dropdown-menu-end p-3">
+                                    <li>
+                                            <Link
+                                                to="#"
+                                                className="dropdown-item rounded-1"
+                                                onClick={()=>setStatusFilter('All')}
+                                            >
+                                                All
+                                            </Link>
+                                        </li>
                                         <li>
                                             <Link
                                                 to="#"
                                                 className="dropdown-item rounded-1"
+                                                onClick={()=>setStatusFilter('Active')}
                                             >
                                                 Active
                                             </Link>
@@ -770,6 +685,7 @@ const Branches = () => {
                                             <Link
                                                 to="#"
                                                 className="dropdown-item rounded-1"
+                                                onClick={()=>setStatusFilter('Inactive')}
                                             >
                                                 Inactive
                                             </Link>
@@ -782,49 +698,20 @@ const Branches = () => {
                                         className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
                                         data-bs-toggle="dropdown"
                                     >
-                                        Sort By : Last 7 Days
+                                        Sort By : {sortOption}
                                     </Link>
-                                    <ul className="dropdown-menu  dropdown-menu-end p-3">
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Recently Added
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Ascending
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Desending
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Last Month
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Last 7 Days
-                                            </Link>
-                                        </li>
+                                    <ul className="dropdown-menu dropdown-menu-end p-3">
+                                        {['Recently Added', 'Ascending', 'Descending', 'Last Month', 'Last 7 Days'].map((option) => (
+                                            <li key={option}>
+                                                <Link
+                                                    to="#"
+                                                    className="dropdown-item rounded-1"
+                                                    onClick={() => handleSortChange(option)}
+                                                >
+                                                    {option}
+                                                </Link>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                             </div>
@@ -929,7 +816,7 @@ const Branches = () => {
                                                 value={addBranchFormData.name}
                                                 onChange={(e) => handleAddBranchChange(e)}
                                                 className={`form-control ${formErrors.name ? 'is-invalid' : ''}`} />
-                                                {formErrors.name && <div className="text-danger mt-1">{formErrors.name}</div>}
+                                            {formErrors.name && <div className="text-danger mt-1">{formErrors.name}</div>}
                                         </div>
                                     </div>
                                     <div className="col-md-6">
@@ -941,7 +828,7 @@ const Branches = () => {
                                                 value={addBranchFormData.email}
                                                 onChange={(e) => handleAddBranchChange(e)}
                                                 className={`form-control ${formErrors.email ? 'is-invalid' : ''}`} />
-                                                {formErrors.email && <div className="text-danger mt-1">{formErrors.email}</div>}
+                                            {formErrors.email && <div className="text-danger mt-1">{formErrors.email}</div>}
                                         </div>
                                     </div>
                                     <div className="col-md-6">
@@ -955,7 +842,7 @@ const Branches = () => {
                                                 value={addBranchFormData.phone}
                                                 onChange={(e) => handleAddBranchChange(e)}
                                                 className={`form-control ${formErrors.phone ? 'is-invalid' : ''}`} />
-                                                {formErrors.phone && <div className="text-danger mt-1">{formErrors.phone}</div>}
+                                            {formErrors.phone && <div className="text-danger mt-1">{formErrors.phone}</div>}
                                         </div>
                                     </div>
 

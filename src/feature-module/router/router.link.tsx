@@ -87,17 +87,8 @@ import Tooltips from "../uiInterface/base-ui/tooltips";
 import Ribbon from "../uiInterface/advanced-ui/ribbon";
 import AdminDashboard from "../mainMenu/adminDashboard";
 import AlertUi from "../uiInterface/base-ui/alert-ui";
-
-import Login2 from "../auth/login/login-2";
-import Login3 from "../auth/login/login-3";
 import ResetPassword2 from "../auth/resetPassword/resetPassword-2";
 import ResetPassword3 from "../auth/resetPassword/resetPassword-3";
-import TwoStepVerification2 from "../auth/twoStepVerification/twoStepVerification-2";
-import TwoStepVerification3 from "../auth/twoStepVerification/twoStepVerification-3";
-import Register2 from "../auth/register/register-2";
-import Register3 from "../auth/register/register-3";
-import ForgotPassword2 from "../auth/forgotPassword/forgotPassword-2";
-import ForgotPassword3 from "../auth/forgotPassword/forgotPassword-3";
 import ResetPasswordSuccess from "../auth/resetPasswordSuccess/resetPasswordSuccess";
 import ResetPasswordSuccess2 from "../auth/resetPasswordSuccess/resetPasswordSuccess-2";
 import ResetPasswordSuccess3 from "../auth/resetPasswordSuccess/resetPasswordSuccess-3";
@@ -136,8 +127,6 @@ import States from "../content/location/states";
 import Testimonials from "../content/testimonials";
 import Profile from "../pages/profile";
 import LockScreen from "../auth/lockScreen";
-import EmailVerification2 from "../auth/emailVerification/emailVerification-2";
-import EmailVerification3 from "../auth/emailVerification/emailVerification-3";
 import EmployeeDashboard from "../mainMenu/employeeDashboard/employee-dashboard";
 import LeadsDasboard from "../mainMenu/leadsDashboard";
 import DealsDashboard from "../mainMenu/dealsDashboard";
@@ -1907,18 +1896,6 @@ export const authRoutes = [
     label: 'login'
   },
   {
-    label: 'Illustration',
-    path: routes.login2,
-    element: <Login2 />,
-    route: Route,
-  },
-  {
-    label: 'Basic',
-    path: routes.login3,
-    element: <Login3 />,
-    route: Route,
-  },
-  {
     label: 'Cover',
     path: routes.register,
     element: <Register />,
@@ -1931,51 +1908,15 @@ export const authRoutes = [
     route: Route,
   },
   {
-    label: 'Illustration',
-    path: routes.twoStepVerification2,
-    element: <TwoStepVerification2 />,
-    route: Route,
-  },
-  {
-    label: 'Basic',
-    path: routes.twoStepVerification3,
-    element: <TwoStepVerification3 />,
-    route: Route,
-  },
-  {
     label: 'Cover',
     path: routes.emailVerification,
     element: <EmailVerification />,
     route: Route,
   },
   {
-    label: 'Illustration',
-    path: routes.emailVerification2,
-    element: <EmailVerification2 />,
-    route: Route,
-  },
-  {
-    label: 'Basic',
-    path: routes.emailVerification3,
-    element: <EmailVerification3 />,
-    route: Route,
-  },
-  {
     label: 'Cover',
     path: routes.register,
     element: <Register />,
-    route: Route,
-  },
-  {
-    label: 'Illustration',
-    path: routes.register2,
-    element: <Register2 />,
-    route: Route,
-  },
-  {
-    label: 'Basic',
-    path: routes.register3,
-    element: <Register3 />,
     route: Route,
   },
   {
@@ -2000,18 +1941,6 @@ export const authRoutes = [
     label: 'Cover',
     path: routes.forgotPassword,
     element: <ForgotPassword />,
-    route: Route,
-  },
-  {
-    label: 'Illustration',
-    path: routes.forgotPassword2,
-    element: <ForgotPassword2 />,
-    route: Route,
-  },
-  {
-    label: 'Basic',
-    path: routes.forgotPassword3,
-    element: <ForgotPassword3 />,
     route: Route,
   },
   {
