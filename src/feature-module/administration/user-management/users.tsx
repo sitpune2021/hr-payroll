@@ -16,14 +16,23 @@ import { fetchUsers, setSort, User } from '../../../core/data/redux/usersSlice';
 import { formatDate } from '../../../utils/dateformatter1';
 import { generateErrorExcelUserUpload } from '../../../utils/generateErrorExcelUploadUser';
 import { Department } from '../../../core/data/redux/departmentsSlice';
+import moment from 'moment';
 type PasswordField = "password" | "confirmPassword";
 
 const Users = () => {
 
     const dispatch = useAppDispatch();
+    const [statusFilter, setStatusFilter] = useState('All');
+    const [sortOption, setSortOption] = useState('Last 7 Days');
+    const [roleFilter, setRoleFilter] = useState(0)
 
-     const userAllowedLabels = useSelector((state: RootState) => state.feature.allowedFeatures);
-      const filteredLabels = userAllowedLabels.map((feature: any) => feature.name);
+
+    const handleSortChange = (option: string) => {
+        setSortOption(option);
+    };
+
+    const userAllowedLabels = useSelector((state: RootState) => state.feature.allowedFeatures);
+    const filteredLabels = userAllowedLabels.map((feature: any) => feature.name);
 
     const [viewUserDetails, setViewUserDetails] = useState<User>();
     const [editUserData, setEditUserData] = useState<Partial<User>>();
@@ -78,26 +87,27 @@ const Users = () => {
 
     const [allcompany, setAllCompany] = useState<Company[]>([])
     const [allBranches, setAllBranches] = useState<Branch[]>([])
-    const [limit,setLimit]= useState(10)
+    const [limit, setLimit] = useState(10)
     const [filteredBranches, setFilteredBranches] = useState<Branch[]>([]);
     const user = useSelector((state: RootState) => state.auth.user);
     const companyList = useAppSelector((state) => state.companies.list);
     const branchList: Branch[] = useSelector((state: RootState) => state.branches.branches);
     const departmentList = useSelector((state: RootState) => state.departments.data)
+    const { start, end } = useSelector((state: any) => state.dateRange);
     const roleList = useAppSelector((state: RootState) => state.roles.list);
 
- 
+
 
     useEffect(() => {
-        if(user && user.departmentId===1){
+        if (user && user.departmentId === 1) {
             setFilteredDepartments(departmentList)
-        }else if (user && user.departmentId !== null) {
-          const filtered = departmentList.filter(dept => dept.id > user.departmentId!);
-          setFilteredDepartments(filtered);
+        } else if (user && user.departmentId !== null) {
+            const filtered = departmentList.filter(dept => dept.id > user.departmentId!);
+            setFilteredDepartments(filtered);
         } else {
-          setFilteredDepartments([]);
+            setFilteredDepartments([]);
         }
-      }, [user, departmentList]);
+    }, [user, departmentList]);
 
 
 
@@ -117,7 +127,7 @@ const Users = () => {
                 })
             );
         }
-    }, [dispatch, user, loggedInRoleId, page,limit]);
+    }, [dispatch, user, loggedInRoleId, page, limit]);
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -149,7 +159,7 @@ const Users = () => {
         maritalStatus: '',
         companyId: '',
         branchId: '',
-        departmentId:''
+        departmentId: ''
     });
 
 
@@ -201,17 +211,6 @@ const Users = () => {
             setFilteredBranches([]);
         }
     }, [editUserData?.companyId, allBranches]);
-
-
-
-
-
-
-
-
-
-
-
 
     const handleAddUserSubmit = async (e: any) => {
         e.preventDefault();
@@ -458,6 +457,50 @@ const Users = () => {
     };
 
 
+    const getSortedFilteredData = () => {
+        let data = [...users];
+
+        if (start && end) {
+            data = data.filter(user =>
+                moment(user.createdAt).isBetween(start, end, 'day', '[]')
+            );
+        }
+        if (roleFilter > 0) {
+            data = data.filter(user =>
+                user.roleId === roleFilter
+            )
+        }
+
+        // if (statusFilter === 'Active') {
+        //     data = data.filter(branch => branch.isActive === true);
+        // } else if (statusFilter === 'Inactive') {
+        //     data = data.filter(branch => branch.isActive === false);
+        // }
+
+        if (sortOption === 'Recently Added') {
+            data.sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
+        } else if (sortOption === 'Ascending') {
+            data.sort((a, b) => a.firstName.localeCompare(b.firstName));
+        } else if (sortOption === 'Descending') {
+            data.sort((a, b) => b.firstName.localeCompare(a.firstName));
+        } else if (sortOption === 'Last Month') {
+            const startOfLastMonth = moment().subtract(1, 'month').startOf('month');
+            const endOfLastMonth = moment().subtract(1, 'month').endOf('month');
+            data = data.filter((user) =>
+                moment(user.createdAt).isBetween(startOfLastMonth, endOfLastMonth, 'day', '[]')
+            );
+        } else if (sortOption === 'Last 7 Days') {
+            const last7Days = moment().subtract(6, 'days');
+            data = data.filter((user) =>
+                moment(user.createdAt).isSameOrAfter(last7Days, 'day')
+            );
+        }
+
+        return data;
+    };
+
+
+
 
     return (
         <>
@@ -527,19 +570,19 @@ const Users = () => {
                                     />
                                 </label>
                                 {
-                                    filteredLabels.includes('AddUser') && 
+                                    filteredLabels.includes('AddUser') &&
                                     <Link
-                                    to="#"
-                                    data-bs-toggle="modal"
-                                    data-inert={true}
-                                    data-bs-target="#add_users"
-                                    className="btn btn-primary d-flex align-items-center"
-                                >
-                                    <i className="ti ti-circle-plus me-2" />
-                                    Add New User
-                                </Link>
+                                        to="#"
+                                        data-bs-toggle="modal"
+                                        data-inert={true}
+                                        data-bs-target="#add_users"
+                                        className="btn btn-primary d-flex align-items-center"
+                                    >
+                                        <i className="ti ti-circle-plus me-2" />
+                                        Add New User
+                                    </Link>
                                 }
-                               
+
                             </div>
 
 
@@ -555,19 +598,21 @@ const Users = () => {
                             <h5>Users List</h5>
                             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
                                 <div className='mx-3'>
-                                    <select 
-                                    className='form-control me-3'
-                                    onChange={(e)=>setLimit(parseInt(e.target.value))}
-                                     value={limit}
-                                     >
+                                    <select
+                                        className='form-control me-3'
+                                        onChange={(e) => setLimit(parseInt(e.target.value))}
+                                        value={limit}
+                                    >
                                         <option value={10}>10</option>
                                         <option value={20}>20</option>
                                         <option value={30}>30</option>
-                                        <option value={40}>50</option>
-                                        <option value={50}>100</option>
-                                        <option value={100}>200</option>
-                                        <option value={150}>200</option>
+                                        <option value={50}>50</option>
+                                        <option value={100}>100</option>
                                         <option value={200}>200</option>
+                                        <option value={300}>300</option>
+                                        <option value={400}>400</option>
+                                        <option value={500}>500</option>
+                                        <option value={1000}>1000</option>
 
                                     </select>
                                 </div>
@@ -585,25 +630,31 @@ const Users = () => {
                                         className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
                                         data-bs-toggle="dropdown"
                                     >
-                                        Role
+                                        {getRoleNameByRoleId(roleFilter)}
                                     </Link>
                                     <ul className="dropdown-menu  dropdown-menu-end p-3">
                                         <li>
                                             <Link
                                                 to="#"
                                                 className="dropdown-item rounded-1"
+                                                onClick={() => setRoleFilter(0)}
                                             >
-                                                Employee
+                                                All
                                             </Link>
                                         </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Client
-                                            </Link>
-                                        </li>
+                                        {
+                                            filteredRoles.map(role => (
+                                                <li key={role.id}>
+                                                    <Link
+                                                        to="#"
+                                                        className="dropdown-item rounded-1"
+                                                        onClick={() => setRoleFilter(role.id)}
+                                                    >
+                                                        {role.name}
+                                                    </Link>
+                                                </li>
+                                            ))
+                                        }
                                     </ul>
                                 </div>
                                 <div className="dropdown me-3">
@@ -619,6 +670,16 @@ const Users = () => {
                                             <Link
                                                 to="#"
                                                 className="dropdown-item rounded-1"
+                                                onClick={() => setStatusFilter('All')}
+                                            >
+                                                All
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link
+                                                to="#"
+                                                className="dropdown-item rounded-1"
+                                                onClick={() => setStatusFilter('Active')}
                                             >
                                                 Active
                                             </Link>
@@ -627,6 +688,7 @@ const Users = () => {
                                             <Link
                                                 to="#"
                                                 className="dropdown-item rounded-1"
+                                                onClick={() => setStatusFilter('Inactive')}
                                             >
                                                 Inactive
                                             </Link>
@@ -639,49 +701,20 @@ const Users = () => {
                                         className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
                                         data-bs-toggle="dropdown"
                                     >
-                                        Sort By : Last 7 Days
+                                        Sort By : {sortOption}
                                     </Link>
-                                    <ul className="dropdown-menu  dropdown-menu-end p-3">
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Recently Added
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Ascending
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Desending
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Last Month
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Last 7 Days
-                                            </Link>
-                                        </li>
+                                    <ul className="dropdown-menu dropdown-menu-end p-3">
+                                        {['Recently Added', 'Ascending', 'Descending', 'Last Month', 'Last 7 Days'].map((option) => (
+                                            <li key={option}>
+                                                <Link
+                                                    to="#"
+                                                    className="dropdown-item rounded-1"
+                                                    onClick={() => handleSortChange(option)}
+                                                >
+                                                    {option}
+                                                </Link>
+                                            </li>
+                                        ))}
                                     </ul>
                                 </div>
                             </div>
@@ -703,7 +736,7 @@ const Users = () => {
                                     </thead>
                                     <tbody>
                                         {
-                                            users.map(user => (
+                                            getSortedFilteredData().map(user => (
                                                 <tr key={user.id}>
                                                     <td>{user.id}</td>
                                                     <td>{user.firstName + " " + user.lastName}</td>
@@ -1197,7 +1230,7 @@ const Users = () => {
                                                 className='form-control'
                                                 name='departmentId'
                                                 value={editUserData?.departmentId}
-                                                onChange={(e)=>handleEditDataChange(e)}
+                                                onChange={(e) => handleEditDataChange(e)}
                                             >
                                                 <option value="">---Select ---</option>
                                                 {

@@ -62,8 +62,6 @@ export const all_routes = {
 
   // auth routes routes
   login: "/login",
-  login2: "/login-2",
-  login3: "/login-3",
   register: "/register",
   register2: "/register-2",
   register3: "/register-3",

@@ -1,13 +1,6 @@
 import React, { useEffect } from 'react'
-import { status } from '../../../core/common/selectoption/selectoption'
-import CommonSelect from '../../../core/common/commonSelect'
 import { all_routes } from '../../router/all_routes'
 import { Link } from 'react-router-dom'
-import PredefinedDateRanges from '../../../core/common/datePicker'
-import Table from "../../../core/common/dataTable/index";
-import ImageWithBasePath from '../../../core/common/imageWithBasePath'
-import { rolesDetails } from '../../../core/data/json/rolesDetails'
-import CollapseHeader from '../../../core/common/collapse-header/collapse-header'
 import { AppDispatch, RootState } from '../../../core/data/redux/store'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchRolePermissions } from '../../../core/data/redux/rolePermissionSlice'
@@ -15,6 +8,7 @@ import axiosClient from '../../../axiosConfig/axiosClient'
 
 const PermissionPage = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const [selectedRoleIds, setSelectedRoleIds] = React.useState<number[]>([]);
 
     useEffect(() => {
         dispatch(fetchRolePermissions());
@@ -38,64 +32,11 @@ const PermissionPage = () => {
         }
     }
 
-
-
-    const data = rolesDetails;
-    const columns = [
-        {
-            title: "Role",
-            dataIndex: "role",
-            sorter: (a: any, b: any) => a.role.length - b.role.length,
-        },
-        {
-            title: "Created Date",
-            dataIndex: "created_date",
-            sorter: (a: any, b: any) => a.created_date.length - b.created_date.length,
-        },
-        {
-            title: "Status",
-            dataIndex: "status",
-            render: (text: string, record: any) => (
-                <>
-                    <span
-                        className={`badge d-inline-flex align-items-center badge-xs ${text === 'Active'
-                            ? 'badge-success'
-                            : 'badge-danger'
-                            }`}
-                    >
-                        <i className="ti ti-point-filled me-1"></i>
-                        {text}
-                    </span>
-                </>
-            ),
-            sorter: (a: any, b: any) => a.status.length - b.status.length,
-        },
-        {
-            title: "",
-            dataIndex: "actions",
-            render: () => (
-                <div className="action-icon d-inline-flex">
-                    <Link to={"permission.html"} className="me-2">
-                        <i className="ti ti-shield" />
-                    </Link>
-                    <Link
-                        to="#"
-                        className="me-2"
-                        data-bs-toggle="modal" data-inert={true}
-                        data-bs-target="#edit_role"
-                    >
-                        <i className="ti ti-edit" />
-                    </Link>
-                    <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
-                        <i className="ti ti-trash" />
-                    </Link>
-                </div>
-
-
-
-            ),
-        },
-    ]
+    useEffect(() => {
+        if (roles.length > 0 && selectedRoleIds.length === 0) {
+            setSelectedRoleIds(roles.map((role) => role.id));
+        }
+    }, [roles]);
 
     return (
         <>
@@ -120,6 +61,43 @@ const PermissionPage = () => {
                                 </ol>
                             </nav>
                         </div>
+                        <div className="mb-3">
+                            <div className="dropdown">
+                                <button
+                                    className="btn btn-outline-primary dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    Roles ({selectedRoleIds.length})
+                                </button>
+                                <ul className="dropdown-menu p-2" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                    {roles.map((role) => (
+                                        <li key={role.id}>
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    checked={selectedRoleIds.includes(role.id)}
+                                                    onChange={() => {
+                                                        setSelectedRoleIds((prev) =>
+                                                            prev.includes(role.id)
+                                                                ? prev.filter((id) => id !== role.id)
+                                                                : [...prev, role.id]
+                                                        );
+                                                    }}
+                                                    id={`role-checkbox-${role.id}`}
+                                                />
+                                                <label className="form-check-label" htmlFor={`role-checkbox-${role.id}`}>
+                                                    {role.name}
+                                                </label>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+
                     </div>
                     {/* /Breadcrumb */}
                     {/* Assets Lists */}
@@ -131,27 +109,31 @@ const PermissionPage = () => {
                                     <thead className="thead-light" style={{ position: "sticky", top: 0, zIndex: 1, backgroundColor: "#fff" }}>
                                         <tr>
                                             <th>Features\Roles</th>
-                                            {roles.map(role => (
-                                                <th key={role.id}>{role.name}</th>
-                                            ))}
+                                            {roles
+                                                .filter((role) => selectedRoleIds.includes(role.id))
+                                                .map((role) => (
+                                                    <th key={role.id}>{role.name}</th>
+                                                ))}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {features.map((feature) => (
                                             <tr key={feature.id}>
                                                 <th>{feature.name}</th>
-                                                {roles.map((role) => (
-                                                    <td key={role.id}>
-                                                        <div className="form-check form-check-md">
-                                                            <input
-                                                                className="form-check-input"
-                                                                type="checkbox"
-                                                                checked={isChecked(role.id, feature.id)}
-                                                                onChange={() => handlePermissionToggle(role.id, feature.id)}
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                ))}
+                                                {roles
+                                                    .filter((role) => selectedRoleIds.includes(role.id))
+                                                    .map((role) => (
+                                                        <td key={role.id}>
+                                                            <div className="form-check form-check-md">
+                                                                <input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    checked={isChecked(role.id, feature.id)}
+                                                                    onChange={() => handlePermissionToggle(role.id, feature.id)}
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                    ))}
                                             </tr>
                                         ))}
                                     </tbody>

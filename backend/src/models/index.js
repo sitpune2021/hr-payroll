@@ -7,6 +7,11 @@ import RoleModel from './Role.model.js';
 import initSuperAdmin from '../config/initSuperAdmin.js';
 import PermissionModel from './Permission.model.js';
 import RolePermissionModel from './RolePermission.model.js';
+import PayrollTemplateModel from './PayrollTemplate.js';
+import PayrollComponentModel from './PayrollComponent.js';
+
+
+
 // import seedPermissions from '../config/permissionSeeder.js';
 import seedRoles from '../config/roleSeeder.js';
 import seedRolePermissions from '../config/rolePermissionSeeder.js';
@@ -49,6 +54,9 @@ const models = {
   Permission: PermissionModel(sequelize),
   RolePermission: RolePermissionModel(sequelize),
   Department: departmentModel(sequelize),
+  PayrollTemplate: PayrollTemplateModel(sequelize),
+  PayrollComponent: PayrollComponentModel(sequelize),
+
 };
 
 // Function to seed roles
