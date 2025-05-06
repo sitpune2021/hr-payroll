@@ -18,7 +18,7 @@ const Sidebar = () => {
   const Location = useLocation();
 
   const allowedFeatures = useSelector((state: RootState) => state.feature.allowedFeatures);
-
+  
   const allowedLabels = allowedFeatures.map((f: any) => f.name);
 
   const filteredSidebar = filterSidebarByLabel(SidebarDataTest, allowedLabels);

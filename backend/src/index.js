@@ -11,16 +11,20 @@ import featureRouter from './routes/feature.route.js';
 import settingRoutes from './routes/settings.router.js';
 import userRouter from './routes/user.routes.js';
 import imageRouter from './routes/images.routes.js';
+import attendanceRouter from './routes/attendance.router.js';
+import employeeShiftRoutes from './routes/employeeShift.router.js';
+import attendanceSettingRoutes from './routes/AttendanceSetting.router.js';
 import depaermentRouter from './routes/department.routes.js' 
 import { PORT } from './envvariablesdata.js';
+
 
 dotenv.config();
 
 const app = express();
 
 app.use(cors({
-  // origin: "http://localhost:3000",
-  origin: "http://103.165.118.71:3020",
+  origin: "http://localhost:3000",
+  // origin: "http://103.165.118.71:3020",
   credentials: true,
 }));
 app.use(express.json());
@@ -36,6 +40,9 @@ app.use('/api/feature',featureRouter)
 app.use('/api/user',userRouter)
 app.use('/api/image',imageRouter)
 app.use('/api/department',depaermentRouter)
+app.use('/api/attendance',attendanceRouter)
+app.use('/api/shifts', attendanceSettingRoutes);
+app.use('/api/employee-shift', employeeShiftRoutes);
 
 
 

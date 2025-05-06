@@ -36,6 +36,7 @@ export default (sequelize) => {
   Branch.associate = (models) => {
     Branch.belongsTo(models.Company, { foreignKey: 'companyId' });
     Branch.hasMany(models.User, { foreignKey: 'branchId' });
+    Branch.hasMany(models.AttendanceSetting, { foreignKey: 'branchId' });
   };
 
   return Branch;
