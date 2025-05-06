@@ -23,6 +23,7 @@ import usersReducer from './usersSlice';
 import departmentsReducer from './departmentsSlice';
 import rolePermissionReducer from './rolePermissionSlice';
 import dateRangeReducer from './dateRangeSlice';
+import shiftReducer from './shiftSlice';
 
 
 
@@ -40,6 +41,7 @@ const rootReducer = combineReducers({
   departments:departmentsReducer,
   rolePermission: rolePermissionReducer,
   dateRange: dateRangeReducer,
+  shifts: shiftReducer,
 });
 
 // 👇 Persist config: Choose what to persist

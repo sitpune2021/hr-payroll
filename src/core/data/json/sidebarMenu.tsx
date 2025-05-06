@@ -64,6 +64,12 @@ export const SidebarDataTest = [
         link: routes.departments,
         base: 'ranches',
       },
+      {
+        label: 'Shift Management',
+        icon: 'layout-grid-add',
+        link: routes.shiftManagement,
+        base: 'ranches',
+      },
     ]
   },
   {

@@ -9,6 +9,15 @@ import PermissionModel from './Permission.model.js';
 import RolePermissionModel from './RolePermission.model.js';
 import PayrollTemplateModel from './PayrollTemplate.js';
 import PayrollComponentModel from './PayrollComponent.js';
+import EmployeePayrollModel from './EmployeePayroll.js';
+import AttendanceModel from './Attendance.js';
+import LeaveRequestModel from './LeaveRequest.js';
+import SalarySlipModel from './SalarySlip.js';
+import AttendanceSettingModel from './AttendanceSetting.js';
+import EmployeeShiftScheduleModel from './EmployeeShiftSchedule.js';
+
+
+
 
 
 
@@ -56,7 +65,12 @@ const models = {
   Department: departmentModel(sequelize),
   PayrollTemplate: PayrollTemplateModel(sequelize),
   PayrollComponent: PayrollComponentModel(sequelize),
-
+  EmployeePayroll: EmployeePayrollModel(sequelize),
+  Attendance: AttendanceModel(sequelize),
+  LeaveRequest: LeaveRequestModel(sequelize),
+  SalarySlip: SalarySlipModel(sequelize),
+  AttendanceSetting: AttendanceSettingModel(sequelize),
+  EmployeeShiftSchedule: EmployeeShiftScheduleModel(sequelize),
 };
 
 // Function to seed roles

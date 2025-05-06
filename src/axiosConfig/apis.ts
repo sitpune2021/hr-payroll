@@ -19,6 +19,12 @@ export const ADD_NEW_FEATURE  =  "/api/feature/addfeature"
 export const FETCH_ALL_DEPARTMENTS  =  "/api/department/getlist"
 export const FETCH_ROLES_PERMISSIONS  =  "/api/settings/rolespermissions"
 
+export const FETCH_ALL_SHIFTS  =  "/api/shifts/list"
+export const ADD_NEW_SHIFT  =  "/api/shifts/create"
+export const EDIT_SHIFT  =  "/api/shifts/edit/"
+
+
+
 
 
 
