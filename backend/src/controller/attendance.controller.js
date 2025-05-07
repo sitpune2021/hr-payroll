@@ -94,7 +94,7 @@ const markNewAttendance = async (req, res) => {
       const shiftDuration = shiftStart && shiftEnd
         ? moment.duration(shiftEnd.diff(shiftStart)).asHours()
         : 0;
-      const isHalfDay = shiftDuration > 0 ? workedHours < shiftDuration * 0.5 : false;
+      const isHalfDay = shiftDuration > 0 && (isLate || isEarlyLeave) ? true : false;
 
       attendance.checkOut = time;
       attendance.isEarlyLeave = leftEarly;
