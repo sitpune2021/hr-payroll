@@ -26,6 +26,8 @@ export const all_routes = {
   adminBranches:"/admin/branch",
   adminFeatures:"/admin/features",
   shiftManagement: "/shiftManagement",
+  payrollTemplate: '/payrolltemplate',
+
 
 
 

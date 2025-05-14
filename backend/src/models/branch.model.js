@@ -28,6 +28,10 @@ export default (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    templateId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },{
     tableName: 'Branch',
     timestamps: true
@@ -35,6 +39,7 @@ export default (sequelize) => {
 
   Branch.associate = (models) => {
     Branch.belongsTo(models.Company, { foreignKey: 'companyId' });
+    Branch.belongsTo(models.PayrollTemplate, { foreignKey: 'templateId' });
     Branch.hasMany(models.User, { foreignKey: 'branchId' });
     Branch.hasMany(models.AttendanceSetting, { foreignKey: 'branchId' });
   };

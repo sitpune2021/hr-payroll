@@ -2106,6 +2106,8 @@ const seedPermissions = async (models) => {
     { name: 'Shift Management', description: 'Permission to open shift management page' },
     { name: 'AddShift', description: 'Permission to add new shift/shift settings' },
     { name: 'EditShift', description: 'Permission to edit shift' },
+    { name: 'Payroll Templates', description: 'Permission access payroll page' },
+
 
 
   ];

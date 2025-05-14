@@ -14,6 +14,8 @@ import imageRouter from './routes/images.routes.js';
 import attendanceRouter from './routes/attendance.router.js';
 import employeeShiftRoutes from './routes/employeeShift.router.js';
 import attendanceSettingRoutes from './routes/AttendanceSetting.router.js';
+import payrollTemplateRoute from './routes/payroll.templete.router.js';
+
 import depaermentRouter from './routes/department.routes.js' 
 import { PORT } from './envvariablesdata.js';
 
@@ -43,6 +45,9 @@ app.use('/api/department',depaermentRouter)
 app.use('/api/attendance',attendanceRouter)
 app.use('/api/shifts', attendanceSettingRoutes);
 app.use('/api/employee-shift', employeeShiftRoutes);
+
+app.use('/api/payrollTemplate', payrollTemplateRoute);
+
 
 
 
