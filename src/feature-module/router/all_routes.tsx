@@ -25,6 +25,10 @@ export const all_routes = {
   //addedRoutes
   adminBranches:"/admin/branch",
   adminFeatures:"/admin/features",
+  shiftManagement: "/shiftManagement",
+  payrollTemplate: '/payrolltemplate',
+
+
 
 
   //super admin module

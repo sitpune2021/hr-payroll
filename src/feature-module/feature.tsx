@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation } from "react-router";
 import Header from "../core/common/header";
 import Sidebar from "../core/common/sidebar";
-import ThemeSettings from "../core/common/theme-settings";
+// import ThemeSettings from "../core/common/theme-settings";
 import { useEffect, useState } from "react";
 import HorizontalSidebar from "../core/common/horizontal-sidebar";
 import TwoColumnSidebar from "../core/common/two-column";
@@ -122,7 +122,7 @@ const Feature: React.FC<FeatureProps>  = ({ allowedLabels }) => {
                 <StackedSidebar />
                 <Outlet />
                 <DeleteModal />
-                {!location.pathname.includes("layout") && <ThemeSettings />}
+                {/* {!location.pathname.includes("layout") && <ThemeSettings />} */}
               </div>
             </> :
             <>
@@ -137,7 +137,7 @@ const Feature: React.FC<FeatureProps>  = ({ allowedLabels }) => {
                 <StackedSidebar />
                 <Outlet />
                 <DeleteModal />
-                {!location.pathname.includes("layout") && <ThemeSettings />}
+                {/* {!location.pathname.includes("layout") && <ThemeSettings />} */}
               </div>
             </>}
 

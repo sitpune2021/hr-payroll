@@ -284,6 +284,8 @@ import Branches from "../Branches/Branches";
 import NotAllowed from "../pages/NotAllowed";
 import { label } from "yet-another-react-lightbox/*";
 import Features from "../features/Features";
+import ShiftsManagement from "../shift management/ShiftsManagement";
+import PayrollTemplate from "../PayrollTemplate/PayrollTemplate";
 const routes = all_routes;
 
 export const publicRoutes = [
@@ -1879,6 +1881,18 @@ export const publicRoutes = [
     element: <Features />,
     route: Route,
     label: "Features"
+  },  
+  {
+    path: routes.shiftManagement,
+    element: <ShiftsManagement />,
+    route: Route,
+    label: "Shift Management"
+  },
+  {
+    path: routes.payrollTemplate,
+    element: <PayrollTemplate />,
+    route: Route,
+    label: "Payroll Templates"
   },
 ];
 

@@ -11,16 +11,8 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    assignTo: {
-      type: DataTypes.ENUM('branch', 'employee'),
-      allowNull: false,
-    },
-    assignId: {
+    companyId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    effectiveFrom: {
-      type: DataTypes.DATE,
       allowNull: false,
     },
   }, {
@@ -30,6 +22,7 @@ export default (sequelize) => {
 
   PayrollTemplate.associate = (models) => {
     PayrollTemplate.hasMany(models.PayrollComponent, { foreignKey: 'templateId' });
+    PayrollTemplate.hasMany(models.Branch, { foreignKey: 'templateId' });
   };
 
   return PayrollTemplate;

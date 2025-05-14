@@ -19,6 +19,21 @@ export const ADD_NEW_FEATURE  =  "/api/feature/addfeature"
 export const FETCH_ALL_DEPARTMENTS  =  "/api/department/getlist"
 export const FETCH_ROLES_PERMISSIONS  =  "/api/settings/rolespermissions"
 
+export const FETCH_ALL_SHIFTS  =  "/api/shifts/list"
+export const ADD_NEW_SHIFT  =  "/api/shifts/create"
+export const EDIT_SHIFT  =  "/api/shifts/edit/"
+
+
+export const ADD_NEW_PAYROLL_TEMPLATE  =  "/api/payrollTemplate/addNew"
+export const FETCH_ALL_PAYROLL_TEMPLATE_LIST  =  "/api/payrollTemplate/list"
+export const FETCH_ALL_COMPONENTS_OF_TEMPLATE  =  "/api/payrollTemplate/templateCOmponents/"
+export const EDIT_TEMPLATE_AND_COMPONENTS =  "/api/payrollTemplate/edit/"
+
+
+
+
+
+
 
 
 
