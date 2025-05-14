@@ -24,6 +24,7 @@ import departmentsReducer from './departmentsSlice';
 import rolePermissionReducer from './rolePermissionSlice';
 import dateRangeReducer from './dateRangeSlice';
 import shiftReducer from './shiftSlice';
+import payrollTemplateReducer from './payrolltemplateSlice';
 
 
 
@@ -42,6 +43,7 @@ const rootReducer = combineReducers({
   rolePermission: rolePermissionReducer,
   dateRange: dateRangeReducer,
   shifts: shiftReducer,
+  payrollTemplate: payrollTemplateReducer,
 });
 
 // 👇 Persist config: Choose what to persist

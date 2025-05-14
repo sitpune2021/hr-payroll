@@ -16,6 +16,7 @@ import { RootState } from '../../core/data/redux/store'
 import { Branch, fetchBranches } from '../../core/data/redux/branchesSlice';
 import { formatDate } from '../../utils/dateformatter1';
 import moment from 'moment'
+import { Template } from '../../core/data/redux/payrolltemplateSlice'
 type PasswordField = "password" | "confirmPassword";
 
 const Branches = () => {
@@ -28,6 +29,7 @@ const Branches = () => {
 
     const [allcompany, setAllCompany] = useState<Company[]>([])
     const [allBranches, setAllBranches] = useState<Branch[]>([])
+    const [allPayrollTemp, setAllPayrollTemp] = useState<Template[]>([])
     const [viewBranchData, setViewBranchData] = useState<Branch>()
     const [editBranchData, setEditBranchData] = useState<Branch>()
 
@@ -36,6 +38,7 @@ const Branches = () => {
 
     const companyList = useAppSelector((state) => state.companies.list);
     const branchList: Branch[] = useSelector((state: RootState) => state.branches.branches);
+    const payrollTempList: Template[] = useSelector((state: RootState) => state.payrollTemplate.templates);
 
     const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -117,8 +120,12 @@ const Branches = () => {
 
             if (loggedUsersCompany) {
                 setAllCompany([loggedUsersCompany]);
+                setAllPayrollTemp(
+                    payrollTempList.filter(temp=>temp.companyId===loggedUsersCompany.id)
+                )
             } else {
                 setAllCompany(activeCompany);
+                setAllPayrollTemp(payrollTempList)
             }
         }
 
@@ -134,7 +141,7 @@ const Branches = () => {
             }
         }
 
-    }, [branchList, companyList, user?.companyId,sortOption,statusFilter,start,end]);
+    }, [branchList, companyList, payrollTempList, user?.companyId,sortOption,statusFilter,start,end]);
 
     const getCompanyNameById = (companyId: number | undefined): string => {
         const company = companyList.find((comp) => comp.id === companyId);
@@ -146,6 +153,7 @@ const Branches = () => {
         email: "",
         phone: "",
         companyId: "",
+        templateId:"",
         address: "",
     });
 
@@ -153,7 +161,8 @@ const Branches = () => {
         name: "",
         email: "",
         phone: "",
-        companyId: ""
+        companyId: "",
+        templateId:""
     });
 
 
@@ -166,7 +175,7 @@ const Branches = () => {
 
     const handleAddBranchSUbmit = async (e: any) => {
         e.preventDefault();
-        const { name, email, phone, companyId, address } = addBranchFormData;
+        const { name, email, phone, companyId, templateId } = addBranchFormData;
         const newErrors: any = {}
         if (!name.trim()) newErrors.name = "Branch Name is required";
         if (!email.trim()) {
@@ -180,6 +189,7 @@ const Branches = () => {
             newErrors.phone = "Enter a valid 10-digit phone number";
         }
         if (!companyId.trim()) newErrors.companyId = "Company selection is required";
+        if (!templateId.trim()) newErrors.templateId = "Template Selection is required";
         setFormErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
@@ -868,7 +878,29 @@ const Branches = () => {
                                         </div>
                                     </div>
 
-                                    <div className="col-md-12">
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">
+                                                Select Payroll Template <span className="text-danger"> *</span>
+                                            </label>
+                                            <select
+                                                name='templateId'
+                                                value={addBranchFormData.templateId}
+                                                className={`form-control ${formErrors.templateId ? 'is-invalid' : ''}`}
+                                                onChange={(e) => handleAddBranchChange(e)}
+                                            >
+                                                <option value="">--Select Template--</option>
+                                                {
+                                                    allPayrollTemp.map(temp => (
+                                                        <option key={temp.id} value={temp.id}>{temp.templateName}</option>
+                                                    ))
+                                                }
+                                            </select>
+                                            {formErrors && <div className="text-danger mt-1">{formErrors.templateId}</div>}
+                                        </div>
+                                    </div>
+
+                                    <div className="col-md-6">
                                         <div className="mb-3">
                                             <label className="form-label">Address</label>
                                             <input

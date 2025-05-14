@@ -70,6 +70,12 @@ export const SidebarDataTest = [
         link: routes.shiftManagement,
         base: 'ranches',
       },
+      {
+        label: 'Payroll Templates',
+        icon: 'layout-grid-add',
+        link: routes.payrollTemplate,
+        base: 'ranches',
+      },
     ]
   },
   {
