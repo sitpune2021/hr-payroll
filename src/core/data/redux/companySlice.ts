@@ -17,6 +17,9 @@ export interface Company {
   userId: number | null;
   createdAt: string;
   updatedAt: string;
+  subscriptionStartDate: string;
+  subscriptionEndDate: string;
+  allowedNoOfUser: number;
 }
 
 

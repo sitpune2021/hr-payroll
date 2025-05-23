@@ -30,7 +30,7 @@ function PayrollTemplate() {
         try {
             const response = await axiosClient.get(`${FETCH_ALL_COMPONENTS_OF_TEMPLATE}${templateId}`);
             if (response.status === 200) {
-                setComponents([...components, ...response.data]);
+                setComponents([...response.data]);
             }
         } catch (error) {
             console.log(error);

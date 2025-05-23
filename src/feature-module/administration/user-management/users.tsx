@@ -23,7 +23,7 @@ const Users = () => {
 
     const dispatch = useAppDispatch();
     const [statusFilter, setStatusFilter] = useState('All');
-    const [sortOption, setSortOption] = useState('Last 7 Days');
+    const [sortOption, setSortOption] = useState('Recently Added');
     const [roleFilter, setRoleFilter] = useState(0)
 
 

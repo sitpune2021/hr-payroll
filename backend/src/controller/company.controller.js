@@ -11,7 +11,10 @@ const addnewcompany = async (req, res) => {
     companyAddress,
     companyPhone,
     companyEmail,
-    companyWebsite
+    companyWebsite,
+    subscriptionStartDate,
+    subscriptionEndDate,
+    allowedNoOfUsers
   } = req.body;
   const transaction = await sequelize.transaction();
 
@@ -61,6 +64,9 @@ const addnewcompany = async (req, res) => {
         email: companyEmail,
         website: companyWebsite || null,
         companyImage: imageFileName,
+        subscriptionStartDate,
+        subscriptionEndDate,
+        allowedNoOfUsers
       },
       { transaction }
     );
