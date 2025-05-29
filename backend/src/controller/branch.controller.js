@@ -4,7 +4,7 @@ const { Branch, Company } = models;
 
 
 const addNewBranch = async (req, res) => {
-  const { name, address, phone, companyId, email,templateId } = req.body;
+  const { name, address, phone, companyId, email } = req.body;
 
   try {
 
@@ -14,8 +14,7 @@ const addNewBranch = async (req, res) => {
       address,
       phone,
       email,
-      companyId,
-      templateId
+      companyId
     });
 
 

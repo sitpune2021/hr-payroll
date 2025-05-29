@@ -3,9 +3,11 @@ import { DataTypes } from "sequelize";
 
 export default (sequelize) => {
   const User = sequelize.define('User', {
+
+
     id: {
       type: DataTypes.INTEGER,
-      autoIncrement:true,
+      autoIncrement: true,
       primaryKey: true,
     },
     email: {
@@ -45,6 +47,10 @@ export default (sequelize) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
+     joiningDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     companyId: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -61,7 +67,39 @@ export default (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-  },{
+    templateId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    ruleTemplateId: { //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    workingShift: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    gender: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    biometricDevice: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+     geofencepoint: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+     paymentMode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    basicSalary: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+  }, {
     tableName: 'User',
     timestamps: true
   });
@@ -71,9 +109,12 @@ export default (sequelize) => {
     User.belongsTo(models.Branch, { foreignKey: 'branchId' });
     User.belongsTo(models.Role, { foreignKey: 'roleId' });
     User.belongsTo(models.Department, { foreignKey: 'departmentId' });
+    User.belongsTo(models.PayrollTemplate, { foreignKey: 'templateId' });
+
   };
 
-  
+
 
   return User;
 };
+ 

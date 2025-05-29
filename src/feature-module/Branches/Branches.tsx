@@ -153,7 +153,6 @@ const Branches = () => {
         email: "",
         phone: "",
         companyId: "",
-        templateId:"",
         address: "",
     });
 
@@ -175,7 +174,7 @@ const Branches = () => {
 
     const handleAddBranchSUbmit = async (e: any) => {
         e.preventDefault();
-        const { name, email, phone, companyId, templateId } = addBranchFormData;
+        const { name, email, phone, companyId } = addBranchFormData;
         const newErrors: any = {}
         if (!name.trim()) newErrors.name = "Branch Name is required";
         if (!email.trim()) {
@@ -189,7 +188,6 @@ const Branches = () => {
             newErrors.phone = "Enter a valid 10-digit phone number";
         }
         if (!companyId.trim()) newErrors.companyId = "Company selection is required";
-        if (!templateId.trim()) newErrors.templateId = "Template Selection is required";
         setFormErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
 
@@ -878,27 +876,6 @@ const Branches = () => {
                                         </div>
                                     </div>
 
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">
-                                                Select Payroll Template <span className="text-danger"> *</span>
-                                            </label>
-                                            <select
-                                                name='templateId'
-                                                value={addBranchFormData.templateId}
-                                                className={`form-control ${formErrors.templateId ? 'is-invalid' : ''}`}
-                                                onChange={(e) => handleAddBranchChange(e)}
-                                            >
-                                                <option value="">--Select Template--</option>
-                                                {
-                                                    allPayrollTemp.map(temp => (
-                                                        <option key={temp.id} value={temp.id}>{temp.templateName}</option>
-                                                    ))
-                                                }
-                                            </select>
-                                            {formErrors && <div className="text-danger mt-1">{formErrors.templateId}</div>}
-                                        </div>
-                                    </div>
 
                                     <div className="col-md-6">
                                         <div className="mb-3">

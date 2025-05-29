@@ -11,18 +11,20 @@ import { toast } from '../../utils/toastUtil';
 import axiosClient from '../../axiosConfig/axiosClient';
 import { ADD_NEW_SHIFT, EDIT_SHIFT } from '../../axiosConfig/apis';
 import { useAppDispatch } from '../../core/data/redux/hooks';
+import { Company } from '../../core/data/redux/companySlice';
 
 function ShiftsManagement() {
 
     const dispatch = useAppDispatch();
 
 
-    const [allBranches, setAllBranches] = useState<Branch[]>([])
+    const [userCompanys, setUserCompanies] = useState<Company[]>([])
     const [tableShifts, setTableShifts] = useState<Shift[]>([]);
     const [editSHiftData, setEditShiftData] = useState<Shift | null>(null);
     const userAllowedLabels = useSelector((state: RootState) => state.feature.allowedFeatures);
     const filteredLabels = userAllowedLabels.map((feature: any) => feature.name);
     const allShifts = useSelector((state: RootState) => state.shifts.shifts);
+    const companyList = useSelector((state: RootState) => state.companies.list);
     const user = useSelector((state: RootState) => state.auth.user);
     const branchList: Branch[] = useSelector((state: RootState) => state.branches.branches);
 
@@ -34,20 +36,20 @@ function ShiftsManagement() {
 
 
     useEffect(() => {
-        if (branchList.length > 0) {
-            const loggedUsersBranches = branchList.filter(
-                (branch) => branch.companyId === user?.companyId
+        if (companyList.length > 0) {
+            const loggedUsersCompany = companyList.filter(
+                (company) => company.id === user?.companyId
             );
 
-            if (loggedUsersBranches.length > 0) {
-                setAllBranches(loggedUsersBranches);
+            if (loggedUsersCompany.length > 0) {
+                setUserCompanies(loggedUsersCompany);
             } else {
-                setAllBranches(branchList);
+                setUserCompanies(companyList);
             }
         }
         if (allShifts.length > 0) {
             const loggedUserShifts = allShifts.filter(
-                (shift) => shift.branchId === user?.companyId
+                (shift) => shift.companyId === user?.companyId
             );
 
             if (loggedUserShifts.length > 0) {
@@ -60,12 +62,11 @@ function ShiftsManagement() {
 
     const [shiftData, setShiftData] = useState({
         shiftName: '',
+        companyId: '',
         checkInTime: '',
         checkOutTime: '',
         gracePeriodMinutes: 10,
-        earlyLeaveAllowanceMinutes: 10,
-        isRotational: false,
-        branchId: '',
+        earlyLeaveAllowanceMinutes: 10
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -124,11 +125,10 @@ function ShiftsManagement() {
             checkOutTime,
             gracePeriodMinutes,
             earlyLeaveAllowanceMinutes,
-            isRotational,
-            branchId,
+            companyId
         } = shiftData;
 
-        if (!shiftName || !checkInTime || !checkOutTime || !branchId) {
+        if (!shiftName || !checkInTime || !checkOutTime) {
             alert('Please fill all required fields');
             return;
         }
@@ -139,8 +139,7 @@ function ShiftsManagement() {
             checkOutTime: checkOutTime + ':00',
             gracePeriodMinutes,
             earlyLeaveAllowanceMinutes,
-            isRotational,
-            branchId: parseInt(branchId),
+            companyId
         };
 
         console.log(payload);
@@ -151,12 +150,11 @@ function ShiftsManagement() {
                 toast('Info', 'Shift record addedd successfully', 'success');
                 setShiftData({
                     shiftName: '',
+                    companyId: '',
                     checkInTime: '',
                     checkOutTime: '',
                     gracePeriodMinutes: 10,
-                    earlyLeaveAllowanceMinutes: 10,
-                    isRotational: false,
-                    branchId: '',
+                    earlyLeaveAllowanceMinutes: 10
                 });
 
                 dispatch(fetchShifts());
@@ -179,8 +177,8 @@ function ShiftsManagement() {
             return;
         }
         try {
-            
-            const response= await axiosClient.put(`${EDIT_SHIFT}${editSHiftData.id}`,editSHiftData);
+
+            const response = await axiosClient.put(`${EDIT_SHIFT}${editSHiftData.id}`, editSHiftData);
             if (response.status === 200) {
                 toast('Info', 'Shift record updated successfully', 'success');
                 dispatch(fetchShifts());
@@ -189,10 +187,10 @@ function ShiftsManagement() {
 
         } catch (error) {
             console.log(error);
-            toast('Error','someting went wrong','danger');
-            
+            toast('Error', 'someting went wrong', 'danger');
+
         }
-       
+
 
     }
 
@@ -259,7 +257,7 @@ function ShiftsManagement() {
                                             <th className='py-3'>Check Out</th>
                                             <th className='py-3'>Late Punch (miniutes)</th>
                                             <th className='py-3'>Early Punch (miniutes)</th>
-                                            <th className='py-3'>Branch</th>
+                                            <th className='py-3'>Company</th>
                                             <th className='py-3'>Actions</th>
                                         </tr>
                                     </thead>
@@ -273,7 +271,7 @@ function ShiftsManagement() {
                                                     <td>{shift.checkOutTime}</td>
                                                     <td>{shift.gracePeriodMinutes}</td>
                                                     <td>{shift.earlyLeaveAllowanceMinutes}</td>
-                                                    <td>{geBranchNameById(shift.branchId)}</td>
+                                                    <td>{shift.companyId}</td>
                                                     <td>
                                                         <div className="action-icon d-inline-flex">
                                                             <Link
@@ -341,7 +339,7 @@ function ShiftsManagement() {
                             <div className="modal-body pb-0">
                                 <div className="row">
                                     {/* Shift Name */}
-                                    <div className="col-md-12">
+                                    <div className="col-md-6">
                                         <div className="mb-3">
                                             <label className="form-label">
                                                 Shift Name <span className="text-danger">*</span>
@@ -354,6 +352,29 @@ function ShiftsManagement() {
                                                 required />
                                         </div>
                                     </div>
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">
+                                                Company <span className="text-danger">*</span>
+                                            </label>
+                                            <select
+                                                name="companyId"
+                                                value={shiftData.companyId}
+                                                className="form-control"
+                                                onChange={handleChange}
+                                            >
+                                                <option value="">--Select Company--</option>
+                                                {
+                                                    userCompanys.map(company => (
+                                                        <option key={company.id} value={company.id}>{company.name}</option>
+                                                    ))
+                                                }
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    {/* company selection */}
 
                                     {/* Check-in Time */}
                                     <div className="col-md-6">
@@ -413,28 +434,6 @@ function ShiftsManagement() {
                                                 value={shiftData.earlyLeaveAllowanceMinutes}
                                                 onChange={handleChange}
                                                 defaultValue={10} />
-                                        </div>
-                                    </div>
-
-                                    {/* Branch ID */}
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">
-                                                Branch ID <span className="text-danger">*</span>
-                                            </label>
-                                            <select
-                                                className="form-control"
-                                                name="branchId"
-                                                value={shiftData.branchId}
-                                                onChange={handleChange}
-                                                required>
-                                                <option value="">---Select branch---</option>
-                                                {
-                                                    allBranches.map(branch => (
-                                                        <option key={branch.id} value={branch.id}>{branch.name}</option>
-                                                    ))
-                                                }
-                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -555,18 +554,18 @@ function ShiftsManagement() {
                                     <div className="col-md-6">
                                         <div className="mb-3">
                                             <label className="form-label">
-                                                Branch ID <span className="text-danger">*</span>
+                                                Company <span className="text-danger">*</span>
                                             </label>
                                             <select
                                                 className="form-control"
                                                 name="branchId"
-                                                value={editSHiftData?.branchId}
+                                                value={editSHiftData?.companyId}
                                                 onChange={handleEditChange}
                                                 required>
                                                 <option value="">---Select branch---</option>
                                                 {
-                                                    allBranches.map(branch => (
-                                                        <option key={branch.id} value={branch.id}>{branch.name}</option>
+                                                    userCompanys.map(company => (
+                                                        <option key={company.id} value={company.id}>{company.name}</option>
                                                     ))
                                                 }
                                             </select>

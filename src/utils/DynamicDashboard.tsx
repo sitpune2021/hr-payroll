@@ -4,6 +4,7 @@ import AdminDashboard from "../feature-module/mainMenu/adminDashboard";
 import EmployeeDashboard from "../feature-module/mainMenu/employeeDashboard/employee-dashboard";
 import { RootState } from "../core/data/redux/store";
 import SuperAdminDashboard from "../feature-module/super-admin/dashboard";
+import BranchManagerDashboard from "../feature-module/mainMenu/companyAdminDashboard/BranchManagerDashboard";
 
 const DynamicDashboard = () => {
     const role = useSelector((state: RootState) => state.auth.user?.role);
@@ -14,7 +15,9 @@ const DynamicDashboard = () => {
         case "COMPANY_ADMIN":
             return <AdminDashboard />;
         case "EMPLOYEE":
-            return <EmployeeDashboard />;
+            return <EmployeeDashboard />; 
+        case "BRANCH_MANAGER":
+            return <BranchManagerDashboard />;
         case "SUPER_ADMIN":
             return <SuperAdminDashboard />;
         default:

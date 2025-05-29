@@ -9,7 +9,7 @@ export interface Shift {
   checkOutTime: string;
   gracePeriodMinutes: number;
   earlyLeaveAllowanceMinutes: number;
-  branchId: number;
+  companyId: number;
 }
 
 interface ShiftState {

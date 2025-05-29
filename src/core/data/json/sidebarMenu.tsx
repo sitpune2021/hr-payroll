@@ -8,7 +8,7 @@ export const SidebarDataTest = [
   {
     tittle: 'Dashboard main',
     icon: 'airplay',
-    showAsTab: true,
+    showAsTab: false,
     separateRoute: false,
     submenuItems: [
       {
@@ -26,19 +26,6 @@ export const SidebarDataTest = [
         icon: 'layout-grid-add',
         link: routes.superAdminCompanies,
         base: 'companies',
-      },
-
-      {
-        label: 'Branches',
-        icon: 'layout-grid-add',
-        link: routes.adminBranches,
-        base: 'ranches',
-      },
-      {
-        label: 'Users',
-        icon: 'user-star',
-        link: routes.users,
-        base: 'users',
       },
       {
         label: 'Features',
@@ -58,25 +45,75 @@ export const SidebarDataTest = [
         link: routes.permissionpage,
         base: 'roles-permissions',
       },
-      {
-        label: 'Departments',
-        icon: 'layout-grid-add',
-        link: routes.departments,
-        base: 'ranches',
-      },
-      {
-        label: 'Shift Management',
-        icon: 'layout-grid-add',
-        link: routes.shiftManagement,
-        base: 'ranches',
-      },
-      {
-        label: 'Payroll Templates',
-        icon: 'layout-grid-add',
-        link: routes.payrollTemplate,
-        base: 'ranches',
-      },
     ]
+  },
+  {
+    tittle: 'Master Section',
+    icon: 'file',
+    showAsTab: false,
+    separateRoute: false,
+    submenuItems: [
+      {
+        label: 'Master',
+        link: routes.employeeList,
+        submenu: true,
+        showSubRoute: false,
+        icon: 'users',
+        base: 'employees',
+        materialicons: 'people',
+        submenuItems: [
+
+          {
+            label: 'Branches',
+            icon: 'layout-grid-add',
+            link: routes.adminBranches,
+            base: 'ranches',
+          },
+          {
+            label: 'Employee',
+            icon: 'user-star',
+            link: routes.users,
+            base: 'users',
+          },
+          {
+            label: 'Shift Management',
+            icon: 'layout-grid-add',
+            link: routes.shiftManagement,
+            base: 'ranches',
+          },
+          {
+            label: 'Departments',
+            icon: 'layout-grid-add',
+            link: routes.departments,
+            base: 'ranches',
+          },
+        ],
+      }
+    ],
+  },
+   {
+    tittle: 'Utils Section',
+    icon: 'file',
+    showAsTab: false,
+    separateRoute: false,
+    submenuItems: [
+      {
+        label: 'Utils',
+        submenu: true,
+        showSubRoute: false,
+        icon: 'users',
+        base: 'employees',
+        materialicons: 'people',
+        submenuItems: [
+          {
+            label: 'Payroll Templates',
+            icon: 'layout-grid-add',
+            link: routes.payrollTemplate,
+            base: 'ranches',
+          }
+        ],
+      }
+    ],
   },
   {
     // tittle: 'Main Menu',

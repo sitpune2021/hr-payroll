@@ -15,6 +15,7 @@ export interface User {
   departmentId: number;
   roleId: number;
   createdAt: string;
+  templateId: number | null | undefined;
 }
 
 interface UsersState {
