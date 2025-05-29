@@ -17,8 +17,8 @@ import { RootState } from '../../../core/data/redux/store'
 
 const Companies = () => {
   const dispatch = useAppDispatch();
-  
-  const [sortOption, setSortOption] = useState('Last 7 Days');
+
+  const [sortOption, setSortOption] = useState('Recently Added');
   const [statusFilter, setStatusFilter] = useState('All');
 
 
@@ -26,12 +26,12 @@ const Companies = () => {
     start: moment().subtract(6, 'days'),
     end: moment(),
   });
-  
 
-    const handleDateRangeChange = (start: moment.Moment, end: moment.Moment) => {
-      setDateRange({ start, end });
-    };
-    
+
+  const handleDateRangeChange = (start: moment.Moment, end: moment.Moment) => {
+    setDateRange({ start, end });
+  };
+
 
 
   const userAllowedLabels = useSelector((state: RootState) => state.feature.allowedFeatures);
@@ -86,11 +86,24 @@ const Companies = () => {
     setSortOption(option);
   };
 
+  const formatDateForInput = (dateStr: string | undefined): string => {
+    return dateStr ? new Date(dateStr).toISOString().split("T")[0] : "";
+  };
+
   const handleSetEditCompany = async (keyId: any) => {
     const companyEdit = companyList.find((company) => company.id === parseInt(keyId));
-    setEditCompanyData(companyEdit);
 
-  }
+    if (companyEdit) {
+      const formattedCompany = {
+        ...companyEdit,
+        subscriptionStartDate: formatDateForInput(companyEdit.subscriptionStartDate),
+        subscriptionEndDate: formatDateForInput(companyEdit.subscriptionEndDate),
+      };
+
+      setEditCompanyData(formattedCompany);
+    }
+  };
+
 
   const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -123,6 +136,9 @@ const Companies = () => {
     formData.append("phone", editCompanyData.phone);
     formData.append("website", editCompanyData.website);
     formData.append("address", editCompanyData.address);
+    formData.append("subscriptionStartDate", editCompanyData.subscriptionStartDate);
+    formData.append("subscriptionEndDate", editCompanyData.subscriptionEndDate);
+    formData.append("allowedNoOfUsers", editCompanyData.allowedNoOfUsers.toString());
 
     if (selectedImageEdit) {
       formData.append("companyImage", selectedImageEdit);
@@ -151,7 +167,7 @@ const Companies = () => {
 
   useEffect(() => {
     setTableData(mapCompanyDataToTable(getSortedFilteredData()))
-  }, [companyList,sortOption,start,end,statusFilter])
+  }, [companyList, sortOption, start, end, statusFilter])
 
 
 
@@ -161,13 +177,19 @@ const Companies = () => {
     companyPhone: "",
     companyWebsite: "",
     companyAddress: "",
+    subscriptionStartDate: "",
+    subscriptionEndDate: "",
+    allowedNoOfUsers: ""
   });
 
   const [formErrors, setFormErrors] = useState({
     companyName: "",
     companyEmail: "",
     companyPhone: "",
-    companyImage: ""
+    companyImage: "",
+    subscriptionStartDate: "",
+    subscriptionEndDate: "",
+    allowedNoOfUsers: ""
   });
 
   const [addCompantImage, setAddCompanyImage] = useState<File | null>(null);
@@ -189,7 +211,7 @@ const Companies = () => {
   const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { companyName, companyEmail, companyPhone } = addCompanyFormData;
+    const { companyName, companyEmail, companyPhone, subscriptionStartDate, subscriptionEndDate, allowedNoOfUsers } = addCompanyFormData;
     const newErrors: any = {};
 
     if (!companyName.trim()) newErrors.companyName = "Company Name is required";
@@ -204,6 +226,10 @@ const Companies = () => {
     } else if (!/^[0-9]{10}$/.test(companyPhone)) {
       newErrors.companyPhone = "Enter a valid 10-digit phone number";
     }
+    if (!subscriptionStartDate.trim()) newErrors.subscriptionStartDate = "Subscription start date is required";
+    if (!subscriptionEndDate.trim()) newErrors.subscriptionEndDate = "Subscription end date is required";
+    if (!allowedNoOfUsers.trim()) newErrors.allowedNoOfUsers = "Number of users required";
+
 
     if (!addCompantImage) {
       newErrors.companyImage = "Company image is required";
@@ -236,6 +262,9 @@ const Companies = () => {
           companyPhone: "",
           companyWebsite: "",
           companyAddress: "",
+          subscriptionStartDate: "",
+          subscriptionEndDate: "",
+          allowedNoOfUsers: ""
         })
         setAddCompanyImage(null)
       }
@@ -775,11 +804,11 @@ const Companies = () => {
                     Select Status
                   </Link>
                   <ul className="dropdown-menu  dropdown-menu-end p-3">
-                  <li>
+                    <li>
                       <Link
                         to="#"
                         className="dropdown-item rounded-1"
-                        onClick={()=>setStatusFilter('All')}
+                        onClick={() => setStatusFilter('All')}
                       >
                         All
                       </Link>
@@ -788,7 +817,7 @@ const Companies = () => {
                       <Link
                         to="#"
                         className="dropdown-item rounded-1"
-                        onClick={()=>setStatusFilter('Active')}
+                        onClick={() => setStatusFilter('Active')}
                       >
                         Active
                       </Link>
@@ -797,7 +826,7 @@ const Companies = () => {
                       <Link
                         to="#"
                         className="dropdown-item rounded-1"
-                        onClick={()=>setStatusFilter('Inactive')}
+                        onClick={() => setStatusFilter('Inactive')}
                       >
                         Inactive
                       </Link>
@@ -1018,7 +1047,50 @@ const Companies = () => {
                         className="form-control" />
                     </div>
                   </div>
-                  <div className="col-md-12">
+                  <div className="col-md-6">
+                    <div className="mb-3">
+                      <label className="form-label">Subscription Start Date <span className="text-danger">*</span></label>
+                      <input
+                        type="date"
+                        name="subscriptionStartDate"
+                        value={addCompanyFormData.subscriptionStartDate}
+                        onChange={(e) => handleAddCompanyChange(e)}
+                        className={`form-control ${formErrors.subscriptionStartDate ? 'is-invalid' : ''}`}
+                      />
+                      {formErrors.subscriptionStartDate && <div className="text-danger mt-1">{formErrors.subscriptionStartDate}</div>}
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="mb-3">
+                      <label className="form-label">Subscription End Date <span className="text-danger">*</span></label>
+                      <input
+                        type="date"
+                        name="subscriptionEndDate"
+                        value={addCompanyFormData.subscriptionEndDate}
+                        onChange={(e) => handleAddCompanyChange(e)}
+                        className={`form-control ${formErrors.subscriptionEndDate ? 'is-invalid' : ''}`}
+                      />
+                      {formErrors.subscriptionEndDate && <div className="text-danger mt-1">{formErrors.subscriptionEndDate}</div>}
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
+                    <div className="mb-3">
+                      <label className="form-label">Allowed No. of Users <span className="text-danger">*</span></label>
+                      <input
+                        type="number"
+                        name="allowedNoOfUsers"
+                        value={addCompanyFormData.allowedNoOfUsers}
+                        onChange={(e) => handleAddCompanyChange(e)}
+                        className={`form-control ${formErrors.allowedNoOfUsers ? 'is-invalid' : ''}`}
+                        min={1}
+                      />
+                      {formErrors.allowedNoOfUsers && <div className="text-danger mt-1">{formErrors.allowedNoOfUsers}</div>}
+                    </div>
+                  </div>
+
+                  <div className="col-md-6">
                     <div className="mb-3">
                       <label className="form-label">Address</label>
                       <input
@@ -1048,6 +1120,11 @@ const Companies = () => {
         </div>
       </form>
       {/* /Add Company */}
+
+
+
+
+
       {/* Edit Company */}
       <div className="modal fade" id="edit_company">
         <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -1157,6 +1234,48 @@ const Companies = () => {
                         value={editCompanyData?.phone}
                         className="form-control"
                         defaultValue="+1 895455450"
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-6">
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Subscription Start Date <span className="text-danger"> *</span>
+                      </label>
+                      <input
+                        type="date"
+                        name='subscriptionStartDate'
+                        onChange={handleEditInputChange}
+                        value={editCompanyData?.subscriptionStartDate}
+                        className="form-control"
+                      />
+                    </div>
+                  </div>
+                   <div className="col-md-6">
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Subscription End Date <span className="text-danger"> *</span>
+                      </label>
+                      <input
+                        type="date"
+                        name='subscriptionEndDate'
+                        onChange={handleEditInputChange}
+                        value={editCompanyData?.subscriptionEndDate}
+                        className="form-control"
+                      />
+                    </div>
+                  </div>
+                   <div className="col-md-6">
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Allowed Number of Users <span className="text-danger"> *</span>
+                      </label>
+                      <input
+                        type="number"
+                        name='allowedNoOfUsers'
+                        onChange={handleEditInputChange}
+                        value={editCompanyData?.allowedNoOfUsers}
+                        className="form-control"
                       />
                     </div>
                   </div>

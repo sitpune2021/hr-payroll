@@ -1,11 +1,10 @@
-import { nanoid } from "nanoid";
 import { DataTypes } from "sequelize";
 
 export default (sequelize) => {
   const Company = sequelize.define('Company', {
     id: {
       type: DataTypes.INTEGER,
-      autoIncrement:true,
+      autoIncrement: true,
       primaryKey: true,
     }, 
     name: {
@@ -43,7 +42,20 @@ export default (sequelize) => {
         isEmail: true,
       },
     },
-  },{
+    subscriptionStartDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    subscriptionEndDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    allowedNoOfUsers: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 10,
+    },
+  }, {
     tableName: 'Company',
     timestamps: true,
   });
@@ -51,7 +63,8 @@ export default (sequelize) => {
   Company.associate = (models) => {
     Company.hasMany(models.Branch, { foreignKey: 'companyId' });
     Company.hasMany(models.User, { foreignKey: 'companyId' });
-    Company.belongsTo(models.User, { foreignKey: 'userId', as: 'adminUser' }); // Linking admin user
+    Company.belongsTo(models.User, { foreignKey: 'userId', as: 'adminUser' });
+    Company.hasMany(models.AttendanceSetting, { foreignKey: 'companyId' });
   };
 
   return Company;

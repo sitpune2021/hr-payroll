@@ -30,7 +30,7 @@ function PayrollTemplate() {
         try {
             const response = await axiosClient.get(`${FETCH_ALL_COMPONENTS_OF_TEMPLATE}${templateId}`);
             if (response.status === 200) {
-                setComponents([...components, ...response.data]);
+                setComponents([...response.data]);
             }
         } catch (error) {
             console.log(error);
@@ -107,7 +107,7 @@ function PayrollTemplate() {
                 companyId: newTemplateCompId
             });
             if (response.status === 201) {
-                await dispatch(fetchPayrollTemplates());
+                await dispatch(fetchPayrollTemplates({ companyId: user?.companyId }));
                 toast('Info', 'Payroll Template Added Successfully', 'success');
                 setNewTemplateName('')
             }

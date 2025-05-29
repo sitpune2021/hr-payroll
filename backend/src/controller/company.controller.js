@@ -11,7 +11,10 @@ const addnewcompany = async (req, res) => {
     companyAddress,
     companyPhone,
     companyEmail,
-    companyWebsite
+    companyWebsite,
+    subscriptionStartDate,
+    subscriptionEndDate,
+    allowedNoOfUsers
   } = req.body;
   const transaction = await sequelize.transaction();
 
@@ -61,6 +64,9 @@ const addnewcompany = async (req, res) => {
         email: companyEmail,
         website: companyWebsite || null,
         companyImage: imageFileName,
+        subscriptionStartDate,
+        subscriptionEndDate,
+        allowedNoOfUsers
       },
       { transaction }
     );
@@ -98,7 +104,10 @@ const updatecompany = async (req, res) => {
       email,
       phone,
       website,
-      address
+      address,
+      subscriptionStartDate,
+      subscriptionEndDate,
+      allowedNoOfUsers
     } = req.body;
 
     const company = await Company.findByPk(companyId);
@@ -111,6 +120,9 @@ const updatecompany = async (req, res) => {
     company.phone = phone;
     company.website = website;
     company.address = address;
+    company.subscriptionStartDate = subscriptionStartDate;
+    company.subscriptionEndDate = subscriptionEndDate;
+    company.allowedNoOfUsers= allowedNoOfUsers;
 
     // If new image uploaded
     if (req.file) {

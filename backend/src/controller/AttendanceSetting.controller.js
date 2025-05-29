@@ -12,7 +12,7 @@ const {  Attendance, AttendanceSetting,Branch, EmployeeShiftSchedule  } = models
       checkOutTime,
       gracePeriodMinutes,
       earlyLeaveAllowanceMinutes,
-      branchId,
+      companyId
     } = req.body;
 
     const newShift = await AttendanceSetting.create({
@@ -21,7 +21,7 @@ const {  Attendance, AttendanceSetting,Branch, EmployeeShiftSchedule  } = models
       checkOutTime,
       gracePeriodMinutes,
       earlyLeaveAllowanceMinutes,
-      branchId,
+      companyId
     });
 
     res.status(201).json({ success: true, data: newShift });
@@ -33,7 +33,7 @@ const {  Attendance, AttendanceSetting,Branch, EmployeeShiftSchedule  } = models
 const fetchShiftList = async(req,res) =>{
   try {
     const shifts =await AttendanceSetting.findAll({
-      attributes: ["id", "shiftName", "checkInTime", "checkOutTime","gracePeriodMinutes","earlyLeaveAllowanceMinutes","branchId"],
+      attributes: ["id", "shiftName", "checkInTime", "checkOutTime","gracePeriodMinutes","earlyLeaveAllowanceMinutes","companyId"],
     });
 
 res.status(200).json(shifts);
@@ -51,7 +51,7 @@ const editShift = async (req,res)=>{
       checkOutTime,
       gracePeriodMinutes,
       earlyLeaveAllowanceMinutes,
-      branchId,
+      companyId
     } = req.body;
 
     const shift= await AttendanceSetting.findOne({
@@ -60,24 +60,15 @@ const editShift = async (req,res)=>{
       }
     });
 
-    const branch= await Branch.findOne({
-      where:{
-        id:branchId
-      }
-    })
-
     if(!shift){
       return res.status(404).json({ success: false, message: "Shift not found"});
-    }
-    if(!branch){
-      return res.status(404).json({ success: false, message: "Branch not found"});
     }
     shift.shiftName = shiftName;
     shift.checkInTime = checkInTime;
     shift.checkOutTime = checkOutTime;
     shift.gracePeriodMinutes = gracePeriodMinutes;
     shift.earlyLeaveAllowanceMinutes = earlyLeaveAllowanceMinutes;
-    shift.branchId = branchId;
+    shift.companyId = companyId;
 
     await shift.save();
     return res.status(200).json({ success: true, message: "Shift updated successfully" });

@@ -1,29 +1,69 @@
 import bcrypt from 'bcryptjs';
 import models from '../models/index.js';
-import { where,Op } from 'sequelize';
+import { where, Op } from 'sequelize';
 import * as XLSX from 'xlsx'
 import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js';
+import { log } from 'console';
 
-const { Permission, Role, User, Company,Department } = models;
+const { Permission, Role, User, Company, Department } = models;
 
 const addNewUser = async (req, res) => {
 
   try {
-    const {
+    let {
       firstName,
       lastName,
       email,
       password,
       contact,
       birthDate,
+      joiningDate,
       roleId,
       maritalStatus,
       companyId,
       branchId,
-      departmentId
+      departmentId,
+      templateId,
+      gender,
+      basicSalary,
+      biometricDevice,
+      geofencepoint,
+      ruleTemplateId,
+      paymentMode,
+      workingShift
     } = req.body;
-    console.log(departmentId,"!!!!!!!!!!!!!!!!!!!!!!!");
-    
+
+    const clean = (val) => val === '' || val === undefined ? null : val;
+
+    birthDate = clean(birthDate);
+    joiningDate = clean(joiningDate);
+    roleId = clean(roleId);
+    maritalStatus = clean(maritalStatus);
+    branchId = clean(branchId);
+    departmentId = clean(departmentId);
+    templateId = clean(templateId);
+    gender = clean(gender);
+    basicSalary = clean(basicSalary);
+    biometricDevice = clean(biometricDevice);
+    geofencepoint = clean(geofencepoint);
+    ruleTemplateId = clean(ruleTemplateId);
+    paymentMode = clean(paymentMode);
+    workingShift = clean(workingShift);
+
+
+    console.log(departmentId, "!!!!!!!!!!!!!!!!!!!!!!!");
+
+    const company = await Company.findOne({ where: { id: companyId } })
+
+    if (!company) {
+      return res.status(400).json({ message: "Company not found" })
+    }
+    const existingUserCount = await User.count({ where: { companyId } });
+
+    if (existingUserCount >= company.allowedNoOfUsers) {
+      return res.status(400).json({ message: "User limit exceeded, please contact Provider." });
+    }
+
 
 
     const userExists = await User.findOne({
@@ -36,7 +76,7 @@ const addNewUser = async (req, res) => {
 
     const deptExist = await Department.findOne({
       where:
-        { id:departmentId}
+        { id: departmentId }
     });
     if (!deptExist) {
       return res.status(400).json({ message: "Department not found." });
@@ -56,7 +96,15 @@ const addNewUser = async (req, res) => {
     const newUser = new User({
       firstName,
       lastName,
+      joiningDate,
+      gender,
       email,
+      basicSalary,
+      biometricDevice,
+      geofencepoint,
+      ruleTemplateId,
+      paymentMode,
+      workingShift,
       password: hashedPassword,
       contact,
       birthDate,
@@ -64,7 +112,8 @@ const addNewUser = async (req, res) => {
       maritalStatus,
       companyId,
       branchId: cleanBranchId,
-      departmentId
+      departmentId,
+      templateId
     });
     const savedUser = await newUser.save();
 
@@ -72,6 +121,8 @@ const addNewUser = async (req, res) => {
     return res.status(200).json({ message: "User added successfully", savedUser });
 
   } catch (error) {
+    console.log(error);
+    
     return res.status(500).json({ message: "Error adding new user", error: error.message });
   }
 }
@@ -81,7 +132,7 @@ const getUsersList = async (req, res) => {
     const { companyId, branchId, roleId, page = 1, limit = 10, sortField = 'id', sortOrder = 'asc' } = req.query;
 
     const whereClause = {};
-    
+
     // Apply dynamic filters
     if (companyId) whereClause.companyId = companyId;
     if (branchId) whereClause.branchId = branchId;
@@ -92,7 +143,7 @@ const getUsersList = async (req, res) => {
     // Ensure valid sortField and sortOrder
     const validSortFields = ['id', 'firstName', 'lastName', 'email', 'createdAt'];
     if (!validSortFields.includes(sortField)) sortField = 'id';
-    
+
     const validSortOrders = ['asc', 'desc'];
     if (!validSortOrders.includes(sortOrder)) sortOrder = 'asc';
 
@@ -102,7 +153,7 @@ const getUsersList = async (req, res) => {
       offset,
       limit: parseInt(limit),
       order: [[sortField, sortOrder]],
-      attributes: ['id','contact', 'companyId','firstName', 'branchId', 'roleId', 'birthDate', 'maritalStatus','departmentId', 'lastName', 'email', 'createdAt'],
+      attributes: ['id', 'contact', 'companyId', 'firstName', 'branchId', 'roleId', 'birthDate', 'maritalStatus', 'departmentId', 'templateId', 'lastName', 'email', 'createdAt'],
     });
 
     return res.status(200).json({
@@ -120,9 +171,9 @@ const getUsersList = async (req, res) => {
 const updateUserCOntrller = async (req, res) => {
   try {
     const id = req.params.userId;
-    const { firstName, lastName, email, contact, birthDate, maritalStatus, companyId, branchId, roleId,departmentId } = req.body;
-    console.log(departmentId,"AAAAAAAAAAAAAAAAAAAAA");
-    
+    const { firstName, lastName, email, contact, birthDate, maritalStatus, companyId, branchId, roleId, departmentId } = req.body;
+    console.log(departmentId, "AAAAAAAAAAAAAAAAAAAAA");
+
     const user = await User.findOne({
       where: {
         id
