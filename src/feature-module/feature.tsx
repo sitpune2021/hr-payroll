@@ -79,6 +79,8 @@ const Feature: React.FC<FeatureProps>  = ({ allowedLabels }) => {
     console.log('isAllowed', isAllowed);
   
     if (!isAllowed) {
+      console.log(location.pathname,currentLabel);
+      
       return <Navigate to="/not-allowed" replace />;
     }  
   return (

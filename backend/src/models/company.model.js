@@ -50,7 +50,7 @@ export default (sequelize) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    allowedNoOfUser: {
+    allowedNoOfUsers: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 10,
@@ -64,6 +64,7 @@ export default (sequelize) => {
     Company.hasMany(models.Branch, { foreignKey: 'companyId' });
     Company.hasMany(models.User, { foreignKey: 'companyId' });
     Company.belongsTo(models.User, { foreignKey: 'userId', as: 'adminUser' });
+    Company.hasMany(models.AttendanceSetting, { foreignKey: 'companyId' });
   };
 
   return Company;

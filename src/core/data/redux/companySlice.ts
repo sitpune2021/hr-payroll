@@ -19,7 +19,7 @@ export interface Company {
   updatedAt: string;
   subscriptionStartDate: string;
   subscriptionEndDate: string;
-  allowedNoOfUser: number;
+  allowedNoOfUsers: number;
 }
 
 

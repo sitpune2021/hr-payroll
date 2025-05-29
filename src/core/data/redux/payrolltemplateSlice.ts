@@ -10,13 +10,16 @@ export interface Template {
 }
 
 
-export const fetchPayrollTemplates = createAsyncThunk<Template[]>(
-  'template/fetchTemplates',
-  async () => {
-    const response = await axiosClient.get<Template[]>(FETCH_ALL_PAYROLL_TEMPLATE_LIST);
-    return response.data;
-  }
-);
+export const fetchPayrollTemplates = createAsyncThunk<
+  Template[],
+  { companyId: number | null | undefined }
+>('template/fetchTemplates', async ({ companyId }) => {
+  const response = await axiosClient.get<Template[]>(FETCH_ALL_PAYROLL_TEMPLATE_LIST, {
+    params: { companyId },
+  });
+  return response.data;
+});
+
 
 interface TemplateState {
   templates: Template[];

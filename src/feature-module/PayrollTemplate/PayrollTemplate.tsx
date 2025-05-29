@@ -107,7 +107,7 @@ function PayrollTemplate() {
                 companyId: newTemplateCompId
             });
             if (response.status === 201) {
-                await dispatch(fetchPayrollTemplates());
+                await dispatch(fetchPayrollTemplates({ companyId: user?.companyId }));
                 toast('Info', 'Payroll Template Added Successfully', 'success');
                 setNewTemplateName('')
             }

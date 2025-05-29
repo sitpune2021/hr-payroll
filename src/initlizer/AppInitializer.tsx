@@ -62,7 +62,7 @@ const AppInitializer = ({ onReady }: { onReady: () => void }) => {
         await dispatch(fetchBranches());
         await dispatch(fetchDepartments());
         await dispatch(fetchShifts());
-        await dispatch(fetchPayrollTemplates());
+        await dispatch(fetchPayrollTemplates({ companyId: userSaved.companyId }));
         await dispatch(fetchUsers({
           companyId: undefined,
           branchId: undefined,

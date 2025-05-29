@@ -136,6 +136,9 @@ const Companies = () => {
     formData.append("phone", editCompanyData.phone);
     formData.append("website", editCompanyData.website);
     formData.append("address", editCompanyData.address);
+    formData.append("subscriptionStartDate", editCompanyData.subscriptionStartDate);
+    formData.append("subscriptionEndDate", editCompanyData.subscriptionEndDate);
+    formData.append("allowedNoOfUsers", editCompanyData.allowedNoOfUsers.toString());
 
     if (selectedImageEdit) {
       formData.append("companyImage", selectedImageEdit);
@@ -1271,7 +1274,7 @@ const Companies = () => {
                         type="number"
                         name='allowedNoOfUsers'
                         onChange={handleEditInputChange}
-                        value={editCompanyData?.allowedNoOfUser}
+                        value={editCompanyData?.allowedNoOfUsers}
                         className="form-control"
                       />
                     </div>

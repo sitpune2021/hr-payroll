@@ -830,7 +830,7 @@ const LayoutDemo = () => {
                       <h5 className="text-primary">99%</h5>
                     </div>
                   </div>
-                  <Link to="employees.html" className="btn btn-light btn-md w-100">
+                  <Link to="/attendance-admin" className="btn btn-light btn-md w-100">
                     View All Employees
                   </Link>
                 </div>

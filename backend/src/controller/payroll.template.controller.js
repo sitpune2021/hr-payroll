@@ -40,15 +40,22 @@ const addNewTemplate = async (req, res) => {
 
 const getListOfTemplate = async (req, res) => {
     try {
+        const { companyId } = req.query;
+
+        const whereClause = {};
+        if (companyId) whereClause.companyId = companyId;
+
         const templates = await PayrollTemplate.findAll({
             attributes: ['id', 'templateName', 'companyId'],
+            where: whereClause,
         });
-        return res.status(200).json(templates);
 
+        return res.status(200).json(templates);
     } catch (error) {
-        return res.status(500).json({ message: 'Error fetching list of templates', error: error.message })
+        return res.status(500).json({ message: 'Error fetching list of templates', error: error.message });
     }
-}
+};
+
 
 const editPayrollTemplateWithComponents = async (req, res) => {
 

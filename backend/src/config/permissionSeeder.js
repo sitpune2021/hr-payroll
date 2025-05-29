@@ -29,7 +29,7 @@ const SidebarDataTest = [
         base: 'ranches',
       },
       {
-        label: 'Users',
+        label: 'Employee',
         icon: 'user-star',
         link: '',
         base: 'users',
@@ -943,7 +943,7 @@ const SidebarDataTest = [
       //   icon: 'user-star',
       //   submenuItems: [
       //     {
-      //       label: 'Users',
+      //       label: 'Employee',
       //       link: '',
       //       base: 'users',
       //     },
@@ -2088,7 +2088,6 @@ const seedPermissions = async (models) => {
     { name: 'AddCompany', description: 'Permission to add a new company' },
     { name: 'EditCompany', description: 'Permission to edit company details' },
     { name: 'User Management', description: 'Permission to manage users' },
-    { name: 'Users', description: 'Permission to access user details' },
     { name: 'EditUser', description: 'Permission to edit user details' },
     { name: 'AddUser', description: 'Permission to add new users' },
     { name: 'Branches', description: 'Permission to manage branches' },
@@ -2107,6 +2106,7 @@ const seedPermissions = async (models) => {
     { name: 'AddShift', description: 'Permission to add new shift/shift settings' },
     { name: 'EditShift', description: 'Permission to edit shift' },
     { name: 'Payroll Templates', description: 'Permission access payroll page' },
+    { name: 'Employee', description: 'Permission to access user details' },
 
 
 

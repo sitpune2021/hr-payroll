@@ -33,7 +33,7 @@ export default (sequelize) => {
       defaultValue: 10,
     },
 
-    branchId: {
+    companyId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     }
@@ -44,7 +44,7 @@ export default (sequelize) => {
   });
 
   AttendanceSetting.associate = (models) => {
-    AttendanceSetting.belongsTo(models.Branch, { foreignKey: 'branchId' });
+  AttendanceSetting.belongsTo(models.Company, { foreignKey: 'companyId' });
   };
 
   return AttendanceSetting;
