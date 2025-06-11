@@ -37,7 +37,7 @@ export default (sequelize) => {
     },
     lastName: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     maritalStatus: {
       type: DataTypes.STRING,
