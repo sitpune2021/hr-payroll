@@ -14,6 +14,7 @@ import { CompanyTableItem, mapCompanyDataToTable } from '../../../utils/CompanyT
 import { Company, fetchCompanies } from '../../../core/data/redux/companySlice'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../../core/data/redux/store'
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 const Companies = () => {
   const dispatch = useAppDispatch();
@@ -957,150 +958,170 @@ const Companies = () => {
 
               <div className="modal-body pb-0">
                 <div className="row">
-                  <div className="col-md-12">
-                    <div className="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
-                      <div className="d-flex align-items-center justify-content-center avatar avatar-xxl rounded-circle border border-dashed me-2 flex-shrink-0 text-dark frames">
-                        <ImageWithBasePath
-                          src="assets/img/profiles/avatar-30.jpg"
-                          alt="img"
-                          className="rounded-circle"
-                        />
-                      </div>
-                      <div className="profile-upload">
-                        <div className="mb-2">
-                          <h6 className="mb-1">Select Image</h6>
-                          <p className="fs-12">Image should be below 4 mb</p>
-                        </div>
-                        <div className="profile-uploader d-flex align-items-center">
-                          <div className={`drag-upload-btn btn btn-sm ${formErrors.companyImage ? 'btn-danger border border-danger' : 'btn-primary'} me-2`}>
-                            Upload
-                            <input
-                              type="file"
-                              name='companyImage'
-                              onChange={handleAddCompanyImageChange}
-                              className="form-control image-sign"
-                            />
+
+                  <Tabs style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <TabList>
+                      <Tab>Company Info</Tab>
+                      <Tab>Admin Info</Tab>
+                    </TabList>
+
+                    <TabPanel>
+                      <div className="row" style={{ minHeight: '300px' }}>
+                        <div className="col-md-12">
+                          <div className="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
+                            <div className="d-flex align-items-center justify-content-center avatar avatar-xxl rounded-circle border border-dashed me-2 flex-shrink-0 text-dark frames">
+                              <ImageWithBasePath
+                                src="assets/img/profiles/avatar-30.jpg"
+                                alt="img"
+                                className="rounded-circle"
+                              />
+                            </div>
+                            <div className="profile-upload">
+                              <div className="mb-2">
+                                <h6 className="mb-1">Select Image</h6>
+                                <p className="fs-12">Image should be below 4 mb</p>
+                              </div>
+                              <div className="profile-uploader d-flex align-items-center">
+                                <div className={`drag-upload-btn btn btn-sm ${formErrors.companyImage ? 'btn-danger border border-danger' : 'btn-primary'} me-2`}>
+                                  Upload
+                                  <input
+                                    type="file"
+                                    name='companyImage'
+                                    onChange={handleAddCompanyImageChange}
+                                    className="form-control image-sign"
+                                  />
+                                </div>
+                                <Link
+                                  to="#"
+                                  className="btn btn-light btn-sm"
+                                >
+                                  Cancel
+                                </Link>
+                              </div>
+                              {formErrors.companyImage && <div className="text-danger mt-1">{formErrors.companyImage}</div>}
+                            </div>
                           </div>
-                          <Link
-                            to="#"
-                            className="btn btn-light btn-sm"
-                          >
-                            Cancel
-                          </Link>
                         </div>
-                        {formErrors.companyImage && <div className="text-danger mt-1">{formErrors.companyImage}</div>}
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">
+                              Name <span className="text-danger"> *</span>
+                            </label>
+                            <input
+                              type="text"
+                              name='companyName'
+                              value={addCompanyFormData.companyName}
+                              onChange={(e) => handleAddCompanyChange(e)}
+                              className={`form-control ${formErrors.companyName ? 'is-invalid' : ''}`} />
+                            {formErrors.companyName && <div className="text-danger mt-1">{formErrors.companyName}</div>}
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">Email Address<span className="text-danger"> *</span></label>
+                            <input
+                              type="email"
+                              name='companyEmail'
+                              value={addCompanyFormData.companyEmail}
+                              onChange={(e) => handleAddCompanyChange(e)}
+                              className={`form-control ${formErrors.companyEmail ? 'is-invalid' : ''}`} />
+                            {formErrors.companyEmail && <div className="text-danger mt-1">{formErrors.companyEmail}</div>}
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">
+                              Phone Number <span className="text-danger"> *</span>
+                            </label>
+                            <input
+                              type="text"
+                              name='companyPhone'
+                              minLength={10}
+                              maxLength={10}
+                              value={addCompanyFormData.companyPhone}
+                              onChange={(e) => handleAddCompanyChange(e)}
+                              pattern="[0-9]{10}"
+                              title="Enter a 10-digit number"
+                              className={`form-control ${formErrors.companyPhone ? 'is-invalid' : ''}`} />
+                            {formErrors.companyPhone && <div className="text-danger mt-1">{formErrors.companyPhone}</div>}
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">Website</label>
+                            <input
+                              type="text"
+                              name='companyWebsite'
+                              value={addCompanyFormData.companyWebsite}
+                              onChange={(e) => handleAddCompanyChange(e)}
+                              className="form-control" />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">Subscription Start Date <span className="text-danger">*</span></label>
+                            <input
+                              type="date"
+                              name="subscriptionStartDate"
+                              value={addCompanyFormData.subscriptionStartDate}
+                              onChange={(e) => handleAddCompanyChange(e)}
+                              className={`form-control ${formErrors.subscriptionStartDate ? 'is-invalid' : ''}`}
+                            />
+                            {formErrors.subscriptionStartDate && <div className="text-danger mt-1">{formErrors.subscriptionStartDate}</div>}
+                          </div>
+                        </div>
+
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">Subscription End Date <span className="text-danger">*</span></label>
+                            <input
+                              type="date"
+                              name="subscriptionEndDate"
+                              value={addCompanyFormData.subscriptionEndDate}
+                              onChange={(e) => handleAddCompanyChange(e)}
+                              className={`form-control ${formErrors.subscriptionEndDate ? 'is-invalid' : ''}`}
+                            />
+                            {formErrors.subscriptionEndDate && <div className="text-danger mt-1">{formErrors.subscriptionEndDate}</div>}
+                          </div>
+                        </div>
+
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">Allowed No. of Users <span className="text-danger">*</span></label>
+                            <input
+                              type="number"
+                              name="allowedNoOfUsers"
+                              value={addCompanyFormData.allowedNoOfUsers}
+                              onChange={(e) => handleAddCompanyChange(e)}
+                              className={`form-control ${formErrors.allowedNoOfUsers ? 'is-invalid' : ''}`}
+                              min={1}
+                            />
+                            {formErrors.allowedNoOfUsers && <div className="text-danger mt-1">{formErrors.allowedNoOfUsers}</div>}
+                          </div>
+                        </div>
+
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">Address</label>
+                            <input
+                              type="text"
+                              name='companyAddress'
+                              value={addCompanyFormData.companyAddress}
+                              onChange={(e) => handleAddCompanyChange(e)}
+                              className="form-control" />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Name <span className="text-danger"> *</span>
-                      </label>
-                      <input
-                        type="text"
-                        name='companyName'
-                        value={addCompanyFormData.companyName}
-                        onChange={(e) => handleAddCompanyChange(e)}
-                        className={`form-control ${formErrors.companyName ? 'is-invalid' : ''}`} />
-                      {formErrors.companyName && <div className="text-danger mt-1">{formErrors.companyName}</div>}
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">Email Address<span className="text-danger"> *</span></label>
-                      <input
-                        type="email"
-                        name='companyEmail'
-                        value={addCompanyFormData.companyEmail}
-                        onChange={(e) => handleAddCompanyChange(e)}
-                        className={`form-control ${formErrors.companyEmail ? 'is-invalid' : ''}`} />
-                      {formErrors.companyEmail && <div className="text-danger mt-1">{formErrors.companyEmail}</div>}
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Phone Number <span className="text-danger"> *</span>
-                      </label>
-                      <input
-                        type="text"
-                        name='companyPhone'
-                        minLength={10}
-                        maxLength={10}
-                        value={addCompanyFormData.companyPhone}
-                        onChange={(e) => handleAddCompanyChange(e)}
-                        pattern="[0-9]{10}"
-                        title="Enter a 10-digit number"
-                        className={`form-control ${formErrors.companyPhone ? 'is-invalid' : ''}`} />
-                      {formErrors.companyPhone && <div className="text-danger mt-1">{formErrors.companyPhone}</div>}
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">Website</label>
-                      <input
-                        type="text"
-                        name='companyWebsite'
-                        value={addCompanyFormData.companyWebsite}
-                        onChange={(e) => handleAddCompanyChange(e)}
-                        className="form-control" />
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">Subscription Start Date <span className="text-danger">*</span></label>
-                      <input
-                        type="date"
-                        name="subscriptionStartDate"
-                        value={addCompanyFormData.subscriptionStartDate}
-                        onChange={(e) => handleAddCompanyChange(e)}
-                        className={`form-control ${formErrors.subscriptionStartDate ? 'is-invalid' : ''}`}
-                      />
-                      {formErrors.subscriptionStartDate && <div className="text-danger mt-1">{formErrors.subscriptionStartDate}</div>}
-                    </div>
-                  </div>
+                    </TabPanel>
 
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">Subscription End Date <span className="text-danger">*</span></label>
-                      <input
-                        type="date"
-                        name="subscriptionEndDate"
-                        value={addCompanyFormData.subscriptionEndDate}
-                        onChange={(e) => handleAddCompanyChange(e)}
-                        className={`form-control ${formErrors.subscriptionEndDate ? 'is-invalid' : ''}`}
-                      />
-                      {formErrors.subscriptionEndDate && <div className="text-danger mt-1">{formErrors.subscriptionEndDate}</div>}
-                    </div>
-                  </div>
+                    <TabPanel>
+                      <div className="row" style={{ minHeight: '300px' }}>
+                        
+                      </div>
+                    </TabPanel>
+                  </Tabs>
 
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">Allowed No. of Users <span className="text-danger">*</span></label>
-                      <input
-                        type="number"
-                        name="allowedNoOfUsers"
-                        value={addCompanyFormData.allowedNoOfUsers}
-                        onChange={(e) => handleAddCompanyChange(e)}
-                        className={`form-control ${formErrors.allowedNoOfUsers ? 'is-invalid' : ''}`}
-                        min={1}
-                      />
-                      {formErrors.allowedNoOfUsers && <div className="text-danger mt-1">{formErrors.allowedNoOfUsers}</div>}
-                    </div>
-                  </div>
 
-                  <div className="col-md-6">
-                    <div className="mb-3">
-                      <label className="form-label">Address</label>
-                      <input
-                        type="text"
-                        name='companyAddress'
-                        value={addCompanyFormData.companyAddress}
-                        onChange={(e) => handleAddCompanyChange(e)}
-                        className="form-control" />
-                    </div>
-                  </div>
                 </div>
               </div>
               <div className="modal-footer">
@@ -1251,7 +1272,7 @@ const Companies = () => {
                       />
                     </div>
                   </div>
-                   <div className="col-md-6">
+                  <div className="col-md-6">
                     <div className="mb-3">
                       <label className="form-label">
                         Subscription End Date <span className="text-danger"> *</span>
@@ -1265,7 +1286,7 @@ const Companies = () => {
                       />
                     </div>
                   </div>
-                   <div className="col-md-6">
+                  <div className="col-md-6">
                     <div className="mb-3">
                       <label className="form-label">
                         Allowed Number of Users <span className="text-danger"> *</span>
