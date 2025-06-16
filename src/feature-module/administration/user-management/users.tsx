@@ -21,6 +21,8 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css'; // Or use custom CSS
 import { Template } from '../../../core/data/redux/payrolltemplateSlice';
 import { Shift } from '../../../core/data/redux/shiftSlice';
+import { Role } from '../../../core/data/redux/rolesSlice';
+import ImageWithBasePath from '../../../core/common/imageWithBasePath';
 type PasswordField = "password" | "confirmPassword";
 
 const Users = () => {
@@ -35,11 +37,19 @@ const Users = () => {
     const [limit, setLimit] = useState(10)
     const [filteredBranches, setFilteredBranches] = useState<Branch[]>([]);
     const [allShifts, setAllSHifts] = useState<Shift[]>([])
+    const [filteredRoles, setFilteredRoles] = useState<Role[]>([])
+    const [bankDetails, setBankDetails] = useState<File | null>(null);
+    const [adhaarCard, setAdhaarCard] = useState<File | null>(null);
+    const [panCard, setPanCard] = useState<File | null>(null);
+    const [educationalQulif, setEducationalQulif] = useState<File | null>(null);
+    const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
 
 
 
 
-    const handleSortChange = (option: string) => { 
+
+
+    const handleSortChange = (option: string) => {
         setSortOption(option);
     };
 
@@ -92,9 +102,9 @@ const Users = () => {
     const roles = useAppSelector((state) => state.roles.list);
     const loggedInuserRole = useSelector((state: RootState) => state.auth.user?.role);
     const loggedInRoleId = roles.find(role => role.name === loggedInuserRole)?.id;
-    const filteredRoles = loggedInRoleId !== undefined
-        ? roles.filter(role => role.id > loggedInRoleId)
-        : [];
+    // const filteredRoles = loggedInRoleId !== undefined
+    //     ? roles.filter(role => role.id > loggedInRoleId)
+    //     : [];
 
 
 
@@ -136,11 +146,16 @@ const Users = () => {
             const usersSHifts = shiftsList.filter(
                 (shift) => shift.companyId === user.companyId
             );
+            const userCompROles = roles.filter(
+                (role) => role.companyId === user.companyId
+            )
+            setFilteredRoles(userCompROles)
             setAllSHifts(usersSHifts);
         } else {
             setAllSHifts(shiftsList)
+            setFilteredRoles(roles)
         }
-    },[user,shiftsList])
+    }, [user, shiftsList])
 
     const { list: users, loading, error, page, totalPages, sortField, sortOrder } = useSelector((state: RootState) => state.users);
 
@@ -181,25 +196,36 @@ const Users = () => {
     const [formDactaAddUser, setFormDataAddUser] = useState({
         firstName: '',
         lastName: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
         contact: '',
-        birthDate: '',
-        joiningDate: '',
+        email: '',
+        gender: '',
+        Designation: '',
         roleId: '',
-        maritalStatus: '',
         companyId: '',
         branchId: '',
         departmentId: '',
-        templateId: '',
-        gender: '',
-        basicSalary: '',
-        biometricDevice: '',
-        geofencepoint: '',
-        ruleTemplateId: '',
-        paymentMode: '',
+        reportingPerson: '',
+        joiningDate: '',
+        birthDate: '',
+        attendanceMode: '',
+        shiftRotationalFixed: '',
         workingShift: '',
+        sendWhatsapp: '',
+        geofencepoint: '',
+        leaveTemplate: '',
+        paymentMode: '',
+        paymentDate: '',
+        basicSalary: '',
+        payrollTemplate: '',
+        tempAddress: '',
+        permenentAddress: '',
+        bloodGroup: '',
+        alternateMobileNO: '',
+        pfNumber: ''
+    });
+
+    const [formErrors, setFormErrors] = useState({
+        firstName: "",
     });
 
 
@@ -207,35 +233,40 @@ const Users = () => {
 
     useEffect(() => {
         if (companyList.length > 0) {
-            const loggedUsersCompany = companyList.find(
-                (company) => company.id === user?.companyId
-            );
-
-            if (loggedUsersCompany) {
-                setAllCompany([loggedUsersCompany]);
+            if (user?.companyId) {
+                const loggedUsersCompany = companyList.find(
+                    (company) => company.id === user.companyId
+                );
+                if (loggedUsersCompany) {
+                    setAllCompany([loggedUsersCompany]);
+                } else {
+                    setAllCompany([]);
+                }
             } else {
+                // Super Admin — show all companies
                 setAllCompany(companyList);
             }
         }
 
         if (branchList.length > 0) {
-            const loggedUsersBranches = branchList.filter(
-                (branch) => branch.companyId === user?.companyId
-            );
-
-            if (loggedUsersBranches.length > 0) {
+            if (user?.companyId) {
+                const loggedUsersBranches = branchList.filter(
+                    (branch) => branch.companyId === user.companyId
+                );
                 setAllBranches(loggedUsersBranches);
             } else {
+                // Super Admin — show all branches
                 setAllBranches(branchList);
             }
+        } else {
+            setAllBranches([]); // Explicitly empty if no branches exist at all
         }
-
 
     }, [branchList, companyList, user?.companyId]);
 
     useEffect(() => {
-        if (formDactaAddUser.companyId) {
-            const branches = allBranches.filter(branch => branch.companyId === parseInt(formDactaAddUser.companyId));
+        if (formDactaAddUser.companyId !== '') {
+            const branches = allBranches.filter(branch => branch.companyId === Number(formDactaAddUser.companyId));
             setFilteredBranches(branches);
         } else {
             setFilteredBranches([]);
@@ -258,81 +289,78 @@ const Users = () => {
         const {
             firstName,
             lastName,
-            email,
-            password,
-            confirmPassword,
             contact,
-            birthDate,
-            joiningDate,
+            email,
+            gender,
+            Designation,
             roleId,
-            maritalStatus,
             companyId,
             branchId,
             departmentId,
-            templateId,
-            gender,
-            basicSalary,
-            biometricDevice,
+            reportingPerson,
+            joiningDate,
+            birthDate,
+            attendanceMode,
+            shiftRotationalFixed,
+            workingShift,
+            sendWhatsapp,
             geofencepoint,
-            ruleTemplateId,
+            leaveTemplate,
             paymentMode,
-            workingShift
+            paymentDate,
+            basicSalary,
+            payrollTemplate,
+            tempAddress,
+            permenentAddress,
+            bloodGroup,
+            alternateMobileNO,
+            pfNumber,
         } = formDactaAddUser;
 
-        if (!companyId) {
-            toast('Error', 'Company is required.', 'danger');
-            return;
+        const newErrors: any = {};
+
+        if (!firstName.trim()) newErrors.firstName = "First Name is required";
+        if (!lastName.trim()) newErrors.lastName = "Lastname Name is required";
+        if (!contact.trim()) newErrors.contact = "Contact is required";
+        if (!email.trim()) newErrors.email = "Enail is required";
+        if (!gender.trim()) newErrors.gender = "Gender is required";
+        if (!Designation.trim()) newErrors.Designation = "Designation is required";
+        if (!roleId.trim()) newErrors.roleId = "Role selection is required";
+        if (!companyId.trim()) newErrors.companyId = "Company Selection is required";
+        if (!departmentId.trim()) newErrors.departmentId = "Department Selection is required";
+
+        setFormErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) return;
+
+        const payload = new FormData();
+        Object.entries(formDactaAddUser).forEach(([key, value]) => {
+            payload.append(key, value);
+        });
+
+        if (profilePhoto) {
+            payload.append("profilePhoto", profilePhoto);
+            console.log("profile photo appended @!@!@!@@!@!@!!!!!!!!!!@@@@@@@@@@@@@@@@@@@!!!!!!!!!!!!!!!!!!!!!!@@@@@@@@");
+
         }
+        if (bankDetails) payload.append("bankDetails", bankDetails);
+        if (adhaarCard) payload.append("adhaarCard", adhaarCard);
+        if (panCard) payload.append("panCard", panCard);
+        if (educationalQulif) payload.append("educationalQulif", educationalQulif);
 
 
-        if (parseInt(roleId) >= 3 && !branchId) {
-            toast('Error', 'Branch is required for selected role.', 'danger');
-            return;
-        }
 
-        if (!firstName || !lastName || !email || !password || !confirmPassword) {
-            toast('Error', 'Please fill all required fields.', 'danger');
 
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            toast('Error', 'Password did not match.', 'danger');
-            return;
-        }
-
-        if (!departmentId) {
-            toast('Error', 'Department is mendatory.', 'danger');
-            return;
-        }
 
 
         try {
-            const response = await axiosClient.post(ADD_NEW_USER, {
-                firstName,
-                lastName,
-                email,
-                password,
-                confirmPassword,
-                contact,
-                birthDate,
-                joiningDate,
-                roleId,
-                maritalStatus,
-                companyId,
-                branchId,
-                departmentId,
-                templateId,
-                gender,
-                basicSalary,
-                biometricDevice,
-                geofencepoint,
-                ruleTemplateId,
-                paymentMode,
-                workingShift
-            }
-            )
-            if (response.status === 200) {
+            console.log(formDactaAddUser);
+
+            const response = await axiosClient.post(ADD_NEW_USER, payload, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+            if (response.status === 201) {
                 toast('Success', response.data.message, 'success');
             }
 
@@ -920,13 +948,51 @@ const Users = () => {
                                 <Tabs style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                     <TabList>
                                         <Tab>Personal Info</Tab>
-                                        <Tab>Salary</Tab>
-                                        <Tab>Employment</Tab>
+                                        <Tab>Attendance Info</Tab>
+                                        <Tab>Salary Info</Tab>
+                                        <Tab>Other Info</Tab>
                                     </TabList>
 
                                     {/* --- Tab 1 --- */}
                                     <TabPanel>
                                         <div className="row" style={{ minHeight: '300px' }}>
+                                            <div className="col-md-12">
+                                                <div className="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
+                                                    <div className="d-flex align-items-center justify-content-center avatar avatar-xxl rounded-circle border border-dashed me-2 flex-shrink-0 text-dark frames">
+                                                        <ImageWithBasePath
+                                                            src="assets/img/profiles/avatar-30.jpg"
+                                                            alt="img"
+                                                            className="rounded-circle"
+                                                        />
+                                                    </div>
+                                                    <div className="profile-upload">
+                                                        <div className="mb-2">
+                                                            <h6 className="mb-1">Select Image</h6>
+                                                            <p className="fs-12">Image should be below 4 mb</p>
+                                                        </div>
+                                                        <div className="profile-uploader d-flex align-items-center">
+                                                            <div className={`drag-upload-btn btn btn-sm btn-primary me-2`}>
+                                                                Upload
+                                                                <input
+                                                                    type="file"
+                                                                    name='companyImage'
+                                                                    onChange={(e) => {
+                                                                        const file = e.target.files?.[0];
+                                                                        if (file) setProfilePhoto(file);
+                                                                    }}
+                                                                    className="form-control image-sign"
+                                                                />
+                                                            </div>
+                                                            <Link
+                                                                to="#"
+                                                                className="btn btn-light btn-sm"
+                                                            >
+                                                                Cancel
+                                                            </Link>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div className="col-md-6 mb-3">
                                                 <label className="form-label">First Name</label>
                                                 <input
@@ -950,43 +1016,29 @@ const Users = () => {
                                                 />
                                             </div>
                                             <div className="col-md-6 mb-3">
-                                                <label className="form-label">Birth Date</label>
+                                                <label className="form-label">Phone</label>
                                                 <input
-                                                    type="date"
+                                                    type="text"
                                                     className="form-control"
-                                                    value={formDactaAddUser.birthDate}
+                                                    value={formDactaAddUser.contact}
                                                     onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, birthDate: e.target.value })
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Joining Date</label>
-                                                <input
-                                                    type="date"
-                                                    className="form-control"
-                                                    value={formDactaAddUser.joiningDate}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, joiningDate: e.target.value })
+                                                        setFormDataAddUser({ ...formDactaAddUser, contact: e.target.value })
                                                     }
                                                 />
                                             </div>
 
                                             <div className="col-md-6 mb-3">
-                                                <label className="form-label">Marital Status</label>
-                                                <select
+                                                <label className="form-label">Email</label>
+                                                <input
+                                                    type="email"
                                                     className="form-control"
-                                                    value={formDactaAddUser.maritalStatus}
+                                                    value={formDactaAddUser.email}
                                                     onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, maritalStatus: e.target.value })
+                                                        setFormDataAddUser({ ...formDactaAddUser, email: e.target.value })
                                                     }
-                                                >
-                                                    <option value="">Select</option>
-                                                    <option value="single">Single</option>
-                                                    <option value="married">Married</option>
-                                                    <option value="unmarried">Unmarried</option>
-                                                </select>
+                                                />
                                             </div>
+
                                             <div className="col-md-6 mb-3">
                                                 <label className="form-label">Gender</label>
                                                 <select
@@ -1003,28 +1055,141 @@ const Users = () => {
                                                 </select>
                                             </div>
                                             <div className="col-md-6 mb-3">
-                                                <label className="form-label">Email</label>
-                                                <input
-                                                    type="email"
-                                                    className="form-control"
-                                                    value={formDactaAddUser.email}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, email: e.target.value })
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Phone</label>
+                                                <label className="form-label">Designation</label>
                                                 <input
                                                     type="text"
                                                     className="form-control"
-                                                    value={formDactaAddUser.contact}
+                                                    value={formDactaAddUser.Designation}
                                                     onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, contact: e.target.value })
+                                                        setFormDataAddUser({ ...formDactaAddUser, Designation: e.target.value })
                                                     }
                                                 />
                                             </div>
                                             <div className="col-md-6 mb-3">
+                                                <label className="form-label">Role</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.roleId}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, roleId: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select Role</option>
+                                                    {filteredRoles.map((role) => (
+                                                        <option key={role.id} value={role.id}>
+                                                            {role.name}-{getCompanyNameById(role.companyId)}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Company</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.companyId}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, companyId: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select Company</option>
+                                                    {allcompany.map((company) => (
+                                                        <option key={company.id} value={company.id}>
+                                                            {company.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Branch</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.branchId}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, branchId: e.target.value })
+                                                    }
+                                                    disabled={formDactaAddUser.companyId === ""}
+                                                >
+                                                    <option value="">Select branch</option>
+                                                    {filteredBranches.map((branch) => (
+                                                        <option key={branch.id} value={branch.id}>
+                                                            {branch.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Department</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.departmentId}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, departmentId: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    {
+                                                        filteredDepartments.map(dept => (
+                                                            <option value={dept.id} key={dept.id}>{dept.name}</option>
+                                                        ))
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Reporting Person</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={formDactaAddUser.reportingPerson}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, reportingPerson: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Joining Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={formDactaAddUser.joiningDate}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, joiningDate: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Birth Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={formDactaAddUser.birthDate}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, birthDate: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+
+                                            {/* <div className="col-md-6 mb-3">
+                                                <label className="form-label">Marital Status</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.maritalStatus}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, maritalStatus: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="single">Single</option>
+                                                    <option value="married">Married</option>
+                                                    <option value="unmarried">Unmarried</option>
+                                                </select>
+                                            </div> */}
+
+
+
+                                            {/* <div className="col-md-6 mb-3">
                                                 <label className="form-label">Password</label>
                                                 <div className="pass-group">
                                                     <input
@@ -1058,7 +1223,7 @@ const Users = () => {
                                                         onClick={() => togglePasswordVisibility("confirmPassword")}
                                                     ></span>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </TabPanel>
 
@@ -1066,177 +1231,33 @@ const Users = () => {
                                     <TabPanel>
                                         <div className="row" style={{ minHeight: '300px' }}>
                                             <div className="col-md-6 mb-3">
-                                                <label className="form-label">Basic Salary (In Rupees)</label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    value={formDactaAddUser.basicSalary}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, basicSalary: e.target.value })
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Salary Template</label>
+                                                <label className="form-label">Atterdance mode</label>
                                                 <select
                                                     className="form-control"
-                                                    value={formDactaAddUser.templateId}
+                                                    value={formDactaAddUser.attendanceMode}
                                                     onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, templateId: e.target.value })
+                                                        setFormDataAddUser({ ...formDactaAddUser, attendanceMode: e.target.value })
                                                     }
                                                 >
                                                     <option value="">Select</option>
-                                                    {
-                                                        allPayrollTemp.map(template => (
-                                                            <option value={template.id} key={template.id}>{template.templateName}</option>
-                                                        ))
-                                                    }
+                                                    <option value="Month">Manual</option>
+                                                    <option value="Day">Biometric</option>
+                                                    <option value="Hour">Geofence point</option>
                                                 </select>
                                             </div>
+
                                             <div className="col-md-6 mb-3">
-                                                <label className="form-label">Face Scan/Biometric Device</label>
+                                                <label className="form-label">Shift (Rotational/fixed)</label>
                                                 <select
                                                     className="form-control"
-                                                    value={formDactaAddUser.biometricDevice}
+                                                    value={formDactaAddUser.shiftRotationalFixed}
                                                     onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, biometricDevice: e.target.value })
+                                                        setFormDataAddUser({ ...formDactaAddUser, shiftRotationalFixed: e.target.value })
                                                     }
                                                 >
                                                     <option value="">Select</option>
-                                                    <option value="Device 1">Device 1</option>
-                                                    <option value="Device 2">Device 2</option>
-                                                    <option value="Device 3">Device 3</option>
-
-                                                </select>
-                                            </div>
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Geofence point</label>
-                                                <select
-                                                    className="form-control"
-                                                    value={formDactaAddUser.geofencepoint}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, geofencepoint: e.target.value })
-                                                    }
-                                                >
-                                                    <option value="">Select</option>
-                                                    <option value="Location 1">Location 1</option>
-                                                    <option value="Location 2">Location 2</option>
-                                                    <option value="Location 3">Location 3</option>
-
-                                                </select>
-                                            </div>
-
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Rules Template</label>
-                                                <select
-                                                    className="form-control"
-                                                    value={formDactaAddUser.ruleTemplateId}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, ruleTemplateId: e.target.value })
-                                                    }
-                                                >
-                                                    <option value="">Select</option>
-                                                    <option value={1}>Rule 1</option>
-                                                    <option value={2}>Rule 2</option>
-                                                    <option value={3}>Rule 3</option>
-                                                </select>
-                                            </div>
-
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Payment mode</label>
-                                                <select
-                                                    className="form-control"
-                                                    value={formDactaAddUser.paymentMode}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, paymentMode: e.target.value })
-                                                    }
-                                                >
-                                                    <option value="">Select</option>
-                                                    <option value="Month">Month</option>
-                                                    <option value="Day">Day</option>
-                                                    <option value="Hour">Hour</option>
-                                                </select>
-                                            </div>
-
-                                        </div>
-                                    </TabPanel>
-
-
-                                    {/* --- Tab 3 --- */}
-                                    <TabPanel>
-                                        <div className="row" style={{ minHeight: '300px' }}>
-                                            {/* Add role, company, branch, department, template, etc. */}
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Role</label>
-                                                <select
-                                                    className="form-control"
-                                                    value={formDactaAddUser.roleId}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, roleId: e.target.value })
-                                                    }
-                                                >
-                                                    <option value="">Select Role</option>
-                                                    {filteredRoles.map((role) => (
-                                                        <option key={role.id} value={role.id}>
-                                                            {role.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Company</label>
-                                                <select
-                                                    className="form-control"
-                                                    value={formDactaAddUser.companyId}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, companyId: e.target.value })
-                                                    }
-                                                    defaultValue={user?.companyId ?? ''}
-                                                >
-                                                    <option value="">Select Company</option>
-                                                    {allcompany.map((company) => (
-                                                        <option key={company.id} value={company.id}>
-                                                            {company.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Branch</label>
-                                                <select
-                                                    className="form-control"
-                                                    value={formDactaAddUser.branchId}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, branchId: e.target.value })
-                                                    }
-                                                    defaultValue={user?.branchId ?? ''}
-                                                >
-                                                    <option value="">Select branch</option>
-                                                    {allBranches.map((branch) => (
-                                                        <option key={branch.id} value={branch.id}>
-                                                            {branch.name}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Department</label>
-                                                <select
-                                                    className="form-control"
-                                                    value={formDactaAddUser.departmentId}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, departmentId: e.target.value })
-                                                    }
-                                                >
-                                                    <option value="">Select</option>
-                                                    {
-                                                        filteredDepartments.map(dept => (
-                                                            <option value={dept.id} key={dept.id}>{dept.name}</option>
-                                                        ))
-                                                    }
+                                                    <option value="Fixed">Fixed</option>
+                                                    <option value="Rotational">Rotational</option>
                                                 </select>
                                             </div>
 
@@ -1258,8 +1279,284 @@ const Users = () => {
                                                 </select>
                                             </div>
 
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Send Attendance to WhatsApp</label>
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name="sendWhatsapp"
+                                                        id="sendWhatsappYes"
+                                                        value="yes"
+                                                        checked={formDactaAddUser.sendWhatsapp === 'yes'}
+                                                        onChange={(e) =>
+                                                            setFormDataAddUser({ ...formDactaAddUser, sendWhatsapp: e.target.value })
+                                                        }
+                                                    />
+                                                    <label className="form-check-label" htmlFor="sendWhatsappYes">
+                                                        Yes
+                                                    </label>
+                                                </div>
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name="sendWhatsapp"
+                                                        id="sendWhatsappNo"
+                                                        value="no"
+                                                        checked={formDactaAddUser.sendWhatsapp === 'no'}
+                                                        onChange={(e) =>
+                                                            setFormDataAddUser({ ...formDactaAddUser, sendWhatsapp: e.target.value })
+                                                        }
+                                                    />
+                                                    <label className="form-check-label" htmlFor="sendWhatsappNo">
+                                                        No
+                                                    </label>
+                                                </div>
+                                            </div>
 
-                                            {/* Add branch, department, and payroll template as needed */}
+
+
+                                            {/* <div className="col-md-6 mb-3">
+                                                <label className="form-label">Face Scan/Biometric Device</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.biometricDevice}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, biometricDevice: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="Device 1">Device 1</option>
+                                                    <option value="Device 2">Device 2</option>
+                                                    <option value="Device 3">Device 3</option>
+
+                                                </select>
+                                            </div> */}
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Geofence point</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.geofencepoint}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, geofencepoint: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="Location 1">Location 1</option>
+                                                    <option value="Location 2">Location 2</option>
+                                                    <option value="Location 3">Location 3</option>
+
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Leave Template</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.leaveTemplate}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, leaveTemplate: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value={1}>Leave Template 1</option>
+                                                    <option value={2}>Leave Template 2</option>
+                                                    <option value={3}>Leave Template 3</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </TabPanel>
+
+
+                                    {/* --- Tab 3 --- */}
+                                    <TabPanel>
+                                        <div className="row" style={{ minHeight: '300px' }}>
+
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Payment mode</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.paymentMode}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, paymentMode: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="Month">Month</option>
+                                                    <option value="Day">Day</option>
+                                                    <option value="Hour">Hour</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Payment Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={formDactaAddUser.paymentDate}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, paymentDate: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Earning (Gross)</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={formDactaAddUser.basicSalary}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, basicSalary: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Payroll Template</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.payrollTemplate}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, payrollTemplate: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    {
+                                                        allPayrollTemp.map(template => (
+                                                            <option value={template.id} key={template.id}>{template.templateName}</option>
+                                                        ))
+                                                    }
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </TabPanel>
+
+                                    {/* --- Tab 4 --- */}
+                                    <TabPanel>
+                                        <div className="row" style={{ minHeight: '300px' }}>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Temperary Address</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={formDactaAddUser.tempAddress}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, tempAddress: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Permenant Address</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={formDactaAddUser.permenentAddress}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, permenentAddress: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Blood Group</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.bloodGroup}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, bloodGroup: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="A+">A+</option>
+                                                    <option value="A-">A−</option>
+                                                    <option value="B+">B+</option>
+                                                    <option value="B-">B−</option>
+                                                    <option value="AB+">AB+</option>
+                                                    <option value="AB-">AB−</option>
+                                                    <option value="O+">O+</option>
+                                                    <option value="O-">O−</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">ALternate Mobile Number</label>
+                                                <input
+                                                    type="number"
+                                                    className="form-control"
+                                                    value={formDactaAddUser.alternateMobileNO}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, alternateMobileNO: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">PF Number</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={formDactaAddUser.pfNumber}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, pfNumber: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Bank Dtails</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) setBankDetails(file);
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Adhaar Card</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) setAdhaarCard(file);
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">PAN Card</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) setPanCard(file);
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Educational Qualification</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) setEducationalQulif(file);
+                                                    }}
+                                                />
+                                            </div>
+
                                         </div>
                                     </TabPanel>
                                 </Tabs>
@@ -1354,7 +1651,7 @@ const Users = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="col-md-6">
+                                    {/* <div className="col-md-6">
                                         <div className="mb-3">
                                             <label className="form-label">Merital Status</label>
                                             <select
@@ -1370,7 +1667,7 @@ const Users = () => {
 
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-6">
                                         <div className="mb-3">
                                             <label className="form-label">Role</label>
@@ -1513,7 +1810,7 @@ const Users = () => {
                                             </label>
                                             <select
                                                 name='templateId'
-                                                value={editUserData?.templateId ?? ''}
+                                                value={editUserData?.payrollTemplate ?? ''}
                                                 className='form-control'
                                                 onChange={(e) => handleEditDataChange(e)}
                                             >
@@ -1621,14 +1918,14 @@ const Users = () => {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="col-md-4">
+                                        {/* <div className="col-md-4">
                                             <div className="mb-3">
                                                 <p className="fs-12 mb-0">Merital Status</p>
                                                 <p className="text-gray-9">
                                                     {viewUserDetails?.maritalStatus}
                                                 </p>
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                             </div>

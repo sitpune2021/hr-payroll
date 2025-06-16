@@ -18,19 +18,25 @@ export default (sequelize) => {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    companyId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
-  },{
+  }, {
     tableName: 'Department',
     timestamps: true
   });
 
   Department.associate = (models) => {
+    Department.belongsTo(models.Company, { foreignKey: 'companyId' });
+
     Department.hasMany(models.User, {
       foreignKey: 'departmentId',
-      onDelete: 'RESTRICT', // prevent deleting department if users exist
+      onDelete: 'RESTRICT',
     });
   };
 

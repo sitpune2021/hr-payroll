@@ -14,7 +14,7 @@ export default (sequelize) => {
     },
     address: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     phone: {
       type: DataTypes.STRING, 
@@ -22,11 +22,23 @@ export default (sequelize) => {
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     companyId: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    branchLogoFileName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    bankDetailsFileName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    nameOfSalarySlip: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },{
     tableName: 'Branch',

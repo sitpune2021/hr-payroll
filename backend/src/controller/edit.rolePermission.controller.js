@@ -6,6 +6,9 @@ const updatePermissionsForRole = async (req, res) => {
 
   const { roleId, permissionId } = req.params;
 
+  console.log(roleId,permissionId);
+  
+
 
   try {
 

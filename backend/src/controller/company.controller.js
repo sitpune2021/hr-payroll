@@ -2,7 +2,7 @@ import models, { sequelize } from "../models/index.js";
 import bcrypt from 'bcryptjs';
 import { deleteImageFile, saveImageFile } from "../utils/imageUtils.js";
 
-const { Company, User, Role } = models;
+const { Company, User, Role, Department } = models;
 
 
 const addnewcompany = async (req, res) => {
@@ -14,7 +14,10 @@ const addnewcompany = async (req, res) => {
     companyWebsite,
     subscriptionStartDate,
     subscriptionEndDate,
-    allowedNoOfUsers
+    allowedNoOfUsers,
+    firstName,
+    lastName,
+    password,
   } = req.body;
   const transaction = await sequelize.transaction();
 
@@ -71,11 +74,43 @@ const addnewcompany = async (req, res) => {
       { transaction }
     );
 
+    const rolesToCreate = ["COMPANY_ADMIN", "BRANCH_MANAGER", "EMPLOYEE"];
+    const createdRoles = {};
+
+    for (const roleName of rolesToCreate) {
+      const role = await Role.create({ name: roleName, companyId: company.id }, { transaction });
+      createdRoles[roleName] = role;
+    }
+
+    const companyAdminRole = createdRoles["COMPANY_ADMIN"];
+    if (!companyAdminRole) throw new Error("Failed to create COMPANY_ADMIN role");
+    if (!companyAdminRole) throw new Error("Role 'COMPANY_ADMIN' not found");
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    let department2 = await Department.findOne({ where: { name: "Admins" } });
+
+    const newUser = await User.create({
+      email: companyEmail,
+      contact: companyPhone,
+      password: hashedPassword,
+      firstName: firstName || "Admin",
+      lastName: lastName || "User",
+      roleId: companyAdminRole.id,
+      designation:"company admin",
+      companyId: company.id,
+      departmentId: department2.id,
+      joiningDate: new Date()
+    }, { transaction });
+
+
+
     await transaction.commit();
 
     res.status(201).json({
-      message: "Company created successfully",
+      message: "Company and Company Admin User created successfully",
       company,
+      newUser
     });
   } catch (error) {
     await transaction.rollback();
@@ -122,7 +157,7 @@ const updatecompany = async (req, res) => {
     company.address = address;
     company.subscriptionStartDate = subscriptionStartDate;
     company.subscriptionEndDate = subscriptionEndDate;
-    company.allowedNoOfUsers= allowedNoOfUsers;
+    company.allowedNoOfUsers = allowedNoOfUsers;
 
     // If new image uploaded
     if (req.file) {

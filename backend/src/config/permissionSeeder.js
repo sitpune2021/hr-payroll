@@ -2107,6 +2107,7 @@ const seedPermissions = async (models) => {
     { name: 'EditShift', description: 'Permission to edit shift' },
     { name: 'Payroll Templates', description: 'Permission access payroll page' },
     { name: 'Employee', description: 'Permission to access user details' },
+    { name: 'Attendance', description: 'Permission to access user details' },
 
 
 

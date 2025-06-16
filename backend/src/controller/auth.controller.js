@@ -63,6 +63,7 @@ const loginController = async (req, res) => {
         lastName: user.lastName,
         contact: user.contact,
         role: userRole.name,
+        roleId: userRole.id,
         companyId: user.companyId,
         branchId:user.branchId,
         departmentId:user.departmentId
@@ -125,6 +126,7 @@ const getUserDataController = async (req, res) => {
         email: user.email,
         contact: user.contact,
         role: req.user.role,
+        roleId:req.user.roleId,
         companyId: user.companyId,
         roleId:user.roleId,
         departmentId:user.departmentId,

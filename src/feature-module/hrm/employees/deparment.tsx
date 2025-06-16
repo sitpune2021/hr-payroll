@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { all_routes } from '../../router/all_routes'
 import { Link } from 'react-router-dom'
 import Table from "../../../core/common/dataTable/index";
@@ -6,19 +6,58 @@ import CommonSelect from '../../../core/common/commonSelect';
 import CollapseHeader from '../../../core/common/collapse-header/collapse-header';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../core/data/redux/store';
+import { useAppSelector } from '../../../core/data/redux/hooks';
+import { Company } from '../../../core/data/redux/companySlice';
+import axiosClient from '../../../axiosConfig/axiosClient';
+import { ADD_NEW_DEPARTMENTS } from '../../../axiosConfig/apis';
+import { toast } from '../../../utils/toastUtil';
 type PasswordField = "password" | "confirmPassword";
 
 const Department = () => {
 
-
+  const [addDeptData, setAddDeptData] = useState({
+    "name": "",
+    "description": "",
+    "companyId": ""
+  })
+  const [allcompany, setAllCompany] = useState<Company[]>([])
+  const companyList = useAppSelector((state) => state.companies.list);
   const departmentList = useSelector((state: RootState) => state.departments.data)
-  const statusChoose = [
-    { value: "Select", label: "Select" },
-    { value: "All Department", label: "All Department" },
-    { value: "Finance", label: "Finance" },
-    { value: "Developer", label: "Developer" },
-    { value: "Executive", label: "Executive" },
-  ];
+  const user = useSelector((state: RootState) => state.auth.user);
+
+
+  useEffect(() => {
+    if (companyList.length > 0) {
+      const activeCompany = companyList.filter(company => company.isActive);
+      const loggedUsersCompany = companyList.find(
+        (company) => company.id === user?.companyId
+      );
+
+      if (loggedUsersCompany) {
+        setAllCompany([loggedUsersCompany]);
+      } else {
+        setAllCompany(activeCompany);
+      }
+    }
+  }, [user, companyList]);
+
+  const handleAddDeptSubmit = async (e: any) => {
+    e.preventDefault();
+
+    const response = await axiosClient.post(ADD_NEW_DEPARTMENTS, addDeptData);
+    if (response.status === 201) {
+      toast('Success', 'Department Added Successfully', 'success')
+    }
+
+    setAddDeptData({
+      "name": "",
+      "description": "",
+      "companyId": ""
+    })
+
+    console.log(addDeptData);
+
+  }
   return (
     <>
       {/* Page Wrapper */}
@@ -254,25 +293,50 @@ const Department = () => {
                 <i className="ti ti-x" />
               </button>
             </div>
-            <form>
+            <form onSubmit={handleAddDeptSubmit}>
               <div className="modal-body pb-0">
                 <div className="row">
                   <div className="col-md-12">
                     <div className="mb-3">
                       <label className="form-label">Department Name</label>
-                      <input type="text" className="form-control" />
-                    </div>
-                  </div>
-                  <div className="col-md-12">
-                    <div className="mb-3">
-                      <label className="form-label">Status</label>
-                      <CommonSelect
-                        className='select'
-                        options={statusChoose}
-                        defaultValue={statusChoose[0]}
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={addDeptData.name}
+                        onChange={(e) => setAddDeptData({ ...addDeptData, name: e.target.value })}
                       />
                     </div>
                   </div>
+
+                  <div className="col-md-12">
+                    <div className="mb-3">
+                      <label className="form-label">Department Description</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={addDeptData.description}
+                        onChange={(e) => setAddDeptData({ ...addDeptData, description: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-md-12">
+                    <div className="mb-3">
+                      <label className="form-label">Select Company Name</label>
+                      <select className="form-control"
+                        value={addDeptData.companyId}
+                        onChange={(e) => setAddDeptData({ ...addDeptData, companyId: e.target.value })}
+                      >
+                        <option value="">Select</option>
+                        {
+                          allcompany.map(company => (
+                            <option value={company.id} key={company.id}>{company.name}</option>
+                          ))
+                        }
+                      </select>
+                    </div>
+                  </div>
+
                 </div>
               </div>
               <div className="modal-footer">
@@ -283,7 +347,7 @@ const Department = () => {
                 >
                   Cancel
                 </button>
-                <button type="button" data-bs-dismiss="modal" className="btn btn-primary">
+                <button type="submit" data-bs-dismiss="modal" className="btn btn-primary">
                   Add Department
                 </button>
               </div>
@@ -317,16 +381,6 @@ const Department = () => {
                         type="text"
                         className="form-control"
                         defaultValue="Finance"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-12">
-                    <div className="mb-3">
-                      <label className="form-label">Status</label>
-                      <CommonSelect
-                        className='select'
-                        options={statusChoose}
-                        defaultValue={statusChoose[1]}
                       />
                     </div>
                   </div>
