@@ -17,6 +17,11 @@ const initSuperAdmin = async (models) => {
       if (!department) {
         department = await Department.create({ name: "Delta", description: "Default department for superadmin" });
       }
+
+        let department2 = await Department.findOne({ where: { name: "Admins" } });
+      if (!department2) {
+        department2 = await Department.create({ name: "Admins", description: "Default department for Admins" });
+      }
   
       const hashedPassword = await bcrypt.hash("Sadmin@123", 10);
   
@@ -26,6 +31,7 @@ const initSuperAdmin = async (models) => {
         password: hashedPassword,
         firstName: "Super",
         lastName: "Admin",
+        designation:"Super Admin", 
         roleId: superAdminRole.id,
         departmentId: department.id, 
       });

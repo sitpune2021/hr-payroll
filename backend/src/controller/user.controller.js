@@ -4,156 +4,171 @@ import { where, Op } from 'sequelize';
 import * as XLSX from 'xlsx'
 import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js';
 import { log } from 'console';
+import { saveImageFile } from '../utils/imageUtils.js';
 
 const { Permission, Role, User, Company, Department } = models;
 
 const addNewUser = async (req, res) => {
-
   try {
     let {
-      firstName,
-      lastName,
-      email,
-      password,
-      contact,
-      birthDate,
-      joiningDate,
-      roleId,
-      maritalStatus,
-      companyId,
-      branchId,
-      departmentId,
-      templateId,
-      gender,
-      basicSalary,
-      biometricDevice,
-      geofencepoint,
-      ruleTemplateId,
-      paymentMode,
-      workingShift
+      firstName, lastName, contact, email, gender, Designation, roleId,
+      companyId, branchId, departmentId, reportingPerson, joiningDate,
+      birthDate, attendanceMode, shiftRotationalFixed, workingShift,
+      sendWhatsapp, geofencepoint, leaveTemplate, paymentMode, paymentDate,
+      basicSalary, payrollTemplate, tempAddress, permenentAddress, bloodGroup,
+      alternateMobileNO, pfNumber
     } = req.body;
 
     const clean = (val) => val === '' || val === undefined ? null : val;
 
-    birthDate = clean(birthDate);
-    joiningDate = clean(joiningDate);
-    roleId = clean(roleId);
-    maritalStatus = clean(maritalStatus);
-    branchId = clean(branchId);
-    departmentId = clean(departmentId);
-    templateId = clean(templateId);
-    gender = clean(gender);
-    basicSalary = clean(basicSalary);
-    biometricDevice = clean(biometricDevice);
-    geofencepoint = clean(geofencepoint);
-    ruleTemplateId = clean(ruleTemplateId);
-    paymentMode = clean(paymentMode);
-    workingShift = clean(workingShift);
+    // Clean values
+    [
+      birthDate, joiningDate, roleId, branchId, departmentId, gender,
+      basicSalary, geofencepoint, paymentMode, workingShift
+    ] = [
+        clean(birthDate), clean(joiningDate), clean(roleId), clean(branchId),
+        clean(departmentId), clean(gender), clean(basicSalary),
+        clean(geofencepoint), clean(paymentMode), clean(workingShift)
+      ];
 
+    // Company check
+    const company = await Company.findByPk(companyId);
+    if (!company) return res.status(400).json({ message: "Company not found" });
 
-    console.log(departmentId, "!!!!!!!!!!!!!!!!!!!!!!!");
-
-    const company = await Company.findOne({ where: { id: companyId } })
-
-    if (!company) {
-      return res.status(400).json({ message: "Company not found" })
-    }
     const existingUserCount = await User.count({ where: { companyId } });
-
     if (existingUserCount >= company.allowedNoOfUsers) {
       return res.status(400).json({ message: "User limit exceeded, please contact Provider." });
     }
 
+    // Duplicate email/contact checks
+    const [userExists, userExists2] = await Promise.all([
+      User.findOne({ where: { email } }),
+      User.findOne({ where: { contact } })
+    ]);
+    if (userExists) return res.status(400).json({ message: "Email already exists" });
+    if (userExists2) return res.status(400).json({ message: "Contact already exists" });
+
+    // Department check
+    const deptExist = await Department.findByPk(departmentId);
+    if (!deptExist) return res.status(400).json({ message: "Department not found" });
+
+    // Handle file uploads
+    const files = req.files || {};
+    console.log('@@@@@@@@@@@@@@@@@@@@@@');
+    console.log("Profile Photo File:", req.files?.profilePhoto?.[0]);
+    console.log("Bank Details File:", req.files?.bankDetails?.[0]);
 
 
-    const userExists = await User.findOne({
-      where:
-        { email: email }
-    });
-    if (userExists) {
-      return res.status(400).json({ message: "User already exists with this email." });
-    }
+    const profilePhoto = files.profilePhoto?.[0] ? await saveImageFile(files.profilePhoto[0]) : null;
+    const adhaarCard = files.adhaarCard?.[0] ? await saveImageFile(files.adhaarCard[0]) : null;
+    const panCard = files.panCard?.[0] ? await saveImageFile(files.panCard[0]) : null;
+    const bankDetails = files.bankDetails?.[0] ? await saveImageFile(files.bankDetails[0]) : null;
+    const educationalQualification = files.educationalQualification?.[0] ? await saveImageFile(files.educationalQualification[0]) : null;
 
-    const deptExist = await Department.findOne({
-      where:
-        { id: departmentId }
-    });
-    if (!deptExist) {
-      return res.status(400).json({ message: "Department not found." });
-    }
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
 
-    const userExists2 = await User.findOne({
-      where: {
-        contact
-      }
-    });
-    if (userExists2) {
-      return res.status(400).json({ message: "User already exists with this contact." });
-    }
+    console.log(panCard, profilePhoto, adhaarCard, bankDetails, educationalQualification);
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const cleanBranchId = branchId === '' ? null : branchId;
-    const newUser = new User({
+    // Password hash
+    const hashedPassword = await bcrypt.hash(contact, 10);
+
+    // Save user
+    const newUser = await User.create({
       firstName,
       lastName,
-      joiningDate,
-      gender,
-      email,
-      basicSalary,
-      biometricDevice,
-      geofencepoint,
-      ruleTemplateId,
-      paymentMode,
-      workingShift,
-      password: hashedPassword,
       contact,
-      birthDate,
+      email,
+      gender,
+      designation: Designation,
       roleId,
-      maritalStatus,
       companyId,
-      branchId: cleanBranchId,
+      branchId,
       departmentId,
-      templateId
+      reportingPerson,
+      joiningDate,
+      birthDate,
+      attendanceMode,
+      shiftRotationalFixed,
+      workingShift,
+      sendAttTOWhatsapp: sendWhatsapp === 'yes' || sendWhatsapp === true,
+      geofencepoint,
+      leaveTemplate,
+      paymentMode,
+      paymentDate,
+      basicSalary,
+      payrollTemplate,
+      temporaryAddress: tempAddress,
+      PermenantAddress: permenentAddress,
+      BloodGroup: bloodGroup,
+      alternatePhone: alternateMobileNO,
+      PFAccountDetails: pfNumber,
+      password: hashedPassword,
+      profilePhoto,
+      adhaarCard,
+      panCard,
+      bankDetails,
+      educationalQualification,
     });
-    const savedUser = await newUser.save();
 
-
-    return res.status(200).json({ message: "User added successfully", savedUser });
+    return res.status(201).json({ message: "User added successfully", user: newUser });
 
   } catch (error) {
-    console.log(error);
-    
+    console.error("Error adding user:", error);
     return res.status(500).json({ message: "Error adding new user", error: error.message });
   }
-}
+};
+
 
 const getUsersList = async (req, res) => {
   try {
-    const { companyId, branchId, roleId, page = 1, limit = 10, sortField = 'id', sortOrder = 'asc' } = req.query;
+    let {
+      companyId,
+      branchId,
+      roleId,
+      page = 1,
+      limit = 10,
+      sortField = 'id',
+      sortOrder = 'asc',
+    } = req.query;
 
     const whereClause = {};
 
-    // Apply dynamic filters
+    // Apply filters
     if (companyId) whereClause.companyId = companyId;
     if (branchId) whereClause.branchId = branchId;
-    if (roleId) whereClause.roleId = { [Op.gt]: roleId };
+    if (roleId) whereClause.roleId = roleId; // use Op.gt only if intentional
 
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
-    // Ensure valid sortField and sortOrder
-    const validSortFields = ['id', 'firstName', 'lastName', 'email', 'createdAt'];
+    // Validate sort field
+    const validSortFields = [
+      'id', 'firstName', 'lastName', 'email', 'createdAt'
+    ];
     if (!validSortFields.includes(sortField)) sortField = 'id';
 
+    // Validate sort order
     const validSortOrders = ['asc', 'desc'];
     if (!validSortOrders.includes(sortOrder)) sortOrder = 'asc';
 
-    // Fetch and sort users from the database
+    // Query the users
     const { rows: users, count: total } = await User.findAndCountAll({
       where: whereClause,
       offset,
       limit: parseInt(limit),
       order: [[sortField, sortOrder]],
-      attributes: ['id', 'contact', 'companyId', 'firstName', 'branchId', 'roleId', 'birthDate', 'maritalStatus', 'departmentId', 'templateId', 'lastName', 'email', 'createdAt'],
+      attributes: [
+        'id', 'firstName', 'lastName', 'contact', 'email',
+        'gender', 'designation', 'roleId', 'companyId',
+        'branchId', 'departmentId', 'reportingPerson',
+        'joiningDate', 'birthDate', 'attendanceMode',
+        'shiftRotationalFixed', 'workingShift', 'sendAttTOWhatsapp',
+        'geofencepoint', 'leaveTemplate', 'paymentMode',
+        'paymentDate', 'basicSalary',
+        'payrollTemplate', 'temporaryAddress', 'PermenantAddress',
+        'BloodGroup', 'alternatePhone', 'PFAccountDetails',
+        'bankDetails', 'adhaarCard', 'panCard',
+        'educationalQualification', 'createdAt', 'updatedAt'
+      ],
     });
 
     return res.status(200).json({
@@ -162,11 +177,15 @@ const getUsersList = async (req, res) => {
       page: parseInt(page),
       totalPages: Math.ceil(total / parseInt(limit)),
     });
+
   } catch (error) {
-    return res.status(500).json({ message: "Error getting users list", error: error.message });
+    console.error('getUsersList error:', error);
+    return res.status(500).json({
+      message: 'Error getting users list',
+      error: error.message,
+    });
   }
 };
-
 
 const updateUserCOntrller = async (req, res) => {
   try {
@@ -235,4 +254,47 @@ const uploadUsersExcel = async (req, res) => {
   }
 };
 
-export { addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel }
+
+const fetchCompanysUsers = async (req, res) => {
+  try {
+    const companyId = req.params.companyId;
+    console.log('[Fetch Company Users] companyId:', companyId);
+
+    const compUserList = await User.findAll({
+      where: {
+        companyId: companyId,
+      },
+      attributes: [
+        'id',
+        'firstName',
+        'lastName',
+        'contact',
+        'email',
+        'designation',
+        'roleId',
+        'companyId',
+        'branchId',
+        'departmentId',
+        'workingShift',
+        'profilePhoto',
+      ],
+    });
+
+    console.log(`[Users Fetched] Count: ${compUserList.length}`);
+
+    return res.status(200).json({
+      success: true,
+      users: compUserList,
+    });
+
+  } catch (error) {
+    console.error('[Error in fetchCompanysUsers]', error);
+    return res.status(500).send({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+
+export { addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel,fetchCompanysUsers }

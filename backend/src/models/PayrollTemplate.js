@@ -22,7 +22,7 @@ export default (sequelize) => {
 
   PayrollTemplate.associate = (models) => {
     PayrollTemplate.hasMany(models.PayrollComponent, { foreignKey: 'templateId' });
-    PayrollTemplate.hasMany(models.User, { foreignKey: 'templateId' });
+    PayrollTemplate.hasMany(models.User, { foreignKey: 'payrollTemplate' });
   };
 
   return PayrollTemplate;

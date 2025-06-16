@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { status } from '../../../core/common/selectoption/selectoption'
 import CommonSelect from '../../../core/common/commonSelect'
 import { all_routes } from '../../router/all_routes'
@@ -11,6 +11,9 @@ import { AppDispatch, RootState } from '../../../core/data/redux/store'
 import { toast } from '../../../utils/toastUtil'
 import axiosClient from '../../../axiosConfig/axiosClient'
 import { ADD_NEW_ROLES } from '../../../axiosConfig/apis'
+import { useAppSelector } from '../../../core/data/redux/hooks'
+import { Company } from '../../../core/data/redux/companySlice'
+import { m } from 'react-router/dist/development/fog-of-war-Cm1iXIp7'
 
 const RolesPermission = () => {
 
@@ -18,7 +21,13 @@ const RolesPermission = () => {
 
 
     const [name, setName] = useState('')
+    const [companySelectedAddRole, setCompanySelectedAddRole] = useState<number | ''>('');
+    const [allcompany, setAllCompany] = useState<Company[]>([])
     const roles = useSelector((state: RootState) => state.roles.list)
+    const companyList = useAppSelector((state) => state.companies.list);
+    const user = useSelector((state: RootState) => state.auth.user);
+
+
 
     const handleAddRoleSubmit = async (e: any) => {
         e.preventDefault();
@@ -26,8 +35,12 @@ const RolesPermission = () => {
             toast('Info', 'Name is required.', 'danger')
             return;
         }
+          if (!companySelectedAddRole) {
+            toast('Info', 'Company selection is required.', 'danger')
+            return;
+        }
         try {
-            const response = await axiosClient.post(ADD_NEW_ROLES, { name })
+            const response = await axiosClient.post(ADD_NEW_ROLES, { name,companyId:companySelectedAddRole })
             if (response.status === 201) {
                 toast('Success', 'Role added Successfully', 'success')
                 await dispatch(fetchRoles());
@@ -36,7 +49,24 @@ const RolesPermission = () => {
             toast('Info', "Error while adding Role", 'danger')
         }
     }
-    
+
+    const getCompanyNameById = (companyId: number | null | undefined): string => {
+        const company = companyList.find((comp) => comp.id === companyId);
+        return company ? company.name : 'Unknown Company';
+    };
+    useEffect(() => {
+        if (companyList.length > 0 && user) {
+            const usersCompany = companyList.find(company => company.id === user.companyId);
+
+            if (usersCompany) {
+                setAllCompany([usersCompany]);
+                setCompanySelectedAddRole(usersCompany.id);
+            } else {
+                setAllCompany(companyList);
+            }
+        }
+    }, [user, companyList]);
+
     return (
         <>
             {/* Page Wrapper */}
@@ -119,6 +149,7 @@ const RolesPermission = () => {
                                         <tr>
                                             <th className='py-3'>Id</th>
                                             <th className='py-3'>Role</th>
+                                            <th className='py-3'>Company</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -127,6 +158,7 @@ const RolesPermission = () => {
                                                 <tr key={role.id}>
                                                     <td>{role.id}</td>
                                                     <td>{role.name}</td>
+                                                    <td>{getCompanyNameById(role.companyId)}</td>
                                                 </tr>
                                             ))
                                         }
@@ -174,6 +206,21 @@ const RolesPermission = () => {
                                                 onChange={(e) => setName(e.target.value)}
                                                 className="form-control" />
                                         </div>
+                                    </div>
+                                    <div className="col-md-12 mb-3">
+                                        <label className="form-label">Select Company</label>
+                                        <select
+                                            className="form-control"
+                                            value={companySelectedAddRole}
+                                            onChange={(e) => setCompanySelectedAddRole(Number(e.target.value))}
+                                        >
+                                            <option value="">Select</option>
+                                            {
+                                                allcompany.map(company => (
+                                                    <option value={company.id} key={company.id}>{company.name}</option>
+                                                ))
+                                            }
+                                        </select>
                                     </div>
                                 </div>
                             </div>

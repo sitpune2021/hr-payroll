@@ -15,6 +15,7 @@ import { Company, fetchCompanies } from '../../../core/data/redux/companySlice'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../../core/data/redux/store'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import Password from 'antd/es/input/Password';
 
 const Companies = () => {
   const dispatch = useAppDispatch();
@@ -174,14 +175,18 @@ const Companies = () => {
 
   const [addCompanyFormData, setAddCompanyFormData] = useState({
     companyName: "",
-    companyEmail: "",
-    companyPhone: "",
-    companyWebsite: "",
     companyAddress: "",
+    companyPhone: "",
+    companyEmail: "",
+    companyWebsite: "",
     subscriptionStartDate: "",
     subscriptionEndDate: "",
-    allowedNoOfUsers: ""
+    allowedNoOfUsers: "",
+    firstName: "",
+    lastName: "",
+    password: "",
   });
+
 
   const [formErrors, setFormErrors] = useState({
     companyName: "",
@@ -190,8 +195,14 @@ const Companies = () => {
     companyImage: "",
     subscriptionStartDate: "",
     subscriptionEndDate: "",
-    allowedNoOfUsers: ""
+    allowedNoOfUsers: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    conformPassword: ""
   });
+
+  const [confirmedPassword, setCOnformedPassword] = useState("")
 
   const [addCompantImage, setAddCompanyImage] = useState<File | null>(null);
 
@@ -231,10 +242,16 @@ const Companies = () => {
     if (!subscriptionEndDate.trim()) newErrors.subscriptionEndDate = "Subscription end date is required";
     if (!allowedNoOfUsers.trim()) newErrors.allowedNoOfUsers = "Number of users required";
 
+    if (!addCompanyFormData.firstName.trim()) newErrors.firstName = "First Name is required";
+    if (!addCompanyFormData.lastName.trim()) newErrors.lastName = "Last Name is required";
+    if (!addCompanyFormData.password.trim()) newErrors.password = "Password is required";
+    if (addCompanyFormData.password!==confirmedPassword) newErrors.conformPassword = "Password does not match";
+
+
 
     if (!addCompantImage) {
-      newErrors.companyImage = "Company image is required";
-    }
+        newErrors.companyImage = "Company image is required";
+      }
 
     setFormErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -259,14 +276,18 @@ const Companies = () => {
         toast('Info', response.data.message, 'success');
         setAddCompanyFormData({
           companyName: "",
-          companyEmail: "",
-          companyPhone: "",
-          companyWebsite: "",
           companyAddress: "",
+          companyPhone: "",
+          companyEmail: "",
+          companyWebsite: "",
           subscriptionStartDate: "",
           subscriptionEndDate: "",
-          allowedNoOfUsers: ""
-        })
+          allowedNoOfUsers: "",
+          firstName: "",
+          lastName: "",
+          password: ""
+        }
+        )
         setAddCompanyImage(null)
       }
 
@@ -1115,8 +1136,63 @@ const Companies = () => {
                     </TabPanel>
 
                     <TabPanel>
-                      <div className="row" style={{ minHeight: '300px' }}>
-                        
+                      <div className="row" style={{ minHeight: '200px' }}>
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">First Name <span className="text-danger">*</span></label>
+                            <input
+                              type="text"
+                              name="firstName"
+                              value={addCompanyFormData.firstName}
+                              onChange={handleAddCompanyChange}
+                              className={`form-control ${formErrors.firstName ? 'is-invalid' : ''}`}
+                            />
+                            {formErrors.firstName && <div className="text-danger mt-1">{formErrors.firstName}</div>}
+                          </div>
+                        </div>
+
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">Last Name <span className="text-danger">*</span></label>
+                            <input
+                              type="text"
+                              name="lastName"
+                              value={addCompanyFormData.lastName}
+                              onChange={handleAddCompanyChange}
+                              className={`form-control ${formErrors.lastName ? 'is-invalid' : ''}`}
+                            />
+                            {formErrors.lastName && <div className="text-danger mt-1">{formErrors.lastName}</div>}
+                          </div>
+                        </div>
+
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">Password <span className="text-danger">*</span></label>
+                            <input
+                              type="password"
+                              name="password"
+                              value={addCompanyFormData.password}
+                              onChange={handleAddCompanyChange}
+                              className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
+                            />
+                            {formErrors.password && <div className="text-danger mt-1">{formErrors.password}</div>}
+                          </div>
+                        </div>
+
+                        <div className="col-md-6">
+                          <div className="mb-3">
+                            <label className="form-label">Conform Password <span className="text-danger">*</span></label>
+                            <input
+                              type="password"
+                              name="password"
+                              value={confirmedPassword}
+                              onChange={(e) => setCOnformedPassword(e.target.value)}
+                              className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
+                            />
+                            {formErrors.conformPassword && <div className="text-danger mt-1">{formErrors.conformPassword}</div>}
+                          </div>
+                        </div>
+
                       </div>
                     </TabPanel>
                   </Tabs>

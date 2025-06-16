@@ -7,6 +7,7 @@ import axiosClient from '../../../axiosConfig/axiosClient';
 export interface Role {
     id: number;
     name: string;
+    companyId:number
   }
 
 interface RolesState {

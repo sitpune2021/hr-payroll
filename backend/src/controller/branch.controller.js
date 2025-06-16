@@ -1,12 +1,28 @@
 import models, { sequelize } from "../models/index.js";
+import { saveImageFile } from "../utils/imageUtils.js";
 
 const { Branch, Company } = models;
 
 
 const addNewBranch = async (req, res) => {
-  const { name, address, phone, companyId, email } = req.body;
+  const { name, address, phone, companyId, email, nameOfSalarySlip } = req.body;
 
   try {
+
+    const branchLogoFile = req.files['branchLogo']?.[0];
+    const bankDetailsFile = req.files['bankDetails']?.[0];
+
+     let branchLogoFileName = null;
+     let bankDetailsFileName = null;
+
+    
+        if (branchLogoFile) {
+          branchLogoFileName = await saveImageFile(branchLogoFile);
+        }
+
+        if (bankDetailsFile) {
+          bankDetailsFileName = await saveImageFile(bankDetailsFile);
+        }
 
 
     const newBranch = await Branch.create({
@@ -14,7 +30,10 @@ const addNewBranch = async (req, res) => {
       address,
       phone,
       email,
-      companyId
+      companyId,
+      nameOfSalarySlip,
+      bankDetailsFileName,
+      branchLogoFileName
     });
 
 

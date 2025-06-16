@@ -33,6 +33,10 @@ const Branches = () => {
     const [viewBranchData, setViewBranchData] = useState<Branch>()
     const [editBranchData, setEditBranchData] = useState<Branch>()
 
+    const [addBranchLogo, setAddBranchLogo] = useState<File | null>(null);
+    const [addBranchBankDetails, setAddBranchBankDetails] = useState<File | null>(null);
+
+
     const user = useSelector((state: RootState) => state.auth.user);
     const { start, end } = useSelector((state: any) => state.dateRange);
 
@@ -91,7 +95,7 @@ const Branches = () => {
 
     const handleSortChange = (option: string) => {
         setSortOption(option);
-      };
+    };
 
     const handleEditBranchSubmit = async (e: any) => {
         e.preventDefault();
@@ -121,7 +125,7 @@ const Branches = () => {
             if (loggedUsersCompany) {
                 setAllCompany([loggedUsersCompany]);
                 setAllPayrollTemp(
-                    payrollTempList.filter(temp=>temp.companyId===loggedUsersCompany.id)
+                    payrollTempList.filter(temp => temp.companyId === loggedUsersCompany.id)
                 )
             } else {
                 setAllCompany(activeCompany);
@@ -141,7 +145,7 @@ const Branches = () => {
             }
         }
 
-    }, [branchList, companyList, payrollTempList, user?.companyId,sortOption,statusFilter,start,end]);
+    }, [branchList, companyList, payrollTempList, user?.companyId, sortOption, statusFilter, start, end]);
 
     const getCompanyNameById = (companyId: number | undefined): string => {
         const company = companyList.find((comp) => comp.id === companyId);
@@ -154,6 +158,7 @@ const Branches = () => {
         phone: "",
         companyId: "",
         address: "",
+        nameOfSalarySlip: ""
     });
 
     const [formErrors, setFormErrors] = useState({
@@ -161,8 +166,27 @@ const Branches = () => {
         email: "",
         phone: "",
         companyId: "",
-        templateId:""
+        templateId: "",
+        branchLogo: "",
+        nameOfSalarySlip: "",
+        bankDetails: ""
     });
+
+    const handleAddBranchLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setAddBranchLogo(file);
+            setFormErrors(prev => ({ ...prev, branchLogo: "" }));
+        }
+    };
+
+    const handleAddBranchBankDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setAddBranchBankDetails(file);
+            setFormErrors(prev => ({ ...prev, bankDetails: "" }));
+        }
+    };
 
 
     const handleAddBranchChange = (e: any) => {
@@ -174,7 +198,7 @@ const Branches = () => {
 
     const handleAddBranchSUbmit = async (e: any) => {
         e.preventDefault();
-        const { name, email, phone, companyId } = addBranchFormData;
+        const { name, email, phone, companyId, address, nameOfSalarySlip } = addBranchFormData;
         const newErrors: any = {}
         if (!name.trim()) newErrors.name = "Branch Name is required";
         if (!email.trim()) {
@@ -188,20 +212,41 @@ const Branches = () => {
             newErrors.phone = "Enter a valid 10-digit phone number";
         }
         if (!companyId.trim()) newErrors.companyId = "Company selection is required";
+        if (!addBranchLogo) newErrors.branchLogo = "Branch logo is required";
         setFormErrors(newErrors);
         if (Object.keys(newErrors).length > 0) return;
-
         try {
-            const response = await axiosClient.post(ADD_NEW_BRANCH, addBranchFormData);
-            console.log(response);
+            const formData = new FormData();
+            formData.append("name", name);
+            formData.append("email", email);
+            formData.append("phone", phone);
+            formData.append("companyId", companyId);
+            formData.append("address", address);
+            formData.append("nameOfSalarySlip", nameOfSalarySlip);
+            if (addBranchLogo) {
+                formData.append("branchLogo", addBranchLogo);
+            }
+
+            if (addBranchBankDetails) {
+                formData.append("bankDetails", addBranchBankDetails);
+            }
+
+            const response = await axiosClient.post(ADD_NEW_BRANCH, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+
             if (response.status === 201) {
                 dispatch(fetchBranches());
                 toast('Info', response.data.message, 'success');
             }
-
+            console.log(formData);
+            
         } catch (error: any) {
-            toast('Info', error.response.data.message, 'danger');
+            toast('Info', error.response?.data?.message || "Something went wrong", 'danger');
         }
+
         console.log(addBranchFormData, "@@@@@@@@@");
 
     }
@@ -671,11 +716,11 @@ const Branches = () => {
                                         Select Status
                                     </Link>
                                     <ul className="dropdown-menu  dropdown-menu-end p-3">
-                                    <li>
+                                        <li>
                                             <Link
                                                 to="#"
                                                 className="dropdown-item rounded-1"
-                                                onClick={()=>setStatusFilter('All')}
+                                                onClick={() => setStatusFilter('All')}
                                             >
                                                 All
                                             </Link>
@@ -684,7 +729,7 @@ const Branches = () => {
                                             <Link
                                                 to="#"
                                                 className="dropdown-item rounded-1"
-                                                onClick={()=>setStatusFilter('Active')}
+                                                onClick={() => setStatusFilter('Active')}
                                             >
                                                 Active
                                             </Link>
@@ -693,7 +738,7 @@ const Branches = () => {
                                             <Link
                                                 to="#"
                                                 className="dropdown-item rounded-1"
-                                                onClick={()=>setStatusFilter('Inactive')}
+                                                onClick={() => setStatusFilter('Inactive')}
                                             >
                                                 Inactive
                                             </Link>
@@ -813,6 +858,41 @@ const Branches = () => {
 
                             <div className="modal-body pb-0">
                                 <div className="row">
+                                    <div className="col-md-12">
+                                        <div className="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
+                                            <div className="d-flex align-items-center justify-content-center avatar avatar-xxl rounded-circle border border-dashed me-2 flex-shrink-0 text-dark frames">
+                                                <ImageWithBasePath
+                                                    src="assets/img/profiles/avatar-30.jpg"
+                                                    alt="img"
+                                                    className="rounded-circle"
+                                                />
+                                            </div>
+                                            <div className="profile-upload">
+                                                <div className="mb-2">
+                                                    <h6 className="mb-1">Select Image</h6>
+                                                    <p className="fs-12">Image should be below 4 mb</p>
+                                                </div>
+                                                <div className="profile-uploader d-flex align-items-center">
+                                                    <div className={`drag-upload-btn btn btn-sm ${formErrors.branchLogo ? 'btn-danger border border-danger' : 'btn-primary'} me-2`}>
+                                                        Upload
+                                                        <input
+                                                            type="file"
+                                                            name='branchLogo'
+                                                            onChange={handleAddBranchLogoChange}
+                                                            className="form-control image-sign"
+                                                        />
+                                                    </div>
+                                                    <Link
+                                                        to="#"
+                                                        className="btn btn-light btn-sm"
+                                                    >
+                                                        Cancel
+                                                    </Link>
+                                                </div>
+                                                {formErrors.branchLogo && <div className="text-danger mt-1">{formErrors.branchLogo}</div>}
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div className="col-md-6">
                                         <div className="mb-3">
                                             <label className="form-label">
@@ -827,30 +907,19 @@ const Branches = () => {
                                             {formErrors.name && <div className="text-danger mt-1">{formErrors.name}</div>}
                                         </div>
                                     </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Email Address</label>
-                                            <input
-                                                type="email"
-                                                name='email'
-                                                value={addBranchFormData.email}
-                                                onChange={(e) => handleAddBranchChange(e)}
-                                                className={`form-control ${formErrors.email ? 'is-invalid' : ''}`} />
-                                            {formErrors.email && <div className="text-danger mt-1">{formErrors.email}</div>}
-                                        </div>
-                                    </div>
+
                                     <div className="col-md-6">
                                         <div className="mb-3">
                                             <label className="form-label">
-                                                Phone Number <span className="text-danger"> *</span>
+                                                Name of Salary Slip <span className="text-danger"> *</span>
                                             </label>
                                             <input
                                                 type="text"
-                                                name='phone'
-                                                value={addBranchFormData.phone}
+                                                name='nameOfSalarySlip'
+                                                value={addBranchFormData.nameOfSalarySlip}
                                                 onChange={(e) => handleAddBranchChange(e)}
-                                                className={`form-control ${formErrors.phone ? 'is-invalid' : ''}`} />
-                                            {formErrors.phone && <div className="text-danger mt-1">{formErrors.phone}</div>}
+                                                className={`form-control ${formErrors.nameOfSalarySlip ? 'is-invalid' : ''}`} />
+                                            {formErrors.nameOfSalarySlip && <div className="text-danger mt-1">{formErrors.nameOfSalarySlip}</div>}
                                         </div>
                                     </div>
 
@@ -876,7 +945,6 @@ const Branches = () => {
                                         </div>
                                     </div>
 
-
                                     <div className="col-md-6">
                                         <div className="mb-3">
                                             <label className="form-label">Address</label>
@@ -888,6 +956,51 @@ const Branches = () => {
                                                 className="form-control" />
                                         </div>
                                     </div>
+
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">
+                                                Phone Number <span className="text-danger"> *</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name='phone'
+                                                value={addBranchFormData.phone}
+                                                onChange={(e) => handleAddBranchChange(e)}
+                                                className={`form-control ${formErrors.phone ? 'is-invalid' : ''}`} />
+                                            {formErrors.phone && <div className="text-danger mt-1">{formErrors.phone}</div>}
+                                        </div>
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">Email Address</label>
+                                            <input
+                                                type="email"
+                                                name='email'
+                                                value={addBranchFormData.email}
+                                                onChange={(e) => handleAddBranchChange(e)}
+                                                className={`form-control ${formErrors.email ? 'is-invalid' : ''}`} />
+                                            {formErrors.email && <div className="text-danger mt-1">{formErrors.email}</div>}
+                                        </div>
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">
+                                                Bank Details <span className="text-danger"> *</span>
+                                            </label>
+                                            <input
+                                                type="file"
+                                                name='bankDetails'
+                                                onChange={(e) => handleAddBranchBankDetailsChange(e)}
+                                                className={`form-control ${formErrors.bankDetails ? 'is-invalid' : ''}`} />
+                                            {formErrors.bankDetails && <div className="text-danger mt-1">{formErrors.bankDetails}</div>}
+                                        </div>
+                                    </div>
+
+
+
                                 </div>
                             </div>
                             <div className="modal-footer">
