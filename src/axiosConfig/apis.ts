@@ -17,6 +17,7 @@ export const EDIT_USER  =  "/api/user/editUser/"
 export const UPLOAD_USERS_EXCEL  =  "/api/user/uploaduserexcel"
 export const ADD_NEW_FEATURE  =  "/api/feature/addfeature"
 export const FETCH_ALL_DEPARTMENTS  =  "/api/department/getlist"
+export const ADD_NEW_DEPARTMENTS  =  "/api/department/addDepartments"
 export const FETCH_ROLES_PERMISSIONS  =  "/api/settings/rolespermissions"
 
 export const FETCH_ALL_SHIFTS  =  "/api/shifts/list"

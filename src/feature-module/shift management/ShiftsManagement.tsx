@@ -384,7 +384,8 @@ function ShiftsManagement() {
                                             </label>
                                             <input
                                                 className="form-control"
-                                                type="time" name="checkInTime"
+                                                type="time" 
+                                                name="checkInTime"
                                                 value={shiftData.checkInTime}
                                                 onChange={handleChange}
                                                 required />

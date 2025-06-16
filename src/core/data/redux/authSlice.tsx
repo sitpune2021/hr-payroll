@@ -9,10 +9,10 @@ interface User {
   email: string;
   contact: string;
   role: string;
+  roleId: number;
   companyId: number | null;
   branchId: number | null;
   departmentId: number | null;
-
 }
 
 interface AuthState {

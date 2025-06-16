@@ -6,16 +6,38 @@ export interface User {
   id: number;
   firstName: string;
   lastName: string;
-  email: string;
   contact: string;
-  birthDate: string | null;
-  maritalStatus: string | null;
-  companyId: number | null;
-  branchId: number | null;
-  departmentId: number;
+  email: string;
+  gender?: string | null;
+  designation: string;
   roleId: number;
+  companyId?: number | null;
+  branchId?: number | null;
+  departmentId: number;
+  reportingPerson?: string | null;
+  joiningDate?: string | null;
+  birthDate?: string | null;
+  attendanceMode?: string | null;
+  shiftRotationalFixed: 'Rotational' | 'Fixed';
+  workingShift?: number | null;
+  sendAttTOWhatsapp: boolean;
+  geofencepoint?: string | null;
+  leaveTemplate?: number | null;
+  paymentMode?: string | null;
+  paymentDate?: string | null;
+  basicSalary?: number | null;
+  payrollTemplate?: number | null;
+  temporaryAddress?: string | null;
+  PermenantAddress?: string | null;
+  BloodGroup?: string | null;
+  alternatePhone?: string | null;
+  PFAccountDetails?: string | null;
+  bankDetails?: string | null;
+  adhaarCard?: string | null;
+  panCard?: string | null;
+  educationalQualification?: string | null;
   createdAt: string;
-  templateId: number | null | undefined;
+  updatedAt: string;
 }
 
 interface UsersState {
@@ -25,8 +47,15 @@ interface UsersState {
   total: number;
   totalPages: number;
   page: number;
-  sortField: string; // Field to sort by
-  sortOrder: string; // 'asc' or 'desc'
+  sortField: string;
+  sortOrder: string;
+  filters: {
+    companyId?: number;
+    branchId?: number;
+    roleId?: number;
+    gender?: string;
+    designation?: string;
+  };
 }
 
 const initialState: UsersState = {
@@ -36,8 +65,9 @@ const initialState: UsersState = {
   total: 0,
   totalPages: 0,
   page: 1,
-  sortField: 'id', // Default sort field
-  sortOrder: 'asc', // Default sort order
+  sortField: 'id',
+  sortOrder: 'asc',
+  filters: {}
 };
 
 export const fetchUsers = createAsyncThunk(
@@ -50,7 +80,7 @@ export const fetchUsers = createAsyncThunk(
       page,
       limit,
       sortField,
-      sortOrder,
+      sortOrder
     }: {
       companyId?: number;
       branchId?: number;
@@ -81,9 +111,11 @@ const usersSlice = createSlice({
       state.page = action.payload;
     },
     setSort(state, action) {
-      // Update sort parameters when a new sort field or order is selected
       state.sortField = action.payload.sortField;
       state.sortOrder = action.payload.sortOrder;
+    },
+    setFilters(state, action) {
+      state.filters = { ...state.filters, ...action.payload };
     },
   },
   extraReducers: (builder) => {
@@ -106,5 +138,5 @@ const usersSlice = createSlice({
   },
 });
 
-export const { setPage, setSort } = usersSlice.actions;
+export const { setPage, setSort, setFilters } = usersSlice.actions;
 export default usersSlice.reducer;

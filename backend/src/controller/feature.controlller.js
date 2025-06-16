@@ -35,6 +35,7 @@ const getAllFeatures = async (req, res) => {
 
 const getFeaturesByRole = async (req, res) => {
     const roleName= req.user.role;
+    const companyId= req.user.companyId;
 
     try {
         if(roleName==="SUPER_ADMIN"){
@@ -45,7 +46,7 @@ const getFeaturesByRole = async (req, res) => {
             return res.status(200).json(featuresList);
         }
         const role = await Role.findOne({
-            where: { name: roleName }, 
+            where: { name: roleName,companyId }, 
             include: {
               model: Permission,
               attributes: ['id', 'name', 'description'],
