@@ -31,6 +31,29 @@ export const FETCH_ALL_COMPONENTS_OF_TEMPLATE  =  "/api/payrollTemplate/template
 export const EDIT_TEMPLATE_AND_COMPONENTS =  "/api/payrollTemplate/edit/"
 
 
+export const FETCH_COMPANYS_EMPLOYEES =  "/api/user/getcompanyusers/"
+
+export const FETCH_COMPANYS_DATE_ATTENDANCE =  "/api/attendance/companyAttendanceByDate/"
+export const PUNCH_ATTENDANCE =  "/api/attendance/markattendance"
+
+export const ADD_HOLIDAY_GROUP_NEW =  "/api/holidaygroup/addnewholidaygroup"
+export const FETCH_HOLIDAY_GROUP_NEW =  "/api/holidaygroup/listall"
+export const FETCH_HOLIDAY_BY_GROUPiD =  "/api/holiday/getbygroupid/"
+export const ADD_NEW_HOLIDAY =  "/api/holiday/addnewholiday"
+
+export const ADD_NEW_LEAVE_TEMPLATE =  "/api/leaveTemplate/addnewleavetemplate"
+
+
+
+
+
+ 
+
+
+
+
+
+
 
 
 

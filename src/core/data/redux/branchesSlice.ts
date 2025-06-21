@@ -11,6 +11,8 @@ export interface Branch {
     phone: string;
     email: string;
     companyId: number;
+    branchLogoFileName: string | null;
+    bankDetailsFileName:string | null;
     createdAt: string;
     updatedAt: string;
   }
