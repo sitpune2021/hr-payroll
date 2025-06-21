@@ -93,7 +93,7 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    leaveTemplate: {
+    leaveTemplateId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
@@ -169,6 +169,7 @@ export default (sequelize) => {
     User.belongsTo(models.Role, { foreignKey: 'roleId' });
     User.belongsTo(models.Department, { foreignKey: 'departmentId' });
     User.belongsTo(models.PayrollTemplate, { foreignKey: 'payrollTemplate' });
+    User.belongsTo(models.LeaveTemplate, { foreignKey: 'leaveTemplateId' });
 
   };
 

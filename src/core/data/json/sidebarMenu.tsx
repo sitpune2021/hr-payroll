@@ -116,6 +116,18 @@ export const SidebarDataTest = [
             icon: 'layout-grid-add',
             link: routes.payrollTemplate,
             base: 'ranches',
+          },
+            {
+            label: 'Holiday Group',
+            icon: 'layout-grid-add',
+            link: routes.holidayGroup,
+            base: 'ranches',
+          },
+          {
+            label: 'Leave Templates',
+            icon: 'layout-grid-add',
+            link: routes.leaveTemplate,
+            base: 'ranches',
           }
         ],
       }

@@ -162,7 +162,7 @@ const getUsersList = async (req, res) => {
         'branchId', 'departmentId', 'reportingPerson',
         'joiningDate', 'birthDate', 'attendanceMode',
         'shiftRotationalFixed', 'workingShift', 'sendAttTOWhatsapp',
-        'geofencepoint', 'leaveTemplate', 'paymentMode',
+        'geofencepoint', 'leaveTemplateId', 'paymentMode',
         'paymentDate', 'basicSalary',
         'payrollTemplate', 'temporaryAddress', 'PermenantAddress',
         'BloodGroup', 'alternatePhone', 'PFAccountDetails',
@@ -282,10 +282,7 @@ const fetchCompanysUsers = async (req, res) => {
 
     console.log(`[Users Fetched] Count: ${compUserList.length}`);
 
-    return res.status(200).json({
-      success: true,
-      users: compUserList,
-    });
+    return res.status(200).json(compUserList);
 
   } catch (error) {
     console.error('[Error in fetchCompanysUsers]', error);

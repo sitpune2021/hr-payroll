@@ -245,13 +245,13 @@ const Companies = () => {
     if (!addCompanyFormData.firstName.trim()) newErrors.firstName = "First Name is required";
     if (!addCompanyFormData.lastName.trim()) newErrors.lastName = "Last Name is required";
     if (!addCompanyFormData.password.trim()) newErrors.password = "Password is required";
-    if (addCompanyFormData.password!==confirmedPassword) newErrors.conformPassword = "Password does not match";
+    if (addCompanyFormData.password !== confirmedPassword) newErrors.conformPassword = "Password does not match";
 
 
 
     if (!addCompantImage) {
-        newErrors.companyImage = "Company image is required";
-      }
+      newErrors.companyImage = "Company image is required";
+    }
 
     setFormErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -931,9 +931,9 @@ const Companies = () => {
                           <Link to="#" onClick={() => handleSetEditCompany(record.key)} className="me-2" data-bs-toggle="modal" data-bs-target="#edit_company">
                             <i className="ti ti-edit" />
                           </Link>
-                          <Link to="#" data-bs-toggle="modal" data-bs-target="#delete_modal">
+                          {/* <Link to="#" data-bs-toggle="modal" data-bs-target="#delete_modal">
                             <i className="ti ti-trash" />
-                          </Link>
+                          </Link> */}
                         </div>
                       </td>
                     </tr>
@@ -1466,34 +1466,57 @@ const Companies = () => {
                 <p className="text-gray-9 fw-medium">Basic Info</p>
                 <div className="pb-1 border-bottom mb-4">
                   <div className="row align-items-center">
-                    <div className="col-md-6">
+                    <div className="col-md-4">
                       <div className="mb-3">
                         <p className="fs-12 mb-0">Website</p>
-                        <p className="text-gray-9">www.exmple.com</p>
+                        <p className="text-gray-9">{viewCompanyData?.AccountURL}</p>
                       </div>
                     </div>
-                    <div className="col-md-6">
+                    <div className="col-md-4">
                       <div className="mb-3">
                         <p className="fs-12 mb-0">Phone Number</p>
                         <p className="text-gray-9">{viewCompanyData?.Phone}</p>
                       </div>
                     </div>
+                    <div className="col-md-4">
+                      <div className="mb-3">
+                        <p className="fs-12 mb-0">Allowed Users</p>
+                        <p className="text-gray-9">{viewCompanyData?.allowedNoOfUsers}</p>
+                      </div>
+                    </div>
 
                   </div>
                   <div className="row align-items-center">
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <p className="fs-12 mb-0">Addresss</p>
-                        <p className="text-gray-9">
-                          {viewCompanyData?.Address}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
+                    <div className="col-md-4">
                       <div className="mb-3">
                         <p className="fs-12 mb-0">Created Date</p>
                         <p className="text-gray-9">
                           {viewCompanyData?.CreatedDate}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="col-md-4">
+                      <div className="mb-3">
+                        <p className="fs-12 mb-0">Subscription Start Date</p>
+                        <p className="text-gray-9">
+                          {viewCompanyData?.subscriptionStartDate}
+                        </p>
+                      </div>
+                    </div><div className="col-md-4">
+                      <div className="mb-3">
+                        <p className="fs-12 mb-0">Subscription End Date</p>
+                        <p className="text-gray-9">
+                          {viewCompanyData?.subscriptionEndDate}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row align-items-center">
+                    <div className="col-md-12">
+                      <div className="mb-3">
+                        <p className="fs-12 mb-0">Addresss</p>
+                        <p className="text-gray-9">
+                          {viewCompanyData?.Address}
                         </p>
                       </div>
                     </div>

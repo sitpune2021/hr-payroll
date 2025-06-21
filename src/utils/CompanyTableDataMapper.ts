@@ -13,6 +13,9 @@ export interface CompanyTableItem {
   Status: string;
   Address: string;
   Phone: string;
+  subscriptionStartDate: string;
+  subscriptionEndDate:string;
+  allowedNoOfUsers:number;
 }
 
 export const mapCompanyDataToTable = (apiData: Company[]): CompanyTableItem[] => {
@@ -30,6 +33,17 @@ export const mapCompanyDataToTable = (apiData: Company[]): CompanyTableItem[] =>
     Image: company.companyImage || "company-01.svg", // fallback to default if needed
     Status: company.isActive ? "Active" : "Inactive",
     Address: company.address,
-    Phone: company.phone
+    Phone: company.phone,
+    subscriptionStartDate: new Date(company.subscriptionStartDate).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }),
+    subscriptionEndDate:new Date(company.subscriptionEndDate).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }),
+    allowedNoOfUsers:company.allowedNoOfUsers
   }));
 };

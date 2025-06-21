@@ -1,7 +1,9 @@
 import axios, { AxiosError,AxiosResponse } from "axios";
 
-export const baseURL="http://103.165.118.71:8087"
-// export const baseURL="http://localhost:8087"
+// export const baseURL="http://103.165.118.71:8087"
+
+export const baseURL="http://localhost:8087"
+
 const axiosClient = axios.create({
   baseURL,
   headers: {

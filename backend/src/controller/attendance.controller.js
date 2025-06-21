@@ -5,7 +5,7 @@ import path from 'path';
 import models from "../models/index.js";
 import { processPunch } from '../utils/punchProcessor.js';
 
-const { Attendance, AttendanceSetting, EmployeeShiftSchedule } = models;
+const { Attendance, AttendanceSetting, User, EmployeeShiftSchedule } = models;
 
 const markNewAttendance = async (req, res) => {
   try {
@@ -190,4 +190,40 @@ const uploadAttendanceFile = async (req, res) => {
 };
 
 
-export { markNewAttendance , uploadAttendanceFile};
+const getCompanyAttendanceByDate = async (req, res) => {
+  try {
+    const { companyId, date } = req.params;
+
+    if (!companyId || !date) {
+      return res.status(400).json({ message: 'companyId and date are required in the URL.' });
+    }
+
+    const attendanceList = await Attendance.findAll({
+      where: { date },
+      include: [
+        {
+          model: User,
+          where: { companyId },
+          attributes: [], // don't return User fields
+        },
+      ],
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'], // optional: exclude timestamps
+      },
+      order: [['checkIn', 'ASC']],
+    });
+
+    console.log(companyId,date);
+    console.log(attendanceList);
+    
+    
+
+    res.status(200).json(attendanceList);
+  } catch (error) {
+    console.error('Error fetching attendance:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+
+export { markNewAttendance , uploadAttendanceFile , getCompanyAttendanceByDate};

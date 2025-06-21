@@ -285,6 +285,9 @@ import Features from "../features/Features";
 import ShiftsManagement from "../shift management/ShiftsManagement";
 import PayrollTemplate from "../PayrollTemplate/PayrollTemplate";
 import DynamicAttendance from "../hrm/attendance/DynamicAttendance";
+import LeaveTemplate from "../leaveTemplate/LeaveTemplate";
+import HolidayGroup from "../HolidayGroup/HolidayGroup";
+import HolidayGroups from "../HolidayGroup/HolidayGroup";
 const routes = all_routes;
 
 export const publicRoutes = [
@@ -1894,6 +1897,18 @@ export const publicRoutes = [
     element: <PayrollTemplate />,
     route: Route,
     label: "Payroll Templates"
+  },
+  {
+    path: routes.leaveTemplate,
+    element: <LeaveTemplate />,
+    route: Route,
+    label: "Leave Templates"
+  },
+  {
+    path: routes.holidayGroup,
+    element: <HolidayGroups />,
+    route: Route,
+    label: "Holiday Group"
   },
 ];
 

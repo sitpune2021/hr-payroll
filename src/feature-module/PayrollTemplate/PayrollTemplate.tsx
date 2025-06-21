@@ -59,7 +59,7 @@ function PayrollTemplate() {
     const companyList = useAppSelector((state) => state.companies.list);
     const user = useSelector((state: RootState) => state.auth.user);
     const payrollTemplates = useSelector((state: RootState) => state.payrollTemplate.templates);
-    const [allcompany, setAllCompany] = useState<Company[]>([])
+    const [allcompany, setAllCompany] = useState<Company[]>([]) 
     const [allPayrollTemp, setAllPayrollTemp] = useState<Template[]>([])
 
     const getCompanyNameById = (companyId: number | undefined): string => {
