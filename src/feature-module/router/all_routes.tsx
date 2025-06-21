@@ -31,6 +31,8 @@ export const all_routes = {
   adminFeatures:"/admin/features",
   shiftManagement: "/shiftManagement",
   payrollTemplate: '/payrolltemplate',
+  leaveTemplate: '/leavetemplate',
+  holidayGroup: '/holidaygroup',
 
 
 

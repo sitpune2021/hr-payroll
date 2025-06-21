@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DatePicker } from 'antd'
 import { useAppDispatch, useAppSelector } from '../../core/data/redux/hooks'
-import axiosClient from '../../axiosConfig/axiosClient'
+import axiosClient, { baseURL } from '../../axiosConfig/axiosClient'
 import { ADD_NEW_BRANCH, EDIT_BRANCH } from '../../axiosConfig/apis'
 import { toast } from '../../utils/toastUtil'
 import ImageWithBasePath from '../../core/common/imageWithBasePath'
@@ -242,7 +242,7 @@ const Branches = () => {
                 toast('Info', response.data.message, 'success');
             }
             console.log(formData);
-            
+
         } catch (error: any) {
             toast('Info', error.response?.data?.message || "Something went wrong", 'danger');
         }
@@ -805,7 +805,7 @@ const Branches = () => {
                                                         <Link to="#" onClick={() => setViewBranchData(branch)} className="me-2" data-bs-toggle="modal" data-bs-target="#company_detail">
                                                             <i className="ti ti-eye" />
                                                         </Link>
-                                                        <Link to="#" onClick={() => setEditBranchData(branch)} className="me-2" data-bs-toggle="modal" data-bs-target="#edit_company">
+                                                        <Link to="#" onClick={() => setEditBranchData(branch)} className="me-2" data-bs-toggle="modal" data-bs-target="#edit_branch">
                                                             <i className="ti ti-edit" />
                                                         </Link>
                                                         <Link to="#" data-bs-toggle="modal" data-bs-target="#delete_modal">
@@ -1022,7 +1022,7 @@ const Branches = () => {
             </form>
             {/* /Add Branch */}
             {/* Edit Branch */}
-            <div className="modal fade" id="edit_company">
+            <div className="modal fade" id="edit_branch">
                 <div className="modal-dialog modal-dialog-centered modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
@@ -1138,8 +1138,8 @@ const Branches = () => {
                                             to="#"
                                             className="avatar avatar-md border rounded-circle flex-shrink-0 me-2"
                                         >
-                                            <ImageWithBasePath
-                                                src="assets/img/company/company-01.svg"
+                                            <img
+                                                src={`${baseURL}/api/image/img/${viewBranchData?.branchLogoFileName}`}
                                                 className="img-fluid"
                                                 alt="img"
                                             />
