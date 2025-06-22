@@ -100,44 +100,50 @@ const Login = () => {
 
   return (
     <div className="container-fuild">
-      <div className="w-100 overflow-hidden position-relative flex-wrap d-block vh-100">
-        <div className="row">
+      <div className="w-100 overflow-hidden position-relative flex-wrap d-block vh-100 ">
+        <div className="row justify-content-center bg-white ">
           <div className="col-lg-5">
-            <div className="login-background position-relative d-lg-flex align-items-center justify-content-center d-none flex-wrap vh-100">
-              <div className="bg-overlay-img">
+            {/* <div className="my-3 row justify-content-center authen-overlay-img vh-100 w-100">
+                    <ImageWithBasePath src="assets/img/logbg4.svg" alt="Img"  />
+                  </div> */}
+            <div className="bg-white position-relative d-lg-flex align-items-center justify-content-center d-none flex-wrap vh-100 w-100">
+              {/* <div className="bg-overlay-img"> */}
                 {/* <ImageWithBasePath src="assets/img/bg/bg-01.png" className="bg-1" alt="Img" /> */}
                 {/* <ImageWithBasePath src="assets/img/bg/bg-02.png" className="bg-2" alt="Img" /> */}
                 {/* <ImageWithBasePath src="assets/img/bg/bg-03.png" className="bg-3" alt="Img" /> */}
-              </div>
-              <div className="authentication-card w-100">
-                <div className="authen-overlay-item border w-100">
-                  <h1 className="text-white display-1">
+              {/* </div> */}
+              <div className=" row justify-content-center authen-overlay-img vh-100 w-100">
+                    <ImageWithBasePath src="assets/img/logbg4.svg" alt="Img"  />
+                  </div>
+                {/* <div className="authen-overlay-item border w-100">
+                   <h1 className="text-white display-1"> 
                     Empowering people <br /> through seamless HR <br /> management.
                   </h1>
-                  <div className="my-4 mx-auto authen-overlay-img">
-                    <ImageWithBasePath src="assets/img/bg/authentication-bg-01.png" alt="Img" />
-                  </div>
-                </div>
-              </div>
+                  
+                
+              </div> */}
+              
             </div>
           </div>
-          <div className="col-lg-7 col-md-12 col-sm-12">
-            <div className="row justify-content-center align-items-center vh-100 overflow-auto flex-wrap">
-              <div className="col-md-7 mx-auto vh-100">
-                <div className="vh-100 d-flex flex-column justify-content-between p-4 pb-0">
-                  <div className=" mx-auto text-center">
+          <div className="col-lg-5 col-md-12 col-sm-12 bg-white ">
+            <div className="row justify-content-center align-items-left vh-100 overflow-auto flex-wrap ">
+              <div className="col-md-7 mx-auto vh-100 bg-white">
+                <div className="vh-100 d-flex flex-column justify-content-evenly  bg-white">
+                  <div className=" text-center mt4">
                     <img
                     style={{height:'100px',borderRadius:'998px'}}
                       src="assets/img/logo.svg"
                       className="img-fluid"
                       alt="Logo"
                     />
-                  </div>
-                  <div className="">
-                    <div className="text-center mb-3">
-                      <h2 className="mb-2">Sign In</h2>
+                    <div className="text-center mt-3">
+                      <h2 className="mb-2">Welcome Back !!</h2>
                       <p className="mb-0">Please enter your details to sign in</p>
                     </div>
+                  </div>
+                  
+                  <div className="">
+                    
                     <form onSubmit={(e) => handleSubmit(e)}>
                       <div className="mb-3">
                         <label className="form-label">Email/Contact</label>
@@ -148,17 +154,44 @@ const Login = () => {
                             onChange={(e) =>
                               setLoginData({ ...loginData, emailOrContact: e.target.value })
                             }
-                            className={`form-control border-end-0 ${errorMessage.emailOrContact ? 'is-invalid' : ''}`}
+                            className={`form-control  ${errorMessage.emailOrContact ? 'is-invalid' : ''}`}
                           />
-                          <span className="input-group-text border-start-0">
+                          <span className="input-group-text ">
                             <i className="ti ti-mail" />
                           </span>
                         </div>
                         {errorMessage.emailOrContact && <div className="text-danger mt-1">{errorMessage.emailOrContact}</div>}
-
-
+                    <div className="mb-3 mt-3">
+                        <label className="form-label">Password</label>
+                  <div className="input-group">
+                          <input
+                          type={
+                              passwordVisibility.password
+                                ? "text"
+                                : "password"
+                            }
+                            className={`form-control  ${errorMessage.password ? 'is-invalid' : ''}`}
+                            value={loginData.password}
+                            onChange={(e) =>
+                              setLoginData({ ...loginData, password: e.target.value })
+                            }
+                          />
+                          <span className="input-group-text ">
+                            <i className={ ` ti  ${passwordVisibility.password
+                              ? "ti-eye"
+                              : "ti-eye-off"
+                              }`}
+                              onClick={() =>
+                              togglePasswordVisibility("password")
+                            }
+                              />
+                          </span>
+                        </div>
+                          {errorMessage.password && <div className="text-danger mt-1">{errorMessage.password}</div>}
+                        </div>
+                        
                       </div>
-                      <div className="mb-3">
+                      {/* <div className="mb-3">
                         <label className="form-label">Password</label>
                         <div className="pass-group">
                           <input
@@ -167,7 +200,7 @@ const Login = () => {
                                 ? "text"
                                 : "password"
                             }
-                            className={`form-control border-end-0 ${errorMessage.password ? 'is-invalid' : ''}`}
+                            className={`form-control  ${errorMessage.password ? 'is-invalid' : ''}`}
                             value={loginData.password}
                             onChange={(e) =>
                               setLoginData({ ...loginData, password: e.target.value })
@@ -184,10 +217,10 @@ const Login = () => {
                           ></span>
                         </div>
                         {errorMessage.password && <div className="text-danger mt-1">{errorMessage.password}</div>}
-                      </div>
+                      </div> */}
                       <div className="d-flex align-items-center justify-content-between mb-3">
                         <div className="d-flex align-items-center">
-                          <div className="form-check form-check-md mb-0">
+                          {/* <div className="form-check form-check-md mb-0">
                             <input
                               className="form-check-input"
                               id="remember_me"
@@ -199,10 +232,10 @@ const Login = () => {
                             >
                               Remember Me
                             </label>
-                          </div>
+                          </div> */}
                         </div>
-                        <div className="text-end">
-                          <Link to={all_routes.forgotPassword} className="link-danger">
+                        <div className="text-end ">
+                          <Link to={all_routes.forgotPassword}  style={{color:'grey'}}>
                             Forgot Password?
                           </Link>
                         </div>
@@ -226,10 +259,10 @@ const Login = () => {
                         </Link>
                       </h6>
                     </div>
-                    <div className="login-or">
+                    {/* <div className="login-or">
                       <span className="span-or">Or</span>
-                    </div>
-                    <div className="mt-2">
+                    </div> */}
+                    {/* <div className="mt-2">
                       <div className="d-flex align-items-center justify-content-center flex-wrap">
                         <div className="text-center me-2 flex-fill">
                           <Link
@@ -268,7 +301,7 @@ const Login = () => {
                           </Link>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
                   <div className="mt-5 pb-4 text-center">
                     <p className="mb-0 text-gray-9">Copyright © 2024 - Smarthr</p>

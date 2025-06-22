@@ -2880,7 +2880,8 @@ body.mini-sidebar.expand-menu .sidebar .sidebar-menu > ul > li ul > li.active a 
 [data-theme=dark] .form-check-label,
 [data-theme=dark] .form-label,
 [data-theme=dark] .sub-header {
-  color: #a3a6a6;
+  color: #0d0d0d;
+  font-size: 10;
 }
 [data-theme=dark] .form-select option {
   background: transparent;
@@ -16203,7 +16204,7 @@ hr.text-danger {
   width: 0.9rem;
   height: 0.9rem;
   background-color: #FFF;
-  border: 1px solid #E8E8E8;
+  border: 1.4px solid #E8E8E8;
 }
 .form-check-input:checked {
   background-color: #E41F07;
