@@ -42,6 +42,7 @@ export default (sequelize) => {
     designation: {
       type: DataTypes.STRING,
       allowNull: false,
+      defaultValue: ''
     },
     roleId: {
       type: DataTypes.INTEGER,
