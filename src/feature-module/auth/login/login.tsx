@@ -327,7 +327,7 @@ const Login = () => {
       </div>
          <div className="bottom">
         <div className="inerBottom">
-         <p style={{fontWeight:500,color:'#000',fontSize:18}}>Paybook Solutiton</p>
+         <p style={{fontWeight:500,color:'#000'}}>Paybook Solutiton</p>
          <p>906,mantra moments moshi-410105</p>
          <p>Contact Us : +91 9322298156    
            Email : paybooksolution@gmail.com  </p>
