@@ -20,6 +20,7 @@ const Login = () => {
     "password": ""
   })
 
+  const [isOtp,setIsOtp] = useState(true);
   const fetchFeatures = async () => {
 
     console.log("@@@@@@@@@@@@");
@@ -100,38 +101,37 @@ const Login = () => {
 
   return (
     <div className="container-fuild">
-      <div className="w-100 overflow-hidden position-relative flex-wrap d-block vh-100 ">
-        <div className="row justify-content-center bg-white ">
-          <div className="col-lg-5">
+      <div className="w-100 overflow-hidden position-relative flex-wrap d-block ">
+        <div className="row justify-content-center bg-white">
+          <div className="col-lg-5 ">
             {/* <div className="my-3 row justify-content-center authen-overlay-img vh-100 w-100">
                     <ImageWithBasePath src="assets/img/logbg4.svg" alt="Img"  />
                   </div> */}
-            <div className="bg-white position-relative d-lg-flex align-items-center justify-content-center d-none flex-wrap vh-100 w-100">
+            <div className="bg-white position-relative d-lg-flex align-items-center justify-content-center d-none flex-wrap right_part w-100">
               {/* <div className="bg-overlay-img"> */}
                 {/* <ImageWithBasePath src="assets/img/bg/bg-01.png" className="bg-1" alt="Img" /> */}
                 {/* <ImageWithBasePath src="assets/img/bg/bg-02.png" className="bg-2" alt="Img" /> */}
                 {/* <ImageWithBasePath src="assets/img/bg/bg-03.png" className="bg-3" alt="Img" /> */}
               {/* </div> */}
-              <div className=" row justify-content-center authen-overlay-img vh-100 w-100">
-                    <ImageWithBasePath src="assets/img/logbg4.svg" alt="Img"  />
+              <div className="row justify-content-center authen-overlay-img ">
+                    <ImageWithBasePath src="assets/img/logbg2.jpeg"  />
                   </div>
-                {/* <div className="authen-overlay-item border w-100">
-                   <h1 className="text-white display-1"> 
-                    Empowering people <br /> through seamless HR <br /> management.
-                  </h1>
-                  
-                
-              </div> */}
               
+                <div className="logformBottom">
+                      <div className="d-flex justify-content-center "><ImageWithBasePath src="assets/img/flag.png" className="SpanIcon" /><p>  Made with in India</p></div>
+                      <div className="d-flex justify-content-center "><ImageWithBasePath src="assets/img/secure.png" className="SpanIcon" /><p>  100% Secure</p></div>
+                      <div className="d-flex justify-content-center "><ImageWithBasePath src="assets/img/check.png" className="SpanIcon" /><p>  100% auto Backup</p></div>
+                    </div>
             </div>
+             
           </div>
-          <div className="col-lg-5 col-md-12 col-sm-12 bg-white ">
-            <div className="row justify-content-center align-items-left vh-100 overflow-auto flex-wrap ">
-              <div className="col-md-7 mx-auto vh-100 bg-white">
-                <div className="vh-100 d-flex flex-column justify-content-evenly  bg-white">
-                  <div className=" text-center mt4">
+          <div className="col-lg-5 col-md-12 col-sm-12 bg-white  ">
+            <div className="row justify-content-center align-items-left  overflow-auto flex-wrap right_part">
+              <div className="col-md-7 mx-auto  bg-white ">
+                <div className=" d-flex flex-column justify-content-evenly  bg-white ">
+                  <div className=" text-center mt4" style={{marginTop:50}}>
                     <img
-                    style={{height:'100px',borderRadius:'998px'}}
+                    style={{height:'70px',borderRadius:'20px',boxShadow: '-3px 0px 10px -2px rgba(2,2,2,0.57)'}}
                       src="assets/img/logo.svg"
                       className="img-fluid"
                       alt="Logo"
@@ -141,10 +141,40 @@ const Login = () => {
                       <p className="mb-0">Please enter your details to sign in</p>
                     </div>
                   </div>
-                  
-                  <div className="">
-                    
+                    <div className="switch-container">
+                        <div className="switch-ball" style={isOtp?{backgroundColor:'#0E98F9'}:{backgroundColor:'transparent'}} onClick={()=>{
+                          if(!isOtp){ setIsOtp(!isOtp)}
+                          }}>
+                            <p style={isOtp?{color:'white'}:{color:'#000'}}>Otp</p>
+                        </div>
+                        <div className="switch-ball" style={isOtp?{backgroundColor:'transparent'}:{backgroundColor:'#0E98F9'}} onClick={()=>{if(isOtp){ setIsOtp(!isOtp)}
+                          }}>
+                            <p style={!isOtp?{color:'white'}:{color:'#000'}}>Password</p>
+                        </div>
+                    </div>
+                  <div className="" >
                     <form onSubmit={(e) => handleSubmit(e)}>
+                      {
+                        isOtp ? <>
+                        <div style={{marginBottom:70}}>
+                        <label className="form-label">Email/Contact</label>
+                        <div className="input-group" >
+                          <input
+                            type="text"
+                            value={loginData.emailOrContact}
+                            onChange={(e) =>
+                              setLoginData({ ...loginData, emailOrContact: e.target.value })
+                            }
+                            className={`form-control  ${errorMessage.emailOrContact ? 'is-invalid' : ''}`}
+                          />
+                          <span className="input-group-text ">
+                            <i className="ti ti-mail" />
+                          </span>
+                        </div>
+                        {errorMessage.emailOrContact && <div className="text-danger mt-1">{errorMessage.emailOrContact}</div>}
+                   </div>
+                          
+                        </>:<div>
                       <div className="mb-3">
                         <label className="form-label">Email/Contact</label>
                         <div className="input-group">
@@ -191,33 +221,7 @@ const Login = () => {
                         </div>
                         
                       </div>
-                      {/* <div className="mb-3">
-                        <label className="form-label">Password</label>
-                        <div className="pass-group">
-                          <input
-                            type={
-                              passwordVisibility.password
-                                ? "text"
-                                : "password"
-                            }
-                            className={`form-control  ${errorMessage.password ? 'is-invalid' : ''}`}
-                            value={loginData.password}
-                            onChange={(e) =>
-                              setLoginData({ ...loginData, password: e.target.value })
-                            }
-                          />
-                          <span
-                            className={`ti toggle-passwords ${passwordVisibility.password
-                              ? "ti-eye"
-                              : "ti-eye-off"
-                              }`}
-                            onClick={() =>
-                              togglePasswordVisibility("password")
-                            }
-                          ></span>
-                        </div>
-                        {errorMessage.password && <div className="text-danger mt-1">{errorMessage.password}</div>}
-                      </div> */}
+                  
                       <div className="d-flex align-items-center justify-content-between mb-3">
                         <div className="d-flex align-items-center">
                           {/* <div className="form-check form-check-md mb-0">
@@ -240,6 +244,9 @@ const Login = () => {
                           </Link>
                         </div>
                       </div>
+                      </div>
+                      }
+                      
                       <div className="mb-3">
                         <button
                           type="submit"
@@ -259,9 +266,13 @@ const Login = () => {
                         </Link>
                       </h6>
                     </div>
+
+                    
+              </div>
                     {/* <div className="login-or">
                       <span className="span-or">Or</span>
                     </div> */}
+                    
                     {/* <div className="mt-2">
                       <div className="d-flex align-items-center justify-content-center flex-wrap">
                         <div className="text-center me-2 flex-fill">
@@ -303,17 +314,25 @@ const Login = () => {
                       </div>
                     </div> */}
                   </div>
-                  <div className="mt-5 pb-4 text-center">
+                  {/* <div className="mt-5 pb-4 text-center">
                     <p className="mb-0 text-gray-9">Copyright © 2024 - Smarthr</p>
-                  </div>
+                  </div> */}
                 </div>
 
               </div>
             </div>
           </div>
-        </div>
+          
+        
       </div>
-
+         <div className="bottom">
+        <div className="inerBottom">
+         <p style={{fontWeight:500,color:'#000',fontSize:18}}>Paybook Solutiton</p>
+         <p>906,mantra moments moshi-410105</p>
+         <p>Contact Us : +91 9322298156    
+           Email : paybooksolution@gmail.com  </p>
+         </div>
+        </div>
       {/* toast message */}
     </div>
 
