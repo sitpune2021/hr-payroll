@@ -325,12 +325,17 @@ const Login = () => {
           
         
       </div>
-         <div className="bottom">
+      <div className="bottom">
         <div className="inerBottom">
-         <p style={{fontWeight:500,color:'#000'}}>Paybook Solutiton</p>
-         <p>906,mantra moments moshi-410105</p>
-         <p>Contact Us : +91 9322298156    
-           Email : paybooksolution@gmail.com  </p>
+          <h3 style={{fontWeight:500,color:'#000',marginBottom:'20px'}}><span style={{fontWeight:600}}>Paybook</span> Solutiton</h3>
+          <div className="row contact-details">
+            <div>
+              <p style={{marginBottom:0}}>906,mantra moments moshi-410105</p>
+              <p style={{marginBottom:0}}>Contact Us : <span className="hover-a"> +91 9322298156  </span>  
+                Email : <span className="hover-a"> paybooksolution@gmail.com  </span></p>
+            </div>
+            <h4><i className="fa-solid fa-shield-halved"></i> Safe and Secure</h4>
+          </div>
          </div>
         </div>
       {/* toast message */}
