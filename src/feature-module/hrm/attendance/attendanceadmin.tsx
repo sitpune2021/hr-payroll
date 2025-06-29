@@ -69,7 +69,7 @@ const AttendanceAdmin = () => {
                         <i className="ti ti-building fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
-                        <p className="fs-12 fw-medium mb-1 text-truncate">
+                        <p className="fs-16 fw-medium mb-1 text-truncate">
                           Total
                         </p>
                         <h4>120</h4>
@@ -94,18 +94,12 @@ const AttendanceAdmin = () => {
                         <i className="ti ti-building fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
-                        <p className="fs-12 fw-medium mb-1 text-truncate">
+                        <p className="fs-16 fw-medium mb-1 text-truncate">
                           Present
                         </p>
                         <h4>9</h4>
                       </div>
                     </div>
-                    {/* <ReactApexChart
-                      options={activeChart}
-                      series={activeChart.series}
-                      type="area"
-                      width={50}
-                    /> */}
                   </div>
                 </div>
               </div>
@@ -119,18 +113,12 @@ const AttendanceAdmin = () => {
                         <i className="ti ti-building fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
-                        <p className="fs-12 fw-medium mb-1 text-truncate">
+                        <p className="fs-16 fw-medium mb-1 text-truncate">
                           Absent
                         </p>
                         <h4>30</h4>
                       </div>
                     </div>
-                    {/* <ReactApexChart
-                      options={inactiveChart}
-                      series={inactiveChart.series}
-                      type="area"
-                      width={50}
-                    /> */}
                   </div>
                 </div>
               </div>
@@ -144,18 +132,12 @@ const AttendanceAdmin = () => {
                         <i className="ti ti-map-pin-check fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
-                        <p className="fs-12 fw-medium mb-1 text-truncate">
+                        <p className="fs-16 fw-medium mb-1 text-truncate">
                           On Leave
                         </p>
                         <h4>13</h4>
                       </div>
                     </div>
-                    {/* <ReactApexChart
-                      options={locationChart}
-                      series={locationChart.series}
-                      type="area"
-                      width={50}
-                    /> */}
                   </div>
                 </div>
               </div>
@@ -168,18 +150,30 @@ const AttendanceAdmin = () => {
                         <i className="ti ti-map-pin-check fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
-                        <p className="fs-12 fw-medium mb-1 text-truncate">
+                        <p className="fs-16 fw-medium mb-1 text-truncate">
                           Half Day
                         </p>
                         <h4>13</h4>
                       </div>
                     </div>
-                    {/* <ReactApexChart
-                      options={locationChart}
-                      series={locationChart.series}
-                      type="area"
-                      width={50}
-                    /> */}
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-lg-2 col-md-6 d-flex">
+                <div className="card flex-fill">
+                  <div className="card-body d-flex align-items-center justify-content-between">
+                    <div className="d-flex align-items-center overflow-hidden">
+                      <span className="avatar avatar-lg bg-skyblue flex-shrink-0">
+                        <i className="ti ti-map-pin-check fs-16" />
+                      </span>
+                      <div className="ms-2 overflow-hidden">
+                        <p className="fs-16 fw-medium mb-1 text-truncate">
+                          On Break
+                        </p>
+                        <h4>13</h4>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -187,18 +181,26 @@ const AttendanceAdmin = () => {
             </div>
             <div className="card">
               <div className="card-header d-flex justify-content-between flex-wrap">
-                <h5>Admin Attendance</h5>
+                <h5>Attendance Summary</h5>
                 <div className="d-inline-flex">
+                  <input style={{minWidth:"200px"}} type="text" className="form-control me-2" placeholder="Search Employees..."
+                    onChange={(e) => setSearchTerm(e.target.value)} />
                   <input type="date" value={selectedDate} className="form-control me-2"
                     onChange={(e) => setSelectedDate(e.target.value)} />
-                  <input type="text" className="form-control" placeholder="Search..."
-                    onChange={(e) => setSearchTerm(e.target.value)} />
                 </div>
               </div>
               <div className="card-body p-0">
                 <table className="table datanew table-bordered bg-white">
                   <thead>
                     <tr>
+                      <th>
+                        <input
+                          className="form-check-input me-1"
+                          type="checkbox"
+                          defaultValue=""
+                          id="user-5"
+                        />
+                      </th>
                       <th>Employee</th>
                       <th>Status</th>
                       <th>Check In</th>
@@ -217,6 +219,14 @@ const AttendanceAdmin = () => {
                       const attendance = attendanceList.find(a => a.employeeId === emp.id);
                       return (
                         <tr key={emp.id}>
+                          <td>
+                            <input
+                              className="form-check-input me-1"
+                              type="checkbox"
+                              defaultValue=""
+                              id="user-5"
+                            />
+                          </td>
                           <td>{emp.firstName} {emp.lastName}</td>
                           <td>{attendance?.status || 'No Record'}</td>
                           <td>
@@ -280,11 +290,14 @@ const AttendanceAdmin = () => {
           </div>
           <div className="btn-group">
             <button className={`btn ${activeTab === 'attendance' ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={() => setActiveTab('attendance')}>Attendance</button>
+              onClick={() => setActiveTab('attendance')}>Attendance Summary</button>
             <button className={`btn ${activeTab === 'shift' ? 'btn-primary' : 'btn-outline-primary'}`}
               onClick={() => setActiveTab('shift')}>Shift Assign</button>
           </div>
           <div className="d-flex align-items-center flex-wrap">
+            <div className="dropdown me-2 mb-2">
+              <Link to="#" className="btn btn-white"><i className="ti ti-file-export me-1" /> Import</Link>
+            </div>
             <div className="dropdown me-2 mb-2">
               <Link to="#" className="btn btn-white dropdown-toggle" data-bs-toggle="dropdown">
                 <i className="ti ti-file-export me-1" /> Export
