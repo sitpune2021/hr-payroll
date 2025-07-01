@@ -183,7 +183,7 @@ const AttendanceAdmin = () => {
               <div className="card-header d-flex justify-content-between flex-wrap">
                 <h5>Attendance Summary</h5>
                 <div className="d-inline-flex">
-                  <input style={{minWidth:"200px"}} type="text" className="form-control me-2" placeholder="Search Employees..."
+                  <input style={{minWidth:"320px"}} type="text" className="form-control me-4" placeholder="Search Employees..."
                     onChange={(e) => setSearchTerm(e.target.value)} />
                   <input type="date" value={selectedDate} className="form-control me-2"
                     onChange={(e) => setSelectedDate(e.target.value)} />
@@ -280,13 +280,13 @@ const AttendanceAdmin = () => {
         <div className="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="my-auto mb-2">
             <h2 className="mb-1">Attendance Admin</h2>
-            <ol className="breadcrumb mb-0">
+            {/* <ol className="breadcrumb mb-0">
               <li className="breadcrumb-item">
                 <Link to={all_routes.adminDashboard}><i className="ti ti-smart-home" /></Link>
               </li>
               <li className="breadcrumb-item">Employee</li>
               <li className="breadcrumb-item active">Attendance Admin</li>
-            </ol>
+            </ol> */}
           </div>
           <div className="btn-group">
             <button className={`btn ${activeTab === 'attendance' ? 'btn-primary' : 'btn-outline-primary'}`}
@@ -307,15 +307,15 @@ const AttendanceAdmin = () => {
                 <li><Link to="#" className="dropdown-item"><i className="ti ti-file-type-xls me-1" />Export as Excel</Link></li>
               </ul>
             </div>
-            <div className="mb-2">
+            {/* <div className="mb-2">
               <Link to="#" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#attendance_report">
                 <i className="ti ti-file-analytics me-2" /> Report
               </Link>
-            </div>
+            </div> */}
 
-            <div className="ms-2">
+            {/* <div className="ms-2">
               <CollapseHeader />
-            </div>
+            </div> */}
           </div>
         </div>
 
