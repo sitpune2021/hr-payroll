@@ -24,6 +24,10 @@ export default (sequelize) => {
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    allowedLateEntries: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
     holidayGroupId: {
       type: DataTypes.INTEGER,
       allowNull: true,
