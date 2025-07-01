@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import models from "../models/index.js";
 import { processPunch } from '../utils/punchProcessor.js';
+import { getAttendanceSummary } from '../utils/GetAttendanceSummary.js';
 
 const { Attendance, AttendanceSetting, User, EmployeeShiftSchedule } = models;
 
@@ -80,12 +81,26 @@ const markNewAttendance = async (req, res) => {
       const isLate = shiftStart ? punchMoment.isAfter(graceCheckIn) : false;
       console.log('[Check-in] isLate:', isLate);
 
+      let initialStatus = 'Absent';
+      if (shiftSchedule) {
+        // Use shift duration to decide Half-Day or Absent
+        const shiftDuration = shiftStart && shiftEnd
+          ? moment.duration(shiftEnd.diff(shiftStart)).asHours()
+          : 0;
+
+        if (shiftDuration > 0) {
+          initialStatus = 'Half-Day';
+        }
+      } else {
+        // No shift - treat unscheduled as Half-Day initially
+        initialStatus = 'Half-Day';
+      }
       attendance = await Attendance.create({
         employeeId,
         date,
         checkIn: time,
         isLate,
-        status: shiftSchedule ? 'Present' : 'Unscheduled',
+        status: initialStatus,
       });
       console.log('[Attendance Created] id:', attendance.id);
     } else {
@@ -108,10 +123,16 @@ const markNewAttendance = async (req, res) => {
         : 0;
 
       const leftEarly = earlyLeaveCutoff ? actualOut.isBefore(earlyLeaveCutoff) : false;
-      const shiftDuration = shiftStart && shiftEnd
-        ? moment.duration(shiftEnd.diff(shiftStart)).asHours()
-        : 0;
-      const isHalfDay = shiftDuration > 0 ? workedHours < shiftDuration * 0.5 : false;
+      let shiftDuration = 0;
+      if (shiftStart && shiftEnd) {
+        shiftDuration = moment.duration(shiftEnd.diff(shiftStart)).asHours();
+      }
+
+      let isHalfDay = false;
+      if (shiftDuration > 0) {
+        isHalfDay = workedHours < shiftDuration * 0.5;
+      }
+
 
       console.log('[Punch-out Calculations] workedHours:', workedHours.toFixed(2), 'overtime:', overtime.toFixed(2), 'leftEarly:', leftEarly, 'isHalfDay:', isHalfDay);
 
@@ -120,11 +141,28 @@ const markNewAttendance = async (req, res) => {
       attendance.workingHours = parseFloat(workedHours.toFixed(2));
       attendance.overtimeHours = parseFloat(overtime.toFixed(2));
 
-      if (isHalfDay) {
-        attendance.status = 'Half-Day';
-      } else if (attendance.status === 'Half-Day' && !leftEarly && !attendance.isLate) {
-        attendance.status = 'Present';
+      // Apply new status logic
+      if (shiftSchedule) {
+        // Scheduled Shift
+        if (isHalfDay) {
+          attendance.status = 'Half-Day';
+        } else {
+          attendance.status = 'Present';
+        }
+      } else {
+        // Unscheduled Shift (no shiftSchedule)
+        if (shiftDuration > 0) {
+          if (workedHours < shiftDuration * 0.5) {
+            attendance.status = 'Half-Day';
+          } else {
+            attendance.status = 'Present';
+          }
+        } else {
+          // If even shift timings are not available, fallback to time-based threshold
+          attendance.status = workedHours >= 4 ? 'Present' : 'Half-Day';
+        }
       }
+
 
       await attendance.save();
       console.log('[Attendance Updated] id:', attendance.id, 'status:', attendance.status);
@@ -213,10 +251,10 @@ const getCompanyAttendanceByDate = async (req, res) => {
       order: [['checkIn', 'ASC']],
     });
 
-    console.log(companyId,date);
+    console.log(companyId, date);
     console.log(attendanceList);
-    
-    
+
+
 
     res.status(200).json(attendanceList);
   } catch (error) {
@@ -225,5 +263,16 @@ const getCompanyAttendanceByDate = async (req, res) => {
   }
 };
 
+const getUserAttendanceSummaryOFUserByStartEndDateAndUserID = async (req, res) => {
+  try {
+    const { userId, startDate, endDate } = req.query;
+    const summary = await getAttendanceSummary(userId, startDate, endDate);
+    res.json(summary);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
-export { markNewAttendance , uploadAttendanceFile , getCompanyAttendanceByDate};
+
+
+export { markNewAttendance, uploadAttendanceFile, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID };

@@ -1,14 +1,15 @@
 import bcrypt from 'bcryptjs';
 import models from '../models/index.js';
-import { where, Op } from 'sequelize';
+import { where, Op, Sequelize } from 'sequelize';
 import * as XLSX from 'xlsx'
 import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js';
 import { log } from 'console';
 import { saveImageFile } from '../utils/imageUtils.js';
 
-const { Permission, Role, User, Company, Department } = models;
+const { Permission, Role, User, Company, Department , UserLeaveQuota } = models;
 
 const addNewUser = async (req, res) => {
+  const transaction = await Sequelize.transaction();
   try {
     let {
       firstName, lastName, contact, email, gender, Designation, roleId,
@@ -20,18 +21,15 @@ const addNewUser = async (req, res) => {
     } = req.body;
 
     const clean = (val) => val === '' || val === undefined ? null : val;
-
-    // Clean values
     [
       birthDate, joiningDate, roleId, branchId, departmentId, gender,
       basicSalary, geofencepoint, paymentMode, workingShift
     ] = [
-        clean(birthDate), clean(joiningDate), clean(roleId), clean(branchId),
-        clean(departmentId), clean(gender), clean(basicSalary),
-        clean(geofencepoint), clean(paymentMode), clean(workingShift)
-      ];
+      clean(birthDate), clean(joiningDate), clean(roleId), clean(branchId),
+      clean(departmentId), clean(gender), clean(basicSalary),
+      clean(geofencepoint), clean(paymentMode), clean(workingShift)
+    ];
 
-    // Company check
     const company = await Company.findByPk(companyId);
     if (!company) return res.status(400).json({ message: "Company not found" });
 
@@ -40,7 +38,6 @@ const addNewUser = async (req, res) => {
       return res.status(400).json({ message: "User limit exceeded, please contact Provider." });
     }
 
-    // Duplicate email/contact checks
     const [userExists, userExists2] = await Promise.all([
       User.findOne({ where: { email } }),
       User.findOne({ where: { contact } })
@@ -48,31 +45,18 @@ const addNewUser = async (req, res) => {
     if (userExists) return res.status(400).json({ message: "Email already exists" });
     if (userExists2) return res.status(400).json({ message: "Contact already exists" });
 
-    // Department check
     const deptExist = await Department.findByPk(departmentId);
     if (!deptExist) return res.status(400).json({ message: "Department not found" });
 
-    // Handle file uploads
     const files = req.files || {};
-    console.log('@@@@@@@@@@@@@@@@@@@@@@');
-    console.log("Profile Photo File:", req.files?.profilePhoto?.[0]);
-    console.log("Bank Details File:", req.files?.bankDetails?.[0]);
-
-
     const profilePhoto = files.profilePhoto?.[0] ? await saveImageFile(files.profilePhoto[0]) : null;
     const adhaarCard = files.adhaarCard?.[0] ? await saveImageFile(files.adhaarCard[0]) : null;
     const panCard = files.panCard?.[0] ? await saveImageFile(files.panCard[0]) : null;
     const bankDetails = files.bankDetails?.[0] ? await saveImageFile(files.bankDetails[0]) : null;
     const educationalQualification = files.educationalQualification?.[0] ? await saveImageFile(files.educationalQualification[0]) : null;
 
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-
-    console.log(panCard, profilePhoto, adhaarCard, bankDetails, educationalQualification);
-
-    // Password hash
     const hashedPassword = await bcrypt.hash(contact, 10);
 
-    // Save user
     const newUser = await User.create({
       firstName,
       lastName,
@@ -92,7 +76,7 @@ const addNewUser = async (req, res) => {
       workingShift,
       sendAttTOWhatsapp: sendWhatsapp === 'yes' || sendWhatsapp === true,
       geofencepoint,
-      leaveTemplate,
+      leaveTemplateId: leaveTemplate,
       paymentMode,
       paymentDate,
       basicSalary,
@@ -108,15 +92,29 @@ const addNewUser = async (req, res) => {
       panCard,
       bankDetails,
       educationalQualification,
-    });
+    }, { transaction });
 
+    const currentYear = new Date().getFullYear();
+
+    await UserLeaveQuota.create({
+      userId: newUser.id,
+      paidLeavesTaken: 0,
+      sickLeavesTaken: 0,
+      casualLeavesTaken: 0,
+      year: currentYear,
+      month: null
+    }, { transaction });
+
+    await transaction.commit();
     return res.status(201).json({ message: "User added successfully", user: newUser });
 
   } catch (error) {
+    await transaction.rollback();
     console.error("Error adding user:", error);
     return res.status(500).json({ message: "Error adding new user", error: error.message });
   }
 };
+
 
 
 const getUsersList = async (req, res) => {
@@ -294,4 +292,4 @@ const fetchCompanysUsers = async (req, res) => {
 };
 
 
-export { addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel,fetchCompanysUsers }
+export { addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel, fetchCompanysUsers }

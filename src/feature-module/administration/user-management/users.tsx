@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../../core/data/redux/store';
 import { toast } from '../../../utils/toastUtil';
 import axiosClient from '../../../axiosConfig/axiosClient';
-import { ADD_NEW_USER, EDIT_USER, UPLOAD_USERS_EXCEL } from '../../../axiosConfig/apis';
+import { ADD_NEW_USER, EDIT_USER, FETCH_USER_LEAVE_STATS, UPLOAD_USERS_EXCEL } from '../../../axiosConfig/apis';
 import { Company } from '../../../core/data/redux/companySlice';
 import { Branch } from '../../../core/data/redux/branchesSlice';
 import { fetchUsers, setSort, User } from '../../../core/data/redux/usersSlice';
@@ -23,6 +23,7 @@ import { Template } from '../../../core/data/redux/payrolltemplateSlice';
 import { Shift } from '../../../core/data/redux/shiftSlice';
 import { Role } from '../../../core/data/redux/rolesSlice';
 import ImageWithBasePath from '../../../core/common/imageWithBasePath';
+import { fetchLeaveTemplates, LeaveTemplates } from '../../../core/data/redux/leaveTemplateSlice';
 type PasswordField = "password" | "confirmPassword";
 
 const Users = () => {
@@ -43,6 +44,40 @@ const Users = () => {
     const [panCard, setPanCard] = useState<File | null>(null);
     const [educationalQulif, setEducationalQulif] = useState<File | null>(null);
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+    const [allLeaveTemplates, setAllLeaveTemplates] = useState<LeaveTemplates[]>([]);
+    const [viewUserDetails, setViewUserDetails] = useState<User>();
+    const [userLeaveStats, setUserLeaveStats] = useState({
+        userId: '',
+        year: '',
+        allowed: {
+            paidLeaveQuota: 0,
+            sickLeaveQuota: 0,
+            casualLeaveQuota: 0
+        },
+        taken: {
+            paidLeavesTaken: 0,
+            sickLeavesTaken: 0,
+            casualLeavesTaken: 0
+        },
+        balance: {
+            paidLeaveBalance: 0,
+            sickLeaveBalance: 0,
+            casualLeaveBalance: 0
+        }
+    });
+
+    useEffect(() => {
+        const fetchLeaveStatsOfUser = async (id: number) => {
+            try {
+                const response = await axiosClient.get(`${FETCH_USER_LEAVE_STATS}${id}`);
+                if (response.status === 200) setUserLeaveStats(response.data);
+            } catch (error) {
+                console.error("Error fetching leave stats:", error);
+            }
+        };
+
+        if (viewUserDetails) fetchLeaveStatsOfUser(viewUserDetails.id);
+    }, [viewUserDetails]);
 
 
 
@@ -56,7 +91,6 @@ const Users = () => {
     const userAllowedLabels = useSelector((state: RootState) => state.feature.allowedFeatures);
     const filteredLabels = userAllowedLabels.map((feature: any) => feature.name);
 
-    const [viewUserDetails, setViewUserDetails] = useState<User>();
     const [editUserData, setEditUserData] = useState<Partial<User>>();
     const [filteredDepartments, setFilteredDepartments] = useState<Department[]>([]);
 
@@ -116,6 +150,7 @@ const Users = () => {
     const roleList = useAppSelector((state: RootState) => state.roles.list);
     const payrollTemplates = useSelector((state: RootState) => state.payrollTemplate.templates);
     const shiftsList = useSelector((state: RootState) => state.shifts.shifts);
+    const leaveTemplateList = useAppSelector((state) => state.leaveTemplate.templates);
 
     useEffect(() => {
         if (payrollTemplates.length > 0) {
@@ -131,6 +166,13 @@ const Users = () => {
     }, [payrollTemplates, companyList, user?.companyId])
 
     useEffect(() => {
+
+        if (user) {
+            dispatch(fetchLeaveTemplates({ companyId: user.companyId }));
+        }
+
+
+
         if (user && user.departmentId === 1) {
             setFilteredDepartments(departmentList)
         } else if (user && user.departmentId !== null) {
@@ -139,7 +181,14 @@ const Users = () => {
         } else {
             setFilteredDepartments([]);
         }
-    }, [user, departmentList]);
+
+        if (user && user.companyId) {
+            const userLeaveTemplates = leaveTemplateList.filter(leaveTemp => leaveTemp.companyId === user.companyId);
+            setAllLeaveTemplates(userLeaveTemplates);
+        } else {
+            setAllLeaveTemplates(leaveTemplateList);
+        }
+    }, [user, departmentList, dispatch]);
 
     useEffect(() => {
         if (user && user.companyId) {
@@ -837,7 +886,9 @@ const Users = () => {
                                                     <td>{getRoleNameByRoleId(user.roleId) || "**"}</td>
                                                     <td>
                                                         <div className="action-icon d-inline-flex">
-                                                            <Link to="#" onClick={() => setViewUserDetails(user)} className="me-2" data-bs-toggle="modal" data-bs-target="#user_detail">
+                                                            <Link to="#" onClick={() =>
+                                                                setViewUserDetails(user)
+                                                            } className="me-2" data-bs-toggle="modal" data-bs-target="#user_detail">
                                                                 <i className="ti ti-eye" />
                                                             </Link>
                                                             <Link
@@ -926,7 +977,7 @@ const Users = () => {
                         </Link>
                     </p>
                 </div>
-            </div>
+            </div >
             {/* /Page Wrapper */}
             {/* Add Users */}
             <div className="modal fade" id="add_users">
@@ -1360,9 +1411,11 @@ const Users = () => {
                                                     }
                                                 >
                                                     <option value="">Select</option>
-                                                    <option value={1}>Leave Template 1</option>
-                                                    <option value={2}>Leave Template 2</option>
-                                                    <option value={3}>Leave Template 3</option>
+                                                    {
+                                                        allLeaveTemplates.map(leaveTemp => (
+                                                            <option value={leaveTemp.id}>{leaveTemp.name}</option>
+                                                        ))
+                                                    }
                                                 </select>
                                             </div>
 
@@ -1902,7 +1955,7 @@ const Users = () => {
                                                 <p className="text-gray-9">{geBranchNameById(viewUserDetails?.branchId)}</p>
                                             </div>
                                         </div>
-                                        <div className="col-md-4">
+                                        <div className="col-md-6">
                                             <div className="mb-3">
                                                 <p className="fs-12 mb-0">Birth Date</p>
                                                 <p className="text-gray-9">
@@ -1910,7 +1963,7 @@ const Users = () => {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="col-md-4">
+                                        <div className="col-md-6">
                                             <div className="mb-3">
                                                 <p className="fs-12 mb-0">Created Date</p>
                                                 <p className="text-gray-9">
@@ -1928,6 +1981,38 @@ const Users = () => {
                                         </div> */}
                                     </div>
                                 </div>
+                            </div>
+                            <div>
+                                <table className="table datanew table-bordered">
+                                    <thead className="table-header">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Allowed Leaves</th>
+                                                <th>Taken Leaves</th>
+                                                <th>Balance Leaves</th>
+                                            </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th>Paid Leaves</th>
+                                            <td>{userLeaveStats.allowed.paidLeaveQuota}</td>
+                                            <td>{userLeaveStats.taken.paidLeavesTaken}</td>
+                                            <td>{userLeaveStats.balance.paidLeaveBalance}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Casual Leaves</th>
+                                            <td>{userLeaveStats.allowed.casualLeaveQuota}</td>
+                                            <td>{userLeaveStats.taken.casualLeavesTaken}</td>
+                                            <td>{userLeaveStats.balance.casualLeaveBalance}</td>
+                                        </tr>
+                                        <tr>
+                                            <th> Sick Leaves</th>
+                                            <td>{userLeaveStats.allowed.sickLeaveQuota}</td>
+                                            <td>{userLeaveStats.taken.sickLeavesTaken}</td>
+                                            <td>{userLeaveStats.balance.sickLeaveBalance}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
