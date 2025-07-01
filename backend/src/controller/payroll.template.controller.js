@@ -66,10 +66,6 @@ const editPayrollTemplateWithComponents = async (req, res) => {
             companyId,
             components = [],
         } = req.body;
-        console.log("@@@@@@@@@@@@@@@@@@@",templateId);
-        console.log("@@@@@@@@@@@@@@@@@@@",companyId);
-        console.log("@@@@@@@@@@@@@@@@@@@",templateName);
-        console.log("@@@@@@@@@@@@@@@@@@@",components);
         
 
         // Step 1: Update the payroll template
@@ -84,10 +80,8 @@ const editPayrollTemplateWithComponents = async (req, res) => {
         });
 
         const existingIds = existingComponents.map((comp) => comp.id);
-        console.log("@@@@@@@@@@@@@@@@@@@existingIds",existingIds);
 
         const incomingIds = components.filter(c => c.id).map(c => c.id);
-        console.log("@@@@@@@@@@@@@@@@@@@incommingIds",incomingIds);
 
 
         console.log("111111111111");
