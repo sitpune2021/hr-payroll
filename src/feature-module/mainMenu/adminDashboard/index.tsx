@@ -11,13 +11,99 @@ import ProjectModals from "../../../core/modals/projectModal";
 import RequestModals from "../../../core/modals/requestModal";
 import TodoModal from "../../../core/modals/todoModal";
 import CollapseHeader from "../../../core/common/collapse-header/collapse-header";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../core/data/redux/store";
+import axiosClient from "../../../axiosConfig/axiosClient";
+import { FETCH_COMPANYS_LEAVE_RECORDS } from "../../../axiosConfig/apis";
+import { formatDate } from "../../../utils/dateformatter1";
 
 const AdminDashboard = () => {
   const routes = all_routes;
+  interface LeaveRecord {
+    id: number;
+    userId: number;
+    leaveType: string;
+    fromDate: string;
+    toDate: string;
+    totalDays: number;
+    reason: string;
+    status: string;
+    approverId: number | null;
+    remarks: string | null;
+    createdAt: string;
+    updatedAt: string;
+    employee: {
+      id: number;
+      firstName: string;
+      lastName: string;
+      email: string;
+    };
+    approver: {
+      id: number;
+      firstName: string;
+      lastName: string;
+    } | null;
+  }
+
+  const user = useSelector((state: RootState) => state.auth.user);
+
+
+  const today = new Date();
+  const formattedToday = today.toISOString().split('T')[0];
+
+  const oneMonthAgo = new Date(today);
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+  const formattedMonthAgo = oneMonthAgo.toISOString().split('T')[0];
+
+  const [fromDate, setFromDate] = useState(formattedMonthAgo);
+  const [toDate, setToDate] = useState(formattedToday);
+  const [selectedLeaveRecord, setSelectedLeaveRecord] = useState<LeaveRecord | null>(null);
+
+
 
   const [isTodo, setIsTodo] = useState([false, false, false]);
+  const [leaveRecords, setLeaveRecords] = useState<LeaveRecord[]>([]);
+  useEffect(() => {
+    const fetchLeaveRecords = async (companyId: number) => {
+      try {
+        const res = await axiosClient.get(FETCH_COMPANYS_LEAVE_RECORDS, {
+          params: {
+            companyId,
+            fromDate,
+            toDate,
+          },
+        });
+        if (res.status === 200) setLeaveRecords(res.data);
 
-  const [date, setDate] = useState(new Date());
+      } catch (err) {
+        console.error('Error fetching leave records:', err);
+      }
+    };
+
+    if (user && user.companyId) {
+      fetchLeaveRecords(user.companyId);
+    }
+  }, [user, toDate, fromDate]);
+
+  const handleLeaveAction = async (status: any) => {
+    if (!selectedLeaveRecord) return;
+
+    try {
+      await axiosClient.post(`/api/leave-records/${selectedLeaveRecord.id}/status`, {
+        status,
+        remarks: prompt(`Add remarks for ${status.toLowerCase()}:`) || null,
+      });
+
+      alert(`Leave ${status.toLowerCase()} successfully!`);
+      // Refresh list or modal here
+      setSelectedLeaveRecord(null); // Close modal if needed
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
+  };
+
+
 
   //New Chart
   const [empDepartment] = useState<any>({
@@ -254,7 +340,7 @@ const AdminDashboard = () => {
           {/* Breadcrumb */}
           <div className="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
             <div className="my-auto mb-2">
-              <h2 className="mb-1">Admin Dashboard</h2>
+              <h2 className="mb-1">Admin Dashboard####</h2>
               <nav>
                 <ol className="breadcrumb mb-0">
                   <li className="breadcrumb-item">
@@ -299,14 +385,6 @@ const AdminDashboard = () => {
                       </Link>
                     </li>
                   </ul>
-                </div>
-              </div>
-              <div className="mb-2">
-                <div className="input-icon w-120 position-relative">
-                  <span className="input-icon-addon">
-                    <i className="ti ti-calendar text-gray-9" />
-                  </span>
-                  <Calendar value={date} onChange={(e: any) => setDate(e.value)} view="year" dateFormat="yy" className="Calendar-form" />
                 </div>
               </div>
               <div className="ms-2 head-icons">
@@ -356,177 +434,178 @@ const AdminDashboard = () => {
                 <div className="col-md-3 d-flex">
                   <div className="card flex-fill">
                     <div className="card-body">
-                      <span className="avatar rounded-circle bg-primary mb-2">
-                        <i className="ti ti-calendar-share fs-16" /> 
-                      </span>
-                      <h6 className="fs-13 fw-medium text-default mb-1">
-                       Total
-                      </h6>
-                      <h3 className="mb-3">
-                        92
-                        <span className="fs-12 fw-medium text-success">
-                          <i className="fa-solid fa-caret-up me-1" />
-                          +2.1%
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="avatar rounded-circle bg-primary me-3">
+                          <i className="ti ti-calendar-share fs-24 text-white" />
                         </span>
-                      </h3>
-                      {/* <Link to="attendance-employee.html" className="link-default">
-                        View Details
-                      </Link> */}
+
+                        <div className="text-end">
+                          <h6 className="fs-16 fw-semibold text-default mb-1">Total</h6>
+                          <h3 className="fs-2 fw-bold mb-0">92</h3>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div className="col-md-3 d-flex">
                   <div className="card flex-fill">
                     <div className="card-body">
-                      <span className="avatar rounded-circle bg-secondary mb-2">
-                        <i className="ti ti-browser fs-16" />
-                      </span>
-                      <h6 className="fs-13 fw-medium text-default mb-1">
-                        Present
-                      </h6>
-                      <h3 className="mb-3">
-                        90/94{" "}
-                        <span className="fs-12 fw-medium text-danger">
-                          <i className="fa-solid fa-caret-down me-1" />
-                          -2.1%
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="avatar rounded-circle bg-secondary me-3">
+                          <i className="ti ti-browser fs-24 text-white" />
                         </span>
-                      </h3>
-                      {/* <Link to="projects.html" className="link-default">
-                        View All
-                      </Link> */}
+
+                        <div className="text-end">
+                          <h6 className="fs-16 fw-semibold text-default mb-1">Present</h6>
+                          <h3 className="fs-2 fw-bold mb-0">
+                            90/94{" "}
+                            <span className="fs-12 fw-medium text-danger">
+                              <i className="fa-solid fa-caret-down me-1" />
+                              -2.1%
+                            </span>
+                          </h3>
+                        </div>
+                      </div>
                     </div>
+
                   </div>
                 </div>
                 <div className="col-md-3 d-flex">
                   <div className="card flex-fill">
                     <div className="card-body">
-                      <span className="avatar rounded-circle bg-info mb-2">
-                        <i className="ti ti-users-group fs-16" />
-                      </span>
-                      <h6 className="fs-13 fw-medium text-default mb-1">
-                        Absent
-                      </h6>
-                      <h3 className="mb-3">
-                        69/86{" "}
-                        <span className="fs-12 fw-medium text-danger">
-                          <i className="fa-solid fa-caret-down me-1" />
-                          -11.2%
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="avatar rounded-circle bg-info me-3">
+                          <i className="ti ti-users-group fs-24 text-white" />
                         </span>
-                      </h3>
-                      {/* <Link to="clients.html" className="link-default">
-                        View All
-                      </Link> */}
+
+                        <div className="text-end">
+                          <h6 className="fs-16 fw-semibold text-default mb-1">Absent</h6>
+                          <h3 className="fs-2 fw-bold mb-0">
+                            69/86{" "}
+                            <span className="fs-12 fw-medium text-danger">
+                              <i className="fa-solid fa-caret-down me-1" />
+                              -11.2%
+                            </span>
+                          </h3>
+                        </div>
+                      </div>
                     </div>
+
                   </div>
                 </div>
                 <div className="col-md-3 d-flex">
                   <div className="card flex-fill">
                     <div className="card-body">
-                      <span className="avatar rounded-circle bg-pink mb-2">
-                        <i className="ti ti-checklist fs-16" />
-                      </span>
-                      <h6 className="fs-13 fw-medium text-default mb-1">
-                        Half Day
-                      </h6>
-                      <h3 className="mb-3">
-                        25/28{" "}
-                        <span className="fs-12 fw-medium text-success">
-                          <i className="fa-solid fa-caret-down me-1" />
-                          +11.2%
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="avatar rounded-circle bg-pink me-3">
+                          <i className="ti ti-checklist fs-24 text-white" />
                         </span>
-                      </h3>
-                      {/* <Link to="tasks.html" className="link-default">
-                        View All
-                      </Link> */}
+
+                        <div className="text-end">
+                          <h6 className="fs-16 fw-semibold text-default mb-1">Half Day</h6>
+                          <h3 className="fs-2 fw-bold mb-0">
+                            25/28{" "}
+                            <span className="fs-12 fw-medium text-success">
+                              <i className="fa-solid fa-caret-down me-1" />
+                              +11.2%
+                            </span>
+                          </h3>
+                        </div>
+                      </div>
                     </div>
+
                   </div>
                 </div>
                 <div className="col-md-3 d-flex">
                   <div className="card flex-fill">
                     <div className="card-body">
-                      <span className="avatar rounded-circle bg-purple mb-2">
-                        <i className="ti ti-moneybag fs-16" />
-                      </span>
-                      <h6 className="fs-13 fw-medium text-default mb-1">
-                        Late Commers
-                      </h6>
-                      <h3 className="mb-3">
-                        $2144{" "}
-                        <span className="fs-12 fw-medium text-success">
-                          <i className="fa-solid fa-caret-up me-1" />
-                          +10.2%
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="avatar rounded-circle bg-purple me-3">
+                          <i className="ti ti-moneybag fs-24 text-white" />
                         </span>
-                      </h3>
-                      {/* <Link to="expenses.html" className="link-default">
-                        View All
-                      </Link> */}
+
+                        <div className="text-end">
+                          <h6 className="fs-16 fw-semibold text-default mb-1">Late Commers</h6>
+                          <h3 className="fs-2 fw-bold mb-0">
+                            $2144{" "}
+                            <span className="fs-12 fw-medium text-success">
+                              <i className="fa-solid fa-caret-up me-1" />
+                              +10.2%
+                            </span>
+                          </h3>
+                        </div>
+                      </div>
                     </div>
+
                   </div>
                 </div>
                 <div className="col-md-3 d-flex">
                   <div className="card flex-fill">
                     <div className="card-body">
-                      <span className="avatar rounded-circle bg-danger mb-2">
-                        <i className="ti ti-browser fs-16" />
-                      </span>
-                      <h6 className="fs-13 fw-medium text-default mb-1">
-                        Early Leaving
-                      </h6>
-                      <h3 className="mb-3">
-                        $5,544{" "}
-                        <span className="fs-12 fw-medium text-success">
-                          <i className="fa-solid fa-caret-up me-1" />
-                          +2.1%
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="avatar rounded-circle bg-danger me-3">
+                          <i className="ti ti-browser fs-24 text-white" />
                         </span>
-                      </h3>
-                      {/* <Link to="purchase-transaction.html" className="link-default">
-                        View All
-                      </Link> */}
+
+                        <div className="text-end">
+                          <h6 className="fs-16 fw-semibold text-default mb-1">Early Leaving</h6>
+                          <h3 className="fs-2 fw-bold mb-0">
+                            $5,544{" "}
+                            <span className="fs-12 fw-medium text-success">
+                              <i className="fa-solid fa-caret-up me-1" />
+                              +2.1%
+                            </span>
+                          </h3>
+                        </div>
+                      </div>
                     </div>
+
                   </div>
                 </div>
                 <div className="col-md-3 d-flex">
                   <div className="card flex-fill">
                     <div className="card-body">
-                      <span className="avatar rounded-circle bg-success mb-2">
-                        <i className="ti ti-users-group fs-16" />
-                      </span>
-                      <h6 className="fs-13 fw-medium text-default mb-1">
-                        On Break
-                      </h6>
-                      <h3 className="mb-3">
-                        98{" "}
-                        <span className="fs-12 fw-medium text-success">
-                          <i className="fa-solid fa-caret-up me-1" />
-                          +2.1%
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="avatar rounded-circle bg-success me-3">
+                          <i className="ti ti-users-group fs-24 text-white" />
                         </span>
-                      </h3>
-                      {/* <Link to="job-list.html" className="link-default">
-                        View All
-                      </Link> */}
+
+                        <div className="text-end">
+                          <h6 className="fs-16 fw-semibold text-default mb-1">On Break</h6>
+                          <h3 className="fs-2 fw-bold mb-0">
+                            98{" "}
+                            <span className="fs-12 fw-medium text-success">
+                              <i className="fa-solid fa-caret-up me-1" />
+                              +2.1%
+                            </span>
+                          </h3>
+                        </div>
+                      </div>
                     </div>
+
                   </div>
                 </div>
                 <div className="col-md-3 d-flex">
                   <div className="card flex-fill">
                     <div className="card-body">
-                      <span className="avatar rounded-circle bg-dark mb-2">
-                        <i className="ti ti-user-star fs-16" />
-                      </span>
-                      <h6 className="fs-13 fw-medium text-default mb-1">
-                        On Leave
-                      </h6>
-                      <h3 className="mb-3">
-                        45/48{" "}
-                        <span className="fs-12 fw-medium text-danger">
-                          <i className="fa-solid fa-caret-down me-1" />
-                          -11.2%
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="avatar rounded-circle bg-dark me-3">
+                          <i className="ti ti-user-star fs-24 text-white" />
                         </span>
-                      </h3>
-                      {/* <Link to="candidates.html" className="link-default">
-                        View All
-                      </Link> */}
+
+                        <div className="text-end">
+                          <h6 className="fs-16 fw-semibold text-default mb-1">On Leave</h6>
+                          <h3 className="fs-2 fw-bold mb-0">
+                            45/48{" "}
+                            <span className="fs-12 fw-medium text-danger">
+                              <i className="fa-solid fa-caret-down me-1" />
+                              -11.2%
+                            </span>
+                          </h3>
+                        </div>
+                      </div>
                     </div>
+
                   </div>
                 </div>
               </div>
@@ -655,223 +734,90 @@ const AdminDashboard = () => {
             <div className="col-xxl-4 col-xl-6 d-flex">
               <div className="card flex-fill">
                 <div className="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                  <h5 className="mb-2">Clock-In/Out</h5>
-                  <div className="d-flex align-items-center">
-                    <div className="dropdown mb-2">
-                      <Link
-                        to="#"
-                        className="dropdown-toggle btn btn-white btn-sm d-inline-flex align-items-center border-0 fs-13 me-2"
-                        data-bs-toggle="dropdown"
-                      >
-                        All Departments
-                      </Link>
-                      <ul className="dropdown-menu  dropdown-menu-end p-3">
-                        <li>
-                          <Link to="#"
-                            className="dropdown-item rounded-1"
-                          >
-                            Finance
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="#"
-                            className="dropdown-item rounded-1"
-                          >
-                            Development
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="#"
-                            className="dropdown-item rounded-1"
-                          >
-                            Marketing
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="dropdown mb-2">
-                      <Link
-                        to="#"
-                        className="btn btn-white border btn-sm d-inline-flex align-items-center"
-                        data-bs-toggle="dropdown"
-                      >
-                        <i className="ti ti-calendar me-1" />
-                        Today
-                      </Link>
-                      <ul className="dropdown-menu  dropdown-menu-end p-3">
-                        <li>
-                          <Link to="#"
-                            className="dropdown-item rounded-1"
-                          >
-                            This Month
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="#"
-                            className="dropdown-item rounded-1"
-                          >
-                            This Week
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="#"
-                            className="dropdown-item rounded-1"
-                          >
-                            Today
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
+                  <h5 className="mb-2">Leave</h5>
+                  <div className="d-flex gap-2">
+                    <select
+                      className="form-control"
+                    >
+                      <option value="All">ALL</option>
+                    </select>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                    />
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                    />
                   </div>
+
                 </div>
-                <div className="card-body">
-                  <div>
-                    <div className="d-flex align-items-center justify-content-between mb-3 p-2 border border-dashed br-5">
-                      <div className="d-flex align-items-center">
-                        <Link to="#"
-                          className="avatar flex-shrink-0"
-                        >
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-24.jpg"
-                            className="rounded-circle border border-2"
-                            alt="img"
-                          />
-                        </Link>
-                        <div className="ms-2">
-                          <h6 className="fs-14 fw-medium text-truncate">
-                            Daniel Esbella
-                          </h6>
-                          <p className="fs-13">UI/UX Designer</p>
-                        </div>
-                      </div>
-                      <div className="d-flex align-items-center">
-                        <Link to="#" className="link-default me-2">
-                          <i className="ti ti-clock-share" />
-                        </Link>
-                        <span className="fs-10 fw-medium d-inline-flex align-items-center badge badge-success">
-                          <i className="ti ti-circle-filled fs-5 me-1" />
-                          09:15
-                        </span>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between mb-3 p-2 border br-5">
-                      <div className="d-flex align-items-center">
-                        <Link to="#"
-                          className="avatar flex-shrink-0"
-                        >
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-23.jpg"
-                            className="rounded-circle border border-2"
-                            alt="img"
-                          />
-                        </Link>
-                        <div className="ms-2">
-                          <h6 className="fs-14 fw-medium">Doglas Martini</h6>
-                          <p className="fs-13">Project Manager</p>
-                        </div>
-                      </div>
-                      <div className="d-flex align-items-center">
-                        <Link to="#" className="link-default me-2">
-                          <i className="ti ti-clock-share" />
-                        </Link>
-                        <span className="fs-10 fw-medium d-inline-flex align-items-center badge badge-success">
-                          <i className="ti ti-circle-filled fs-5 me-1" />
-                          09:36
-                        </span>
-                      </div>
-                    </div>
-                    <div className="mb-3 p-2 border br-5">
-                      <div className="d-flex align-items-center justify-content-between">
+
+                <div className="card-body" style={{ maxHeight: "450px", overflowY: "auto" }}>
+                  {leaveRecords.length > 0 ? (
+                    leaveRecords.map((record, index) => (
+                      <div
+                        className={`d-flex align-items-center justify-content-between mb-3 p-2 border ${record.status === "Rejected"
+                          ? "border-danger"
+                          : record.status === "Approved"
+                            ? "border-success"
+                            : "border-warning"
+                          } br-5`}
+                        key={index}
+                      >
                         <div className="d-flex align-items-center">
-                          <Link to="#"
-                            className="avatar flex-shrink-0"
-                          >
-                            <ImageWithBasePath
-                              src="assets/img/profiles/avatar-27.jpg"
+                          <div className="avatar flex-shrink-0">
+                            <img
+                              src="/assets/img/profiles/default-avatar.jpg"
+                              alt="avatar"
                               className="rounded-circle border border-2"
-                              alt="img"
+                              width={40}
+                              height={40}
                             />
-                          </Link>
+                          </div>
                           <div className="ms-2">
-                            <h6 className="fs-14 fw-medium text-truncate">
-                              Brian Villalobos
+                            <h6 className="fs-14 fw-medium text-truncate mb-1">
+                              {record.employee?.firstName} {record.employee?.lastName}
                             </h6>
-                            <p className="fs-13">PHP Developer</p>
+                            <p className="fs-13 mb-0">
+                              {new Date(record.fromDate).toLocaleDateString()} →{" "}
+                              {new Date(record.toDate).toLocaleDateString()}
+                            </p>
                           </div>
                         </div>
-                        <div className="d-flex align-items-center">
-                          <Link to="#"
-                            className="link-default me-2"
-                          >
-                            <i className="ti ti-clock-share" />
-                          </Link>
-                          <span className="fs-10 fw-medium d-inline-flex align-items-center badge badge-success">
-                            <i className="ti ti-circle-filled fs-5 me-1" />
-                            09:15
-                          </span>
-                        </div>
+                        <span
+                          className={`badge fw-medium ${record.status === "Rejected"
+                            ? "badge-danger"
+                            : record.status === "Approved"
+                              ? "badge-success"
+                              : "badge-warning"
+                            }`}
+                        >
+                          {record.status}
+                        </span>
+
+                        {/* <button className="btn btn-sm btn-link text-primary">
+                          View
+                        </button> */}
+
+                        <Link to="#"
+                          className="me-2"
+                          onClick={() => setSelectedLeaveRecord(record)}
+                          style={{ fontSize: "1.25rem" }}
+                          data-bs-toggle="modal"
+                          data-bs-target="#leave_details">
+                          <i className="ti ti-eye" />
+                        </Link>
+
                       </div>
-                      <div className="d-flex align-items-center justify-content-between flex-wrap mt-2 border br-5 p-2 pb-0">
-                        <div>
-                          <p className="mb-1 d-inline-flex align-items-center">
-                            <i className="ti ti-circle-filled text-success fs-5 me-1" />
-                            Clock in
-                          </p>
-                          <h6 className="fs-13 fw-normal mb-2">10:30 AM</h6>
-                        </div>
-                        <div>
-                          <p className="mb-1 d-inline-flex align-items-center">
-                            <i className="ti ti-circle-filled text-danger fs-5 me-1" />
-                            Clock Out
-                          </p>
-                          <h6 className="fs-13 fw-normal mb-2">09:45 AM</h6>
-                        </div>
-                        <div>
-                          <p className="mb-1 d-inline-flex align-items-center">
-                            <i className="ti ti-circle-filled text-warning fs-5 me-1" />
-                            Production
-                          </p>
-                          <h6 className="fs-13 fw-normal mb-2">09:21 Hrs</h6>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <h6 className="mb-2">Late</h6>
-                  <div className="d-flex align-items-center justify-content-between mb-3 p-2 border border-dashed br-5">
-                    <div className="d-flex align-items-center">
-                      <span className="avatar flex-shrink-0">
-                        <ImageWithBasePath
-                          src="assets/img/profiles/avatar-29.jpg"
-                          className="rounded-circle border border-2"
-                          alt="img"
-                        />
-                      </span>
-                      <div className="ms-2">
-                        <h6 className="fs-14 fw-medium text-truncate">
-                          Anthony Lewis{" "}
-                          <span className="fs-10 fw-medium d-inline-flex align-items-center badge badge-success">
-                            <i className="ti ti-clock-hour-11 me-1" />
-                            30 Min
-                          </span>
-                        </h6>
-                        <p className="fs-13">Marketing Head</p>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center">
-                      <Link to="#" className="link-default me-2">
-                        <i className="ti ti-clock-share" />
-                      </Link>
-                      <span className="fs-10 fw-medium d-inline-flex align-items-center badge badge-danger">
-                        <i className="ti ti-circle-filled fs-5 me-1" />
-                        08:35
-                      </span>
-                    </div>
-                  </div>
-                  <Link to="attendance-report.html"
-                    className="btn btn-light btn-md w-100"
-                  >
-                    View All Attendance
-                  </Link>
+                    ))
+                  ) : (
+                    <p className="text-muted">No leave records found.</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -1177,6 +1123,106 @@ const AdminDashboard = () => {
       <ProjectModals />
       <RequestModals />
       <TodoModal />
+
+
+
+      {/* user Detail */}
+      <div className="modal fade" id="leave_details">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">Leave Request Details</h4>
+              <button type="button" className="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close">
+                <i className="ti ti-x" />
+              </button>
+            </div>
+            <div className="modal-body">
+              {selectedLeaveRecord && (
+                <>
+                  {/* Header Info */}
+                  <div className="p-3">
+                    <div className="d-flex justify-content-between align-items-center rounded bg-light p-3">
+                      <div className="file-name-icon d-flex align-items-center">
+                        <div>
+                          <p className="text-gray-9 fw-medium mb-0">
+                            {selectedLeaveRecord.employee.firstName} {selectedLeaveRecord.employee.lastName}
+                          </p>
+                          <p>{selectedLeaveRecord.employee.email}</p>
+                        </div>
+                      </div>
+                      <div>
+                        <span className={`badge fw-medium ${selectedLeaveRecord.status === 'Approved'
+                          ? 'badge-success'
+                          : selectedLeaveRecord.status === 'Rejected'
+                            ? 'badge-danger'
+                            : 'badge-warning'
+                          }`}>
+                          {selectedLeaveRecord.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Basic Info */}
+                  <div className="p-3">
+                    <p className="text-gray-9 fw-medium">Leave Info</p>
+                    <div className="pb-1 border-bottom mb-4">
+                      <div className="row">
+                        <div className="col-md-6">
+                          <p className="fs-12 mb-0">Leave Type</p>
+                          <p className="text-gray-9">{selectedLeaveRecord.leaveType}</p>
+                        </div>
+                        <div className="col-md-6">
+                          <p className="fs-12 mb-0">Total Days</p>
+                          <p className="text-gray-9">{selectedLeaveRecord.totalDays}</p>
+                        </div>
+                        <div className="col-md-6">
+                          <p className="fs-12 mb-0">From - To</p>
+                          <p className="text-gray-9">
+                            {new Date(selectedLeaveRecord.fromDate).toLocaleDateString()} → {new Date(selectedLeaveRecord.toDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="col-md-6">
+                          <p className="fs-12 mb-0">Reason</p>
+                          <p className="text-gray-9">{selectedLeaveRecord.reason}</p>
+                        </div>
+                        <div className="col-md-6">
+                          <p className="fs-12 mb-0">Applied On</p>
+                          <p className="text-gray-9">{new Date(selectedLeaveRecord.createdAt).toLocaleString()}</p>
+                        </div>
+                        {selectedLeaveRecord.approver && (
+                          <div className="col-md-6">
+                            <p className="fs-12 mb-0">Approved/Rejected By</p>
+                            <p className="text-gray-9">
+                              {selectedLeaveRecord.approver.firstName} {selectedLeaveRecord.approver.lastName}
+                            </p>
+                          </div>
+                        )}
+                        {selectedLeaveRecord.remarks && (
+                          <div className="col-md-12">
+                            <p className="fs-12 mb-0">Remarks</p>
+                            <p className="text-gray-9">{selectedLeaveRecord.remarks}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  {selectedLeaveRecord.status === 'Applied' && (
+                    <div className="p-3 d-flex justify-content-end gap-2">
+                      <button className="btn btn-danger" onClick={() => handleLeaveAction('Rejected')}>Reject</button>
+                      <button className="btn btn-success" onClick={() => handleLeaveAction('Approved')}>Approve</button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* /user Detail */}
     </>
 
   );

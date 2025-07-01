@@ -28,6 +28,7 @@ import payrollTemplateReducer from './payrolltemplateSlice';
 import companysEmployeeReducer from './companysUsersSlice';
 import companyDateAttendanceReducer from './companyDateAttendanceSlice'
 import holidayGroupReducer from './holidayGroupSlice'
+import leaveTemplateReducer from './leaveTemplateSlice'
 
 
 
@@ -49,7 +50,8 @@ const rootReducer = combineReducers({
   payrollTemplate: payrollTemplateReducer,
   companysEmployees: companysEmployeeReducer,
   companyDateAttendance: companyDateAttendanceReducer,
-  holidayGroup: holidayGroupReducer
+  holidayGroup: holidayGroupReducer,
+  leaveTemplate: leaveTemplateReducer,
 });
 
 // 👇 Persist config: Choose what to persist

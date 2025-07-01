@@ -28,7 +28,6 @@ export const fetchHolidayGroups = createAsyncThunk<
       const response = await axiosClient.get<HolidayGroup[]>(FETCH_HOLIDAY_GROUP_NEW, {
         params: { companyId },
       });
-      console.log(response,'@@@@@@@@@@@@@@@@@@@@@@@@@@@');
       
       return response.data;
     } catch (error: any) {

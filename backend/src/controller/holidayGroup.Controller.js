@@ -39,7 +39,6 @@ export const listHolidayGroups = async (req, res) => {
       attributes: ['id', 'groupName', 'companyId'], // only these fields, no include
     });
 
-    console.log('@@@@@@@@@@@@@@@@',groups);
     
 
     res.status(200).json(groups);
