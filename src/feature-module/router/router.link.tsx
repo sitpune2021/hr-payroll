@@ -170,7 +170,6 @@ import BudgetExpenses from "../accounting/budget-expenses";
 import BudgetRevenues from "../accounting/budget-revenues";
 import Appearance from "../settings/websiteSettings/appearance";
 import SuperAdminDashboard from "../super-admin/dashboard";
-import LayoutDemo from "../mainMenu/layout-dashoard";
 import ExpensesReport from "../administration/reports/expensereport";
 import InvoiceReport from "../administration/reports/invoicereport";
 import PaymentReport from "../administration/reports/paymentreport";
@@ -1083,77 +1082,6 @@ export const publicRoutes = [
     path: routes.trainingType,
     element: <TrainingType />,
     route: Route,
-  },
-
-  {
-    label: 'Horizontal',
-    path: routes.Horizontal,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Detached',
-    path: routes.Detached,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Modern',
-    path: routes.Modern,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Two Column',
-    path: routes.TwoColumn,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Hovered',
-    path: routes.Hovered,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Boxed',
-    path: routes.layoutBox,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Horizontal Single',
-    path: routes.HorizontalSingle,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Horizontal Overlay',
-    path: routes.HorizontalOverlay,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Horizontal Box',
-    path: routes.HorizontalBox,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Menu Aside',
-    path: routes.MenuAside,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Transparent',
-    path: routes.Transparent,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Without Header',
-    path: routes.WithoutHeader,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'RTL',
-    path: routes.layoutRtl,
-    element: <LayoutDemo />,
-  },
-  {
-    label: 'Dark',
-    path: routes.layoutDark,
-    element: <LayoutDemo />,
   },
 
   //Settings

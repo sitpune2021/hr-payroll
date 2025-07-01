@@ -42,7 +42,15 @@ export const FETCH_HOLIDAY_BY_GROUPiD =  "/api/holiday/getbygroupid/"
 export const ADD_NEW_HOLIDAY =  "/api/holiday/addnewholiday"
 
 export const ADD_NEW_LEAVE_TEMPLATE =  "/api/leaveTemplate/addnewleavetemplate"
+export const EDIT_LEAVE_TEMPLATE_WITH_COMPONENTS =  "/api/leaveTemplate/edittemplatewithcomponent/"
 
+export const FETCH_ALL_LEAVE_TEMPLATE_LIST  =  "/api/leaveTemplate/getleavetemplatelist"
+
+export const FETCH_WEEKLY_OFF_COMPO_BY_TEMP_ID  =  "/api/weeklyoffcomponents/listbytemplateId/"
+
+export const FETCH_USER_LEAVE_STATS  =  "/api/leaveRecord/fetchusersLeaverecordstats/"
+
+export const FETCH_COMPANYS_LEAVE_RECORDS  =  "/api/leaveRecord/fetchCompanyLeaverecord"
 
 
 
