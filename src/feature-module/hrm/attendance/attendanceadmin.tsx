@@ -128,7 +128,7 @@ const AttendanceAdmin = () => {
                 <div className="card flex-fill">
                   <div className="card-body d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center overflow-hidden">
-                      <span className="avatar avatar-lg bg-skyblue flex-shrink-0">
+                      <span className="avatar avatar-lg bg-purple flex-shrink-0">
                         <i className="ti ti-map-pin-check fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
@@ -164,7 +164,7 @@ const AttendanceAdmin = () => {
                 <div className="card flex-fill">
                   <div className="card-body d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center overflow-hidden">
-                      <span className="avatar avatar-lg bg-skyblue flex-shrink-0">
+                      <span className="avatar avatar-lg bg-pink flex-shrink-0">
                         <i className="ti ti-map-pin-check fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
@@ -180,14 +180,12 @@ const AttendanceAdmin = () => {
               {/* /Company Location */}
             </div>
             <div className="card">
-              <div className="card-header d-flex justify-content-between flex-wrap">
-                <h5>Attendance Summary</h5>
-                <div className="d-inline-flex">
-                  <input style={{minWidth:"320px"}} type="text" className="form-control me-4" placeholder="Search Employees..."
-                    onChange={(e) => setSearchTerm(e.target.value)} />
-                  <input type="date" value={selectedDate} className="form-control me-2"
-                    onChange={(e) => setSelectedDate(e.target.value)} />
-                </div>
+              <div className="card-header d-flex flex-wrap" style={{alignItems:'center'}}>
+                <h5>Search Employee</h5>
+                <input style={{maxWidth:"320px"}} type="text" className="form-control ms-4" placeholder="Search Employees..."
+                  onChange={(e) => setSearchTerm(e.target.value)} />
+                {/* <div className="d-inline-flex">
+                </div> */}
               </div>
               <div className="card-body p-0">
                 <table className="table datanew table-bordered bg-white">
@@ -205,6 +203,7 @@ const AttendanceAdmin = () => {
                       <th>Status</th>
                       <th>Check In</th>
                       <th>Check Out</th>
+                      <th>Break</th>
                       <th>Late</th>
                       <th>Early Leave</th>
                       <th>Production Hours</th>
@@ -249,6 +248,7 @@ const AttendanceAdmin = () => {
                               ) : '-'}
                           </td>
                           <td>{attendance?.isLate || '-'}</td>
+                          <td>{attendance?.isLate || '-'}</td>
                           <td>{attendance?.isEarlyLeave || '-'}</td>
                           <td>{attendance?.workingHours || '-'}</td>
                           <td>{attendance?.overtimeHours || '-'}</td>
@@ -256,6 +256,7 @@ const AttendanceAdmin = () => {
                             <div className="action-icon d-inline-flex">
                               <Link to="#"><i className="ti ti-edit me-2" /></Link>
                               <Link to="#"><i className="ti ti-trash" /></Link>
+                              <Link to="#"><i className="ti ti-eye" /></Link>
                             </div>
                           </td>
                         </tr>
@@ -290,11 +291,13 @@ const AttendanceAdmin = () => {
           </div>
           <div className="btn-group">
             <button className={`btn ${activeTab === 'attendance' ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={() => setActiveTab('attendance')}>Attendance Summary</button>
+              onClick={() => setActiveTab('attendance')}>Attendance</button>
             <button className={`btn ${activeTab === 'shift' ? 'btn-primary' : 'btn-outline-primary'}`}
               onClick={() => setActiveTab('shift')}>Shift Assign</button>
           </div>
           <div className="d-flex align-items-center flex-wrap">
+            <input style={{width:'120px'}} type="date" value={selectedDate} className="form-control me-2"
+                    onChange={(e) => setSelectedDate(e.target.value)} />
             <div className="dropdown me-2 mb-2">
               <Link to="#" className="btn btn-white"><i className="ti ti-file-export me-1" /> Import</Link>
             </div>
