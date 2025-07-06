@@ -16,12 +16,23 @@ import filterSidebarByLabel from "../../../utils/filterSidebarByLabel";
 
 const Sidebar = () => {
   const Location = useLocation();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const [sidebarData, setSidebarData] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (user?.role) {
+      const data = SidebarDataTest(user.role);
+      setSidebarData(data);
+    }
+  }, [user]);
+
 
   const allowedFeatures = useSelector((state: RootState) => state.feature.allowedFeatures);
   
   const allowedLabels = allowedFeatures.map((f: any) => f.name);
 
-  const filteredSidebar = filterSidebarByLabel(SidebarDataTest, allowedLabels);
+
+  const filteredSidebar = filterSidebarByLabel(sidebarData, allowedLabels);
 
   const [subOpen, setSubopen] = useState<any>("Dashboard");
   const [subsidebar, setSubsidebar] = useState("");

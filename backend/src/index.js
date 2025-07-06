@@ -19,7 +19,10 @@ import holidayGroupRoute from './routes/HolidayGroup.routes.js';
 import holidayRoute from './routes/holiday.routes.js';
 import depaermentRouter from './routes/department.routes.js' 
 import leaveTemplateRoute from './routes/LeaveTemplate.routes.js';
-import { PORT } from './envvariablesdata.js';
+import weeklyOffComponentsRoute from './routes/weeklyOffComponents.routes.js';
+import paymentsRoute from './routes/Payments.routes.js';
+import leaveRecordRoute from './routes/LeaveRecord.route.js';
+import { PORT } from './envvariablesdata.js'
 
 
 dotenv.config();
@@ -55,6 +58,12 @@ app.use('/api/leaveTemplate', leaveTemplateRoute);
 app.use('/api/holidaygroup', holidayGroupRoute);
 app.use('/api/holidaygroup', holidayGroupRoute);
 app.use('/api/holiday', holidayRoute);
+
+app.use('/api/weeklyoffcomponents', weeklyOffComponentsRoute);
+app.use('/api/payments', paymentsRoute);
+
+app.use('/api/leaveRecord',leaveRecordRoute);
+
 
 
 

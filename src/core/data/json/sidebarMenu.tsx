@@ -4,7 +4,7 @@ const routes = all_routes;
 
 
 
-export const SidebarDataTest = [
+export const SidebarDataTest = (userRole: string) => [
   {
     tittle: 'Dashboard main',
     icon: 'airplay',
@@ -27,12 +27,12 @@ export const SidebarDataTest = [
         link: routes.superAdminCompanies,
         base: 'companies',
       },
-      {
+      (userRole !== "SUPER_ADMIN" && {
         label: 'Attendance',
         icon: 'layout-grid-add',
         link: routes.attendance,
         base: 'attendance-employee',
-      },
+      }),
       {
         label: 'Features',
         icon: 'layout-grid-add',
@@ -81,18 +81,6 @@ export const SidebarDataTest = [
             link: routes.users,
             base: 'users',
           },
-          {
-            label: 'Shift Management',
-            icon: 'layout-grid-add',
-            link: routes.shiftManagement,
-            base: 'ranches',
-          },
-          {
-            label: 'Departments',
-            icon: 'layout-grid-add',
-            link: routes.departments,
-            base: 'ranches',
-          },
         ],
       }
     ],
@@ -117,7 +105,7 @@ export const SidebarDataTest = [
             link: routes.payrollTemplate,
             base: 'ranches',
           },
-            {
+          {
             label: 'Holiday Group',
             icon: 'layout-grid-add',
             link: routes.holidayGroup,
@@ -128,7 +116,19 @@ export const SidebarDataTest = [
             icon: 'layout-grid-add',
             link: routes.leaveTemplate,
             base: 'ranches',
-          }
+          },
+          {
+            label: 'Shift Management',
+            icon: 'layout-grid-add',
+            link: routes.shiftManagement,
+            base: 'ranches',
+          },
+          {
+            label: 'Departments',
+            icon: 'layout-grid-add',
+            link: routes.departments,
+            base: 'ranches',
+          },
         ],
       }
     ],
