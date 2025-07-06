@@ -65,7 +65,7 @@ import axios, { RawAxiosRequestHeaders, AxiosRequestConfig } from "axios";
         return return_data;
     }
 
-    async function addEmployee(employeeCode, name, gender, status) {
+    export async function addEmployee(employeeCode, name, gender, status) {
         let return_data = {
             code: 0,
             message: "SOMETHING BROKEN",
@@ -118,7 +118,7 @@ import axios, { RawAxiosRequestHeaders, AxiosRequestConfig } from "axios";
         return return_data;
     }
 
-    async function deleteEmployee(employeeCode, serialNumber) {
+    export async function deleteEmployee(employeeCode, serialNumber) {
         let return_data = {
             code: 0,
             message: "SOMETHING BROKEN",

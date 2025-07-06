@@ -110,6 +110,8 @@ const addNewUser = async (req, res) => {
       educationalQualification,
     });
 
+    // await addEmployee(newUser.id, newUser.firstName + " " + newUser.lastName, newUser.gender, newUser.designation)
+
     return res.status(201).json({ message: "User added successfully", user: newUser });
 
   } catch (error) {
