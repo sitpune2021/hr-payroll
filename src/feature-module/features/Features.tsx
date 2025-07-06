@@ -10,7 +10,6 @@ import axiosClient from '../../axiosConfig/axiosClient'
 import { ADD_NEW_FEATURE, EDIT_FEATURE } from '../../axiosConfig/apis'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../core/data/redux/store'
-import { f } from 'react-router/dist/development/fog-of-war-Cm1iXIp7'
 import { Feature } from '../../core/data/redux/featureSlice'
 
 function Features() {
