@@ -43,11 +43,24 @@ const Users = () => {
     const [panCard, setPanCard] = useState<File | null>(null);
     const [educationalQulif, setEducationalQulif] = useState<File | null>(null);
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+    const [employeeSearch, setEmployeeSearch] = useState("");
 
+    const branchOptions = ['Branch 1', 'Branch 2', 'Branch 3', 'Branch 4']; // Dummy data
+    const departmentOptions = ['Department 1', 'Department 2', 'Department 3']; // Dummy data
+    const activeInactiveOptions = ['Yes', 'No'];   // Dummy Data
+    const shiftTimingOptions = ['9AM to 6PM', '6PM to 12AM', '12AM to 6AM']; // Dummy data
+    const [branch, setBranch] = useState<string[]>([]);
+    const [department, setDepartment] = useState<string[]>([]);
+    const [activeInactive, setActiveInactive] = useState<string[]>([]);
+    const [shiftTiming, setShiftTiming] = useState<string[]>([]);
 
-
-
-
+    const handleToggle = (option: any, group: any, setter: any, values: any) => {
+        if (values.includes(option)) {
+            setter(values.filter((v: any) => v !== option));
+        } else {
+            setter([...values, option]);
+        }
+    };
 
     const handleSortChange = (option: string) => {
         setSortOption(option);
@@ -600,8 +613,8 @@ const Users = () => {
                     {/* Breadcrumb */}
                     <div className="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
                         <div className="my-auto mb-2">
-                            <h2 className="mb-1">Users</h2>
-                            <nav>
+                            <h2 className="mb-1">Employee Master</h2>
+                            {/* <nav>
                                 <ol className="breadcrumb mb-0">
                                     <li className="breadcrumb-item">
                                         <Link to={all_routes.adminDashboard}>
@@ -613,10 +626,10 @@ const Users = () => {
                                         Users
                                     </li>
                                 </ol>
-                            </nav>
+                            </nav> */}
                         </div>
                         <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-                            <div className="me-2 mb-2">
+                            <div className="me-2">
                                 <div className="dropdown">
                                     <Link
                                         to="#"
@@ -672,11 +685,14 @@ const Users = () => {
                                         Add New Employee
                                     </Link>
                                 }
-
+                                <label className="btn btn-secondary d-flex align-items-center mb-0" style={{ backgroundColor: '#03C95A', border: 'none', outline: 'none' }}>
+                                    <i className="fa fa-chart-simple me-2" />
+                                    Organization Chart
+                                </label>
                             </div>
 
 
-                            <div className="head-icons ms-2">
+                            <div className="head-icons ms-2 mb-0">
                                 <CollapseHeader />
                             </div>
                         </div>
@@ -685,9 +701,9 @@ const Users = () => {
                     {/* Performance Indicator list */}
                     <div className="card">
                         <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-                            <h5>Users List</h5>
-                            <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-                                <div className='mx-3'>
+                            {/* <h5>Users List</h5> */}
+                            <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3 w-100">
+                                {/* <div className='mx-3'>
                                     <select
                                         className='form-control me-3'
                                         onChange={(e) => setLimit(parseInt(e.target.value))}
@@ -746,8 +762,22 @@ const Users = () => {
                                             ))
                                         }
                                     </ul>
+                                </div> */}
+
+
+                                <div className='d-flex align-items-center' style={{ minWidth: '50%' }}>
+                                    <div className='emp-search-bar' style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '6px', width: '100%' }}>
+                                        <i className='fas fa-search' style={{ padding: '0 0 0 12px' }}></i>
+                                        <input style={{ minWidth: "320px", border: 'none' }} type="text" value={employeeSearch} className="form-control me-2" placeholder="Search Employees..." onChange={(e) => setEmployeeSearch(e.target.value)} />
+                                        {employeeSearch && <i className='fas fa-times' style={{ padding: '0 20px 0 0', cursor: 'pointer' }} onClick={() => setEmployeeSearch("")}></i>}
+                                        <span style={{ borderLeft: '1px solid rgba(0, 0, 0, 0.8)', height: '30px' }}></span>
+                                        <div>
+                                            <i className='fas fa-sliders-h' style={{ padding: '0 15px', color: 'rgba(0, 0, 0, 0.5)', cursor: 'pointer' }} data-bs-toggle="modal" data-inert={true} data-bs-target="#search_filters"></i>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="dropdown me-3">
+
+                                <div className="dropdown me-3 ms-auto">
                                     <Link
                                         to="#"
                                         className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
@@ -928,6 +958,103 @@ const Users = () => {
                 </div>
             </div>
             {/* /Page Wrapper */}
+            {/* search filters popup */}
+            <div className="modal fade" id="search_filters">
+                <div className="modal-dialog modal-dialog-centered modal-md">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h4 className="modal-title">Apply Search Filters</h4>
+                            <button
+                                type="button"
+                                className="btn-close custom-btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            >
+                                <i className="ti ti-x" />
+                            </button>
+                        </div>
+
+                        {/* filters */}
+                        <div style={{ fontSize: '16px', color: 'rgba(0, 0, 0, 0.8)' }}>
+                            <div className='mb-2' style={{ padding: '10px 20px 0' }}>
+                                <div className='d-flex align-items-center justify-content-between mb-1'>
+                                    <label style={{ fontSize: '16px', color: 'black', fontWeight: '500' }}>Filter Branch</label>
+                                    <button onClick={() => branch.length === 0 ? setBranch([...branchOptions]) : setBranch([])} style={{ background: 'none', outline: 'none', border: 'none', padding: '0', margin: '0', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>{branch.length === 0 ? 'Select All' : 'Unselect All'}</button>
+                                </div>
+                                <div className='d-flex align-items-center flex-wrap'>
+                                    {branchOptions.map(option => (
+                                        <label key={option} className="checkbox-label d-flex align-items-center me-5 mb-1">
+                                            <input
+                                                type="checkbox"
+                                                checked={branch.includes(option)}
+                                                onChange={() => handleToggle(option, 'branch', setBranch, branch)}
+                                            />
+                                            <span className='ms-1'>{option}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className='mb-2' style={{ padding: '10px 20px 0' }}>
+                                <div className='d-flex align-items-center justify-content-between mb-1'>
+                                    <label style={{ fontSize: '16px', color: 'black', fontWeight: '500' }}>Filter Department</label>
+                                    <button onClick={() => department.length === 0 ? setDepartment([...departmentOptions]) : setDepartment([])} style={{ background: 'none', outline: 'none', border: 'none', padding: '0', margin: '0', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>{department.length === 0 ? 'Select All' : 'Unselect All'}</button>
+                                </div>
+                                <div className='d-flex align-items-center flex-wrap'>
+                                    {departmentOptions.map(option => (
+                                        <label key={option} className="checkbox-label  d-flex align-items-center me-5 mb-1">
+                                            <input
+                                                type="checkbox"
+                                                checked={department.includes(option)}
+                                                onChange={() => handleToggle(option, 'department', setDepartment, department)}
+                                            />
+                                            <span className='ms-1'>{option}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className='mb-2' style={{ padding: '10px 20px 0' }}>
+                                <div className='d-flex align-items-center justify-content-between mb-1'>
+                                    <label style={{ fontSize: '16px', color: 'black', fontWeight: '500' }}>Filter Active Status</label>
+                                    <button onClick={() => activeInactive.length === 0 ? setActiveInactive([...activeInactiveOptions]) : setActiveInactive([])} style={{ background: 'none', outline: 'none', border: 'none', padding: '0', margin: '0', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>{activeInactive.length === 0 ? 'Select All' : 'Unselect All'}</button>
+                                </div>
+                                <div className='d-flex align-items-center flex-wrap'>
+                                    {activeInactiveOptions.map(option => (
+                                        <label key={option} className="checkbox-label d-flex align-items-center me-5 mb-1">
+                                            <input
+                                                type="checkbox"
+                                                checked={activeInactive.includes(option)}
+                                                onChange={() => handleToggle(option, 'activeInactive', setActiveInactive, activeInactive)}
+                                            />
+                                            <span className='ms-1'>{option}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className='mb-2' style={{ padding: '10px 20px 0' }}>
+                                <div className='d-flex align-items-center justify-content-between mb-1'>
+                                    <label style={{ fontSize: '16px', color: 'black', fontWeight: '500' }}>Filter Shift Timing</label>
+                                    <button onClick={() => shiftTiming.length === 0 ? setShiftTiming([...shiftTimingOptions]) : setShiftTiming([])} style={{ background: 'none', outline: 'none', border: 'none', padding: '0', margin: '0', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>{shiftTiming.length === 0 ? 'Select All' : 'Unselect All'}</button>
+                                </div>
+                                <div className='d-flex align-items-center flex-wrap'>
+                                    {shiftTimingOptions.map(option => (
+                                        <label key={option} className="checkbox-label d-flex align-items-center me-5 mb-1">
+                                            <input
+                                                type="checkbox"
+                                                checked={shiftTiming.includes(option)}
+                                                onChange={() => handleToggle(option, 'shiftTiming', setShiftTiming, shiftTiming)}
+                                            />
+                                            <span className='ms-1'>{option}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {/* Add Users */}
             <div className="modal fade" id="add_users">
                 <div className="modal-dialog modal-dialog-centered modal-lg">
