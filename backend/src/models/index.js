@@ -10,7 +10,6 @@ import RolePermissionModel from './RolePermission.model.js';
 import PayrollTemplateModel from './PayrollTemplate.js';
 import PayrollComponentModel from './PayrollComponent.js';
 import AttendanceModel from './Attendance.js';
-import LeaveRequestModel from './LeaveRequest.js';
 import SalarySlipModel from './SalarySlip.js';
 import AttendanceSettingModel from './AttendanceSetting.js';
 import EmployeeShiftScheduleModel from './EmployeeShiftSchedule.js';
@@ -31,6 +30,8 @@ import { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER } from '../envvariables
 import WeeklyOffPatternModel from './WeeklyOffPattern.model.js';
 import HolidayModel from './Holiday.model.js';
 import HolidayGroupModel from './HolidayGroup.model.js';
+import UserLeaveQuotaModel from './UserLeaveQuota.model.js';
+import LeaveRecordModel from './LeaveRecord.model.js';
 
 // dotenv.config();
 
@@ -70,15 +71,15 @@ const models = {
   PayrollTemplate: PayrollTemplateModel(sequelize),
   PayrollComponent: PayrollComponentModel(sequelize),
   Attendance: AttendanceModel(sequelize),
-  LeaveRequest: LeaveRequestModel(sequelize),
   SalarySlip: SalarySlipModel(sequelize),
   AttendanceSetting: AttendanceSettingModel(sequelize),
   EmployeeShiftSchedule: EmployeeShiftScheduleModel(sequelize),
-
   LeaveTemplate: LeaveTemplateModel(sequelize),
   WeeklyOffPattern: WeeklyOffPatternModel(sequelize),
   HolidayGroup: HolidayGroupModel(sequelize),
   Holiday: HolidayModel(sequelize),
+  UserLeaveQuota: UserLeaveQuotaModel(sequelize),
+  LeaveRecord: LeaveRecordModel(sequelize),
 };
 
 // Function to seed roles

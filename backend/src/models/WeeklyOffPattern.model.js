@@ -8,7 +8,7 @@ export default (sequelize) => {
       autoIncrement: true,
       primaryKey: true,
     },
-    leaveTemplateId: {
+    leaveTemplateId: { 
       type: DataTypes.INTEGER,
       allowNull: false,
     },
