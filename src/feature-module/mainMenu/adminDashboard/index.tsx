@@ -11,6 +11,8 @@ import ProjectModals from "../../../core/modals/projectModal";
 import RequestModals from "../../../core/modals/requestModal";
 import TodoModal from "../../../core/modals/todoModal";
 import CollapseHeader from "../../../core/common/collapse-header/collapse-header";
+import CommonSelect from "../../../core/common/commonSelect";
+
 import { useSelector } from "react-redux";
 import { RootState } from "../../../core/data/redux/store";
 import axiosClient from "../../../axiosConfig/axiosClient";
@@ -329,12 +331,163 @@ const AdminDashboard = () => {
     setSemidonutOptions(options);
   }, []);
 
+  const todoItemList = [
+    {
+      label: "Today Birthday & Work Anniversary",
+      icon: "ti-cake",
+      color: "#e83e8c", // pinkish
+      value: 0,
+    },
+    {
+      label: "Announcement",
+      icon: "ti-speakerphone",
+      color: "#090a09",
+      value: 5,
+    },
+    {
+      label: "Pending Leave Request",
+      icon: "ti-login",
+      color: "#090a09", // teal
+      value: 8,
+    },
+    {
+      label: "Pending Payment Request",
+      icon: "ti-currency-rupee",
+      color: "#090a09", // yellow
+      value: 0,
+    },
+    {
+      label: "Miss Punch Request",
+      icon: "ti-logout",
+      color: "#dc3545", // red
+      value: 10,
+    },
+  ];
 
+  const attendanceRow1 = [
+    { label: "Total", value: 98, color: "#8000FF" },
+    { label: "Present", value: 89, color: "#00B050" },
+    { label: "Absent", value: 9, color: "#FF0000" },
+    { label: "Half Day", value: 0, color: "#FFC000" },
+  ];
 
+  const attendanceRow2 = [
+    { label: "Late Comers", value: 24, color: "#B266FF" },
+    { label: "Early Leaving", value: 1, color: "#00B0F0" },
+    { label: "On Break", value: 0, color: "#00FFFF" },
+    { label: "On Leave", value: 0, color: "#FFD966" },
+  ];
+
+  const paymentSummary = [
+    { label: "Old Balance", value: "-" },
+    { label: "Payable Salary", value: "₹12,94,728" },
+    { label: "Allowance & Bonus", value: "-" },
+    { label: "Deduction", value: "₹25,500" },
+    { label: "Net Payable", value: "₹12,69,228", highlight: true },
+  ];
+
+  const LoanList = [
+    { label: "Loan Given", value: "2,75,000" },
+    { label: "Loan Received", value: "₹4,74,800" },
+    { label: "Loan balance", value: "3,70,000" },
+  ];
+
+  const advancePaymentList = [
+    { label: "27/06/2025", value: "₹5,000" },
+    { label: "28/06/2025", value: "₹1,000" },
+    { label: "10/07/2025", value: "₹2,000" },
+  ];
+
+  const statutoryExpList = [
+    { label: "PF", value: "₹57,960" },
+    { label: "ESI", value: "₹10,000" },
+    { label: "PT", value: "₹25,070" },
+  ];
+
+  const branchOptions = [
+    { value: "all", label: "All" },
+    { value: "nanded", label: "Nanded Phata" },
+    { value: "vadgaon", label: "VADGAON" },
+  ];
+
+  const [selectedBranch, setSelectedBranch] = useState(branchOptions[0]);
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   return (
     <>
       {/* Page Wrapper */}
+
+      <div className="page-wrapper mt-2">
+        <div className="container mb-4">
+          {/* branch selection dropdown*/}
+          <div className="input-block w-100 d-flex align-items-center justify-content-flex-start gap-1" style={{ paddingLeft: 0, marginBottom: -10 }}>
+            <h6 style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>Branch:</h6>
+            <div style={{ width: "32%", borderColor: '#333' }}>
+              <CommonSelect
+                className="select"
+                options={branchOptions}
+                defaultValue={selectedBranch}
+              />
+            </div>
+          </div>
+
+          {/* row-1 attendance and Todo */}
+          <div className="row g-3 mt-2 align-items-stretch">
+            {/* Left Column - Attendance Card */}
+            <div className="col-lg-8 col-12">
+              <div className="p-3 bg-white rounded-3 shadow-sm d-flex flex-column justify-content-between h-100">
+                {/* Attendance Header */}
+                <div>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="d-flex align-items-center gap-2">
+                      <div
+                        style={{
+                          backgroundColor: "#f4f1ff",  // light purple background
+                          padding: "6px",              // adjust padding for better circle
+                          borderRadius: "50%",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <i
+                          className="ti ti-user"
+                          style={{ fontSize: "24px", color: "#333" }}
+                        ></i>
+                      </div>
+                      <div>
+                        <h6 className="mb-0" style={{ fontSize: "16px", color: "#333", }}>Attendance</h6>
+                        <small className="text-muted">
+                          Report Center
+                        </small>
+                      </div>
+                    </div>
+
+                    {/* Calendar Section */}
+                    <div
+                      className="d-flex align-items-center justify-content-between rounded px-2"
+                      style={{
+                        border: "1px solid #E0E0E0",
+                        backgroundColor: "#fff",
+                      }}
+                    >
+                      <i className="ti ti-chevron-left text-primary" style={{ fontSize: "18px" }}></i>
+
+                      <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className="form-control text-center"
+                        style={{
+                          border: "none",
+                          fontSize: "14px",
+                          color: "#333",
+                          width: "140px",
+                        }}
+                      />
+
+                      <i className="ti ti-chevron-right text-primary" style={{ fontSize: "18px" }}></i>
+
       <div className="page-wrapper">
         <div className="content">
           {/* Breadcrumb */}
@@ -489,9 +642,150 @@ const AdminDashboard = () => {
                           </h3>
                         </div>
                       </div>
+
                     </div>
 
                   </div>
+
+
+                  {/*Full-Width Bottom Border */}
+                  <div
+                    style={{
+                      margin: "0 -1rem", // cancels out the .p-3 padding
+                      borderBottom: "1px solid #eee",
+                    }}
+                  />
+
+                  {/* Attendance Summary */}
+                  <div className="row mt-4 px-3">
+                    {[
+                      { label: "Total", value: 101, color: "#8000FF" },
+                      { label: "Present", value: 87, color: "#00B050" },
+                      { label: "Absent", value: 14, color: "#FF0000" },
+                      { label: "Half Day", value: 0, color: "#FFC000" },
+                      { label: "Late Comers", value: 19, color: "#B266FF" },
+                      { label: "Early Leaving", value: 0, color: "#00B0F0" },
+                      { label: "On Break", value: 0, color: "#00FFFF" },
+                      { label: "On Leave", value: 0, color: "#FFD966" },
+                    ].map((item, index) => {
+                      const isLastColumn = index % 4 === 3;
+                      const isFirstRow = index < 4;
+
+                      return (
+                        <div
+                          key={index}
+                          className="col-6 col-md-3 py-3 px-3"
+                          style={{
+                            borderRight: isLastColumn ? "none" : "1px solid #ccc",
+                            borderBottom: isFirstRow ? "1px solid #ccc" : "none",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "14px",
+                              color: item.color,
+                              marginBottom: "1px",
+                              fontWeight: 400,
+                            }}
+                          >
+                            {item.label}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "38px",
+                              fontWeight: 600,
+                              color: item.color,
+                            }}
+                          >
+                            {item.value}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/*Full-Width Bottom Border */}
+                <div
+                  style={{
+                    margin: "0 -1rem", // cancels out the .p-3 padding
+                    marginTop: '2.7%',
+                    borderBottom: "1px solid #eee",
+                  }}
+                />
+                {/* Footer */}
+                <div className="text-end mt-3">
+                  <a
+                    href="#"
+                    className="text-primary"
+                    style={{ fontWeight: 500, fontSize: "16px" }}
+                  >
+                    Detailed Attendance View &nbsp;
+                    <i className="ti ti-arrow-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - To Do */}
+            <div className="col-lg-4 col-12">
+              <div className="p-3 bg-white justify-content-between rounded-3 shadow-sm h-100">
+                <div className="d-flex align-items-center gap-2 mb-3">
+                  <div
+                    style={{
+                      backgroundColor: "#f4f1ff",  // light purple background
+                      padding: "8px",              // adjust padding for better circle
+                      borderRadius: "50%",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <i
+                      className="ti ti-gift"
+                      style={{ fontSize: "24px", color: "#6f42c1" }}
+                    ></i>
+                  </div>
+                  <div>
+                    <h6 className="mb-0" style={{ fontSize: "16px", color: "#333", }}>To Do</h6>
+                    <small className="text-muted">Today Work</small>
+                  </div>
+                </div>
+                {/*Full-Width Bottom Border */}
+                <div
+                  style={{
+                    margin: "0 -1rem", // cancels out the .p-3 padding
+                    borderBottom: "1px solid #eee",
+                  }}
+                />
+                <ul className="list-unstyled mb-0">
+                  {todoItemList.map((item, index) => (
+                    <li
+                      key={index}
+                      className="py-3"
+                      style={{
+                        borderBottom: "1px solid #eee",
+                        margin: "0 -1rem", // cancels out the .p-3 padding
+                      }}
+                    >
+                      <div className="px-3 d-flex flex-row justify-content-between align-items-center">
+                        <div className="d-flex align-items-center gap-2 ">
+                          <i
+                            className={`ti ${item.icon}`}
+                            style={{ fontSize: "18px", color: item.color }}
+                          ></i>
+                          <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                            {item.label}
+                          </span>
+                        </div>
+                        <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                          {item.value}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
                 </div>
                 <div className="col-md-3 d-flex">
                   <div className="card flex-fill">
@@ -608,127 +902,169 @@ const AdminDashboard = () => {
 
                   </div>
                 </div>
+
               </div>
             </div>
-            {/* /Widget Info */}
           </div>
-          <div className="row">
-            {/* Attendance Overview */}
-            <div className="col-xxl-4 col-xl-6 d-flex">
-              <div className="card flex-fill">
-                <div className="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                  <h5 className="mb-2">Attendance Overview</h5>
-                  <div className="dropdown mb-2">
-                    <Link to="#"
-                      className="btn btn-white border btn-sm d-inline-flex align-items-center"
-                      data-bs-toggle="dropdown"
+
+          {/* row-2 Payment and Loan Style Cards */}
+          <div className="row g-3 mt-2 align-items-stretch">
+            {/* Payment Card */}
+            <div className="col-lg-6 col-12">
+              <div className="bg-white rounded-3 shadow-sm p-3 d-flex flex-column justify-content-between h-100">
+
+                {/* Payment Card - Header */}
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <div className="d-flex align-items-center gap-2">
+                    <div
+                      style={{
+                        backgroundColor: "#f4f1ff",  // light purple background
+                        padding: "8px",              // adjust padding for better circle
+                        borderRadius: "50%",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                     >
-                      <i className="ti ti-calendar me-1" />
-                      Today
-                    </Link>
-                    <ul className="dropdown-menu  dropdown-menu-end p-3">
-                      <li>
-                        <Link to="#"
-                          className="dropdown-item rounded-1"
-                        >
-                          This Month
-                        </Link>
-                      </li>
-                      <li>
-                        <Link to="#"
-                          className="dropdown-item rounded-1"
-                        >
-                          This Week
-                        </Link>
-                      </li>
-                      <li>
-                        <Link to="#"
-                          className="dropdown-item rounded-1"
-                        >
-                          Today
-                        </Link>
-                      </li>
-                    </ul>
+                      <i
+                        className="ti ti-wallet"
+                        style={{ fontSize: "24px", color: "#333" }} // adjust icon size & color
+                      ></i>
+                    </div>
+
+                    <div>
+                      <h6 className="mb-0" style={{ fontSize: "16px", color: "#333", }}>Payment</h6>
+                      <small className="text-muted">
+                        Staff Payment Summary
+                      </small>
+                    </div>
+                  </div>
+                  <div className="d-flex gap-2">
+                    <select
+                      className="form-select form-select-sm"
+                      style={{ width: "100%" }}
+                    >
+                      <option>Monthly</option>
+                      <option>Yearly</option>
+                    </select>
+                    <select
+                      className="form-select form-select-sm"
+                      style={{ width: "100%" }}
+                    >
+                      <option>2025 Jun</option>
+                      <option>2025 May</option>
+                    </select>
                   </div>
                 </div>
-                <div className="card-body">
-                  <div className="chartjs-wrapper-demo position-relative mb-4">
-                    <Chart type="doughnut" data={chartData} options={chartOptions} className="w-full attendence-chart md:w-30rem" />
-                    <div className="position-absolute text-center attendance-canvas">
-                      <p className="fs-13 mb-1">Total Attendance</p>
-                      <h3>120</h3>
-                    </div>
-                  </div>
-                  <h6 className="mb-3">Status</h6>
-                  <div className="d-flex align-items-center justify-content-between">
-                    <p className="f-13 mb-2">
-                      <i className="ti ti-circle-filled text-success me-1" />
-                      Present
-                    </p>
-                    <p className="f-13 fw-medium text-gray-9 mb-2">59%</p>
-                  </div>
-                  <div className="d-flex align-items-center justify-content-between">
-                    <p className="f-13 mb-2">
-                      <i className="ti ti-circle-filled text-secondary me-1" />
-                      Late
-                    </p>
-                    <p className="f-13 fw-medium text-gray-9 mb-2">21%</p>
-                  </div>
-                  <div className="d-flex align-items-center justify-content-between">
-                    <p className="f-13 mb-2">
-                      <i className="ti ti-circle-filled text-warning me-1" />
-                      Permission
-                    </p>
-                    <p className="f-13 fw-medium text-gray-9 mb-2">2%</p>
-                  </div>
-                  <div className="d-flex align-items-center justify-content-between mb-2">
-                    <p className="f-13 mb-2">
-                      <i className="ti ti-circle-filled text-danger me-1" />
-                      Absent
-                    </p>
-                    <p className="f-13 fw-medium text-gray-9 mb-2">15%</p>
-                  </div>
-                  <div className="bg-light br-5 box-shadow-xs p-2 pb-0 d-flex align-items-center justify-content-between flex-wrap">
-                    <div className="d-flex align-items-center">
-                      <p className="mb-2 me-2">Total Absenties</p>
-                      <div className="avatar-list-stacked avatar-group-sm mb-2">
-                        <span className="avatar avatar-rounded">
-                          <ImageWithBasePath
-                            className="border border-white"
-                            src="assets/img/profiles/avatar-27.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        <span className="avatar avatar-rounded">
-                          <ImageWithBasePath
-                            className="border border-white"
-                            src="assets/img/profiles/avatar-30.jpg"
-                            alt="img"
-                          />
-                        </span>
-                        <span className="avatar avatar-rounded">
-                          <ImageWithBasePath src="assets/img/profiles/avatar-14.jpg" alt="img" />
-                        </span>
-                        <span className="avatar avatar-rounded">
-                          <ImageWithBasePath src="assets/img/profiles/avatar-29.jpg" alt="img" />
-                        </span>
-                        <Link
-                          className="avatar bg-primary avatar-rounded text-fixed-white fs-10"
-                          to="#"
-                        >
-                          +1
-                        </Link>
-                      </div>
-                    </div>
-                    <Link to="leaves.html"
-                      className="fs-13 link-primary text-decoration-underline mb-2"
+
+                {/*Full-Width Bottom Border */}
+                <div
+                  style={{
+                    margin: "0 -1rem", // cancels out the .p-3 padding
+                    borderBottom: "1px solid #eee",
+                  }}
+                />
+                {/* Summary List */}
+                <ul className="list-unstyled mb-2 border-bottom">
+                  {paymentSummary.map((item, index) => (
+                    <li
+                      key={index}
+                      className={`${index !== paymentSummary.length - 1 ? 'border-bottom' : ''}`}
+                      style={{
+                        ...(item.highlight ? { backgroundColor: "#f4f1ff" } : {}),
+                        borderBottom: "1px solid #eee",
+                        margin: "0 -1rem", // expands full width under padding
+                      }}
                     >
-                      View Details
-                    </Link>
-                  </div>
+                      <div className="d-flex justify-content-between py-2 px-3">
+                        <span style={{ ...(item.highlight ? { fontWeight: 600 } : {}), color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                          {item.label}
+                        </span>
+                        <span style={{ ...(item.highlight ? { fontWeight: 600 } : {}), color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                          {item.value}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Footer */}
+                <div className="text-end mt-2">
+                  <a
+                    href="#"
+                    className="text-primary"
+                    style={{ fontSize: "14px" }}
+                  >
+                    View Details <i className="ti ti-arrow-right"></i>
+                  </a>
                 </div>
               </div>
             </div>
+
+
+            {/* Loan Card */}
+            <div className="col-lg-6 col-12">
+              <div className="bg-white rounded-3 shadow-sm p-3 d-flex flex-column justify-content-between h-100">
+                <div className="d-flex align-items-center gap-2">
+                  <div
+                    style={{
+                      backgroundColor: "#f4f1ff",  // light purple background
+                      padding: "8px",              // adjust padding for better circle
+                      borderRadius: "50%",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <i
+                      className="ti ti-building-bank"
+                      style={{ fontSize: "24px", color: "#333" }}
+                    ></i>
+                  </div>
+                  <div>
+                    <h6 className="mb-0" style={{ fontSize: "16px", color: "#333", }}>Loan</h6>
+                    <small className="text-muted">Summary of Loan</small>
+                  </div>
+                </div>
+                {/*Full-Width Bottom Border */}
+                <div
+                  style={{
+                    margin: "0 -1rem", // cancels out the .p-3 padding
+                    borderBottom: "1px solid #eee",
+                  }}
+                />
+                {/*loan item List */}
+                <ul className="list-unstyled mb-2 border-bottom">
+                  {LoanList.map((item, index) => (
+                    <li
+                      key={index}
+                      style={{
+                        borderBottom: "1px solid #eee",
+                        margin: "0 -1rem", // expands full width under padding
+                      }}
+                    >
+                      <div className="d-flex justify-content-between py-3 px-3">
+                        <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                          {item.label}
+                        </span>
+                        <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                          {item.value}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Footer */}
+                <div className="text-end mt-1">
+                  <a
+                    href="#"
+                    className="text-primary"
+                    style={{ fontSize: "14px" }}
+                  >
+                    View Details <i className="ti ti-arrow-right"></i>
+                  </a>
+
             {/* /Attendance Overview */}
             {/* Clock-In/Out */}
             <div className="col-xxl-4 col-xl-6 d-flex">
@@ -818,307 +1154,173 @@ const AdminDashboard = () => {
                   ) : (
                     <p className="text-muted">No leave records found.</p>
                   )}
+
                 </div>
               </div>
             </div>
-            {/* /Clock-In/Out */}
           </div>
-          <div className="row">
-            {/* Employees */}
-            <div className="col-xxl-4 col-xl-6 d-flex">
-              <div className="card flex-fill">
-                <div className="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                  <h5 className="mb-2">Employees</h5>
-                  <Link to="employees.html" className="btn btn-light btn-md mb-2">
-                    View All
-                  </Link>
-                </div>
-                <div className="card-body p-0">
-                  <div className="table-responsive">
-                    <table className="table table-nowrap mb-0">
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Department</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <Link to="#" className="avatar">
-                                <ImageWithBasePath
-                                  src="assets/img/users/user-32.jpg"
-                                  className="img-fluid rounded-circle"
-                                  alt="img"
-                                />
-                              </Link>
-                              <div className="ms-2">
-                                <h6 className="fw-medium">
-                                  <Link to="#">Anthony Lewis</Link>
-                                </h6>
-                                <span className="fs-12">Finance</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="badge badge-secondary-transparent badge-xs">
-                              Finance
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <Link to="#" className="avatar">
-                                <ImageWithBasePath
-                                  src="assets/img/users/user-09.jpg"
-                                  className="img-fluid rounded-circle"
-                                  alt="img"
-                                />
-                              </Link>
-                              <div className="ms-2">
-                                <h6 className="fw-medium">
-                                  <Link to="#">Brian Villalobos</Link>
-                                </h6>
-                                <span className="fs-12">PHP Developer</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="badge badge-danger-transparent badge-xs">
-                              Development
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <Link to="#" className="avatar">
-                                <ImageWithBasePath
-                                  src="assets/img/users/user-01.jpg"
-                                  className="img-fluid rounded-circle"
-                                  alt="img"
-                                />
-                              </Link>
-                              <div className="ms-2">
-                                <h6 className="fw-medium">
-                                  <Link to="#">Stephan Peralt</Link>
-                                </h6>
-                                <span className="fs-12">Executive</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="badge badge-info-transparent badge-xs">
-                              Marketing
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <Link to="#" className="avatar">
-                                <ImageWithBasePath
-                                  src="assets/img/users/user-34.jpg"
-                                  className="img-fluid rounded-circle"
-                                  alt="img"
-                                />
-                              </Link>
-                              <div className="ms-2">
-                                <h6 className="fw-medium">
-                                  <Link to="#">Doglas Martini</Link>
-                                </h6>
-                                <span className="fs-12">Project Manager</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <span className="badge badge-purple-transparent badge-xs">
-                              Manager
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="border-0">
-                            <div className="d-flex align-items-center">
-                              <Link to="#" className="avatar">
-                                <ImageWithBasePath
-                                  src="assets/img/users/user-37.jpg"
-                                  className="img-fluid rounded-circle"
-                                  alt="img"
-                                />
-                              </Link>
-                              <div className="ms-2">
-                                <h6 className="fw-medium">
-                                  <Link to="#">Anthony Lewis</Link>
-                                </h6>
-                                <span className="fs-12">UI/UX Designer</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="border-0">
-                            <span className="badge badge-pink-transparent badge-xs">
-                              UI/UX Design
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* /Employees */}
-            {/* Todo */}
-            <div className="col-xxl-4 col-xl-6 d-flex">
-              <div className="card flex-fill">
-                <div className="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                  <h5 className="mb-2">Todo</h5>
-                  <div className="d-flex align-items-center">
-                    <div className="dropdown mb-2 me-2">
-                      <Link
-                        to="#"
-                        className="btn btn-white border btn-sm d-inline-flex align-items-center"
-                        data-bs-toggle="dropdown"
+
+          {/* row-3 Advance Payment and Statutory Expenses */}
+          <div className="row g-3 mt-2 align-items-stretch">
+            {/* Advance Payment Card */}
+            <div className="col-lg-6 col-12">
+              <div className="bg-white rounded-3 shadow-sm p-3 d-flex flex-column justify-content-between h-100">
+                <div>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="d-flex align-items-center gap-2">
+                      <div
+                        style={{
+                          backgroundColor: "#f4f1ff",  // light purple background
+                          padding: "8px",              // adjust padding for better circle
+                          borderRadius: "50%",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
                       >
-                        <i className="ti ti-calendar me-1" />
-                        Today
-                      </Link>
-                      <ul className="dropdown-menu  dropdown-menu-end p-3">
-                        <li>
-                          <Link to="#"
-                            className="dropdown-item rounded-1"
-                          >
-                            This Month
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="#"
-                            className="dropdown-item rounded-1"
-                          >
-                            This Week
-                          </Link>
-                        </li>
-                        <li>
-                          <Link to="#"
-                            className="dropdown-item rounded-1"
-                          >
-                            Today
-                          </Link>
-                        </li>
-                      </ul>
+                        <i
+                          className="ti ti-currency-rupee"
+                          style={{ fontSize: "24px", color: "#333" }}
+                        ></i>
+                      </div>
+                      <div>
+                        <h6 className="mb-0" style={{ fontSize: "16px", color: "#333", }}>Advance Payment</h6>
+                        <small className="text-muted">
+                          Summary of Advances
+                        </small>
+                      </div>
                     </div>
-                    <Link to="#"
-                      className="btn btn-primary btn-icon btn-xs rounded-circle d-flex align-items-center justify-content-center p-0 mb-2"
-                      data-bs-toggle="modal" data-inert={true}
-                      data-bs-target="#add_todo"
+                    <select
+                      className="form-select form-select-sm"
+                      style={{ width: "120px" }}
                     >
-                      <i className="ti ti-plus fs-16" />
-                    </Link>
+                      <option>2025 Jun</option>
+                      <option>2025 May</option>
+                    </select>
                   </div>
+                  {/*Full-Width Bottom Border */}
+                  <div
+                    style={{
+                      margin: "0 -1rem", // cancels out the .p-3 padding
+                      borderBottom: "1px solid #eee",
+                    }}
+                  />
+                  {/* Table of dates and amounts */}
+                  <ul className="list-unstyled mb-2 border-bottom">
+                    {advancePaymentList.map((item, index) => (
+                      <li
+                        key={index}
+                        style={{
+                          borderBottom: "1px solid #eee",
+                          margin: "0 -1rem", // expands full width under padding
+                        }}
+                      >
+                        <div className="d-flex justify-content-between py-3 px-3">
+                          <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                            {item.label}
+                          </span>
+                          <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                            {item.value}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="card-body">
-                  <div className={`d-flex align-items-center todo-item border p-2 br-5 mb-2 ${isTodo[0] ? 'todo-strike' : ''}`}>
-                    <i className="ti ti-grid-dots me-2" />
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="todo1"
-                        onChange={() => toggleTodo(0)}
-                      />
-                      <label className="form-check-label fw-medium" htmlFor="todo1">
-                        Add Holidays
-                      </label>
-                    </div>
-                  </div>
-                  <div className={`d-flex align-items-center todo-item border p-2 br-5 mb-2 ${isTodo[1] ? 'todo-strike' : ''}`}>
-                    <i className="ti ti-grid-dots me-2" />
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="todo2"
-                        onChange={() => toggleTodo(1)}
-                      />
-                      <label className="form-check-label fw-medium" htmlFor="todo2">
-                        Add Meeting to Client
-                      </label>
-                    </div>
-                  </div>
-                  <div className={`d-flex align-items-center todo-item border p-2 br-5 mb-2 ${isTodo[2] ? 'todo-strike' : ''}`}>
-                    <i className="ti ti-grid-dots me-2" />
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="todo3"
-                        onChange={() => toggleTodo(2)}
-                      />
-                      <label className="form-check-label fw-medium" htmlFor="todo3">
-                        Chat with Adrian
-                      </label>
-                    </div>
-                  </div>
-                  <div className={`d-flex align-items-center todo-item border p-2 br-5 mb-2 ${isTodo[3] ? 'todo-strike' : ''}`}>
-                    <i className="ti ti-grid-dots me-2" />
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="todo4"
-                        onChange={() => toggleTodo(3)}
-                      />
-                      <label className="form-check-label fw-medium" htmlFor="todo4">
-                        Management Call
-                      </label>
-                    </div>
-                  </div>
-                  <div className={`d-flex align-items-center todo-item border p-2 br-5 mb-2 ${isTodo[4] ? 'todo-strike' : ''}`}>
-                    <i className="ti ti-grid-dots me-2" />
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="todo5"
-                        onChange={() => toggleTodo(4)}
-                      />
-                      <label className="form-check-label fw-medium" htmlFor="todo5">
-                        Add Payroll
-                      </label>
-                    </div>
-                  </div>
-                  <div className={`d-flex align-items-center todo-item border p-2 br-5 mb-2 ${isTodo[5] ? 'todo-strike' : ''}`}>
-                    <i className="ti ti-grid-dots me-2" />
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="todo6"
-                        onChange={() => toggleTodo(5)}
-                      />
-                      <label className="form-check-label fw-medium" htmlFor="todo6">
-                        Add Policy for Increment{" "}
-                      </label>
-                    </div>
-                  </div>
+
+                {/* Footer */}
+                <div className="text-end mt-2">
+                  <a
+                    href="#"
+                    className="text-primary"
+                    style={{ fontSize: "14px" }}
+                  >
+                    View Details <i className="ti ti-arrow-right"></i>
+                  </a>
                 </div>
               </div>
             </div>
-            {/* /Todo */}
+
+            {/* Statutory Expenses Card */}
+            <div className="col-lg-6 col-12">
+              <div className="bg-white rounded-3 shadow-sm p-3 d-flex flex-column justify-content-between h-100">
+                <div>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="d-flex align-items-center gap-2">
+                      <div
+                        style={{
+                          backgroundColor: "#f4f1ff",  // light purple background
+                          padding: "8px",              // adjust padding for better circle
+                          borderRadius: "50%",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <i
+                          className="ti ti-receipt-tax"
+                          style={{ fontSize: "24px", color: "#333" }}
+                        ></i>
+                      </div>
+                      <div>
+                        <h6 className="mb-0" style={{ fontSize: "16px", color: "#333", }}>Statutory Expenses</h6>
+                        <small className="text-muted">Duties & Taxes</small>
+                      </div>
+                    </div>
+                    <select
+                      className="form-select form-select-sm"
+                      style={{ width: "120px" }}
+                    >
+                      <option>2025 Jun</option>
+                      <option>2025 May</option>
+                    </select>
+                  </div>
+                  {/*Full-Width Bottom Border */}
+                  <div
+                    style={{
+                      margin: "0 -1rem", // cancels out the .p-3 padding
+                      borderBottom: "1px solid #eee",
+                    }}
+                  />
+                  {/* Expense List */}
+                  <ul className="list-unstyled mb-2 border-bottom">
+                    {statutoryExpList.map((item, index) => (
+                      <li
+                        key={index}
+                        style={{
+                          borderBottom: "1px solid #eee",
+                          margin: "0 -1rem", // expands full width under padding
+                        }}
+                      >
+                        <div className="d-flex justify-content-between py-3 px-3">
+                          <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                            {item.label}
+                          </span>
+                          <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
+                            {item.value}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Footer */}
+                <div className="text-end mt-2">
+                  <a
+                    href="#"
+                    className="text-primary"
+                    style={{ fontSize: "14px" }}
+                  >
+                    View Details <i className="ti ti-arrow-right"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="footer d-sm-flex align-items-center justify-content-between border-top bg-white p-3">
-          <p className="mb-0">2014 - 2025 © SmartHR.</p>
-          <p>
-            Designed &amp; Developed By{" "}
-            <Link to="#" className="text-primary">
-              Dreams
-            </Link>
-          </p>
         </div>
       </div>
+
       {/* /Page Wrapper */}
       <ProjectModals />
       <RequestModals />

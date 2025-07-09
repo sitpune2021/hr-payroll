@@ -63,16 +63,16 @@ button {
         }
     }
     &.btn-primary {
-        background-color: $primary-900;
-        border: 1px solid $primary-900;
+        background-color: $primary;
+        border: 1px solid $primary;
         color: $white;
         &:hover,
         &:focus,
         &.focus,
         &:active,
         &.active {
-            background-color: darken($primary-900, 7%);
-            border: 1px solid darken($primary-900, 7%);
+            background-color: darken($primary, 7%);
+            border: 1px solid darken($primary, 7%);
             color: $white;
         }
     }
