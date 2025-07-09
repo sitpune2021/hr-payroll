@@ -96,9 +96,6 @@ const addNewUser = async (req, res) => {
 
     const currentYear = new Date().getFullYear();
 
-
-    // await addEmployee(newUser.id, newUser.firstName + " " + newUser.lastName, newUser.gender, newUser.designation)
-
     await UserLeaveQuota.create({
       userId: newUser.id,
       paidLeavesTaken: 0,
@@ -109,7 +106,6 @@ const addNewUser = async (req, res) => {
     }, { transaction });
 
     await transaction.commit();
-
     return res.status(201).json({ message: "User added successfully", user: newUser });
 
   } catch (error) {

@@ -31,7 +31,6 @@ export default (sequelize) => {
     branchLogoFileName: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: ''
     },
     bankDetailsFileName: {
       type: DataTypes.STRING,
