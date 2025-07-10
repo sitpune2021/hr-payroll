@@ -88,6 +88,10 @@ const models = {
 // Authenticate and seed roles
 await sequelize.authenticate();
 console.log('Database connected successfully.');
+console.log(`✅ Connected to database: ${DB_NAME}`);
+console.log(`✅ DB Host: ${DB_HOST}`);
+console.log(`✅ DB Port: ${DB_PORT || 5432}`);
+console.log(`✅ DB User: ${DB_USER}`);
 
 await sequelize.sync({alter:true});
 // console.log('Database synchronized successfully.');
