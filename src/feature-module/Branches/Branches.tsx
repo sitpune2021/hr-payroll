@@ -133,12 +133,12 @@ const Branches = () => {
             }
         }
 
-        if (branchList.length > 0) {
+        if (branchList.length > 0 && user?.companyId) {
             const loggedUsersBranches = branchList.filter(
                 (branch) => branch.companyId === user?.companyId
             );
 
-            if (loggedUsersBranches.length > 0) {
+            if (user.companyId) {
                 setAllBranches(loggedUsersBranches);
             } else {
                 setAllBranches(getSortedFilteredData());
