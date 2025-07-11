@@ -5,6 +5,7 @@ import path from 'path';
 import models from "../models/index.js";
 import { processPunch } from '../utils/punchProcessor.js';
 import { getAttendanceSummary } from '../utils/GetAttendanceSummary.js';
+import { getAttendanceLogs } from '../utils/getAttendanceLogs.js';
 
 const { Attendance, AttendanceSetting, User, EmployeeShiftSchedule } = models;
 
@@ -273,6 +274,25 @@ const getUserAttendanceSummaryOFUserByStartEndDateAndUserID = async (req, res) =
   }
 };
 
+const getUserAttendanceLogsByStartEndDate = async (req, res) => {
+  try {
+    const { userId, startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: "startDate and endDate are required" });
+    }
+
+    const logs = await getAttendanceLogs(userId, startDate, endDate);
+
+    return res.status(200).json({
+      success: true,
+      data: logs,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 
-export { markNewAttendance, uploadAttendanceFile, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID };
+
+export { markNewAttendance, uploadAttendanceFile, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUserAttendanceLogsByStartEndDate };

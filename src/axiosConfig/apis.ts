@@ -52,6 +52,14 @@ export const FETCH_USER_LEAVE_STATS  =  "/api/leaveRecord/fetchusersLeaverecords
 
 export const FETCH_COMPANYS_LEAVE_RECORDS  =  "/api/leaveRecord/fetchCompanyLeaverecord"
 
+export const FETCH_ATTENDANCE_LOGS_USER  =  "/api/attendance/attendanceLogsByUserIDStartDtEndDt"
+
+export const FETCH_ATTENDANCE_SUMMARY_USER  =  "/api/attendance/userAttendanceDetailsStartDateEndDateUserID"
+
+
+
+
+
 
 
 
