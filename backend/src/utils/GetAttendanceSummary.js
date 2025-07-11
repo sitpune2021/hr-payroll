@@ -17,28 +17,38 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
     if (!user) throw new Error('User not found');
     console.log('User found:', user.toJSON());
 
-    const leaveTemplate = await LeaveTemplate.findByPk(user.leaveTemplateId);
-    if (!leaveTemplate) throw new Error('Leave Template not found');
-    console.log('Leave Template:', leaveTemplate.toJSON());
+    let weeklyOffs = [];
+    let holidayDates = [];
 
-    const weeklyOffs = await WeeklyOffPattern.findAll({
-        where: {
-            leaveTemplateId: leaveTemplate.id,
-            isActive: true,
-        },
-    });
-    console.log('Weekly Offs:', weeklyOffs.map(w => w.toJSON()));
+    if (user.leaveTemplateId) {
+        const leaveTemplate = await LeaveTemplate.findByPk(user.leaveTemplateId);
+        if (leaveTemplate) {
+            console.log('Leave Template:', leaveTemplate.toJSON());
 
-    const holidays = await Holiday.findAll({
-        where: {
-            holidayGroupId: leaveTemplate.holidayGroupId,
-            holidayDate: {
-                [Op.between]: [startDate, endDate],
-            },
-        },
-    });
-    const holidayDates = holidays.map(h => h.holidayDate.toString());
-    console.log('Holidays:', holidayDates);
+            weeklyOffs = await WeeklyOffPattern.findAll({
+                where: {
+                    leaveTemplateId: leaveTemplate.id,
+                    isActive: true,
+                },
+            });
+            console.log('Weekly Offs:', weeklyOffs.map(w => w.toJSON()));
+
+            const holidays = await Holiday.findAll({
+                where: {
+                    holidayGroupId: leaveTemplate.holidayGroupId,
+                    holidayDate: {
+                        [Op.between]: [startDate, endDate],
+                    },
+                },
+            });
+            holidayDates = holidays.map(h => h.holidayDate.toISOString().split('T')[0]);
+            console.log('Holidays:', holidayDates);
+        } else {
+            console.log(`Leave Template ID ${user.leaveTemplateId} not found → ignoring leave template.`);
+        }
+    } else {
+        console.log(`User ${userId} does not have leaveTemplateId → skipping weekly offs & holidays.`);
+    }
 
     const attendanceRecords = await Attendance.findAll({
         where: {
@@ -49,7 +59,12 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
         },
     });
     const attendanceMap = Object.fromEntries(
-        attendanceRecords.map(a => [a.date.toString(), a])
+        attendanceRecords.map(a => {
+            const dateStr = typeof a.date === 'string'
+                ? a.date
+                : new Date(a.date).toISOString().split('T')[0];
+            return [dateStr, a];
+        })
     );
     console.log('Attendance Records:', attendanceRecords.map(a => a.toJSON()));
 
@@ -85,9 +100,6 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
         }
     }
 
-    console.log('Paid Leave Dates:', Array.from(paidLeaveDates));
-    console.log('Unpaid Leave Dates:', Array.from(unpaidLeaveDates));
-
     const getDateArray = (start, end) => {
         const arr = [];
         const dt = new Date(start);
@@ -100,20 +112,18 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
 
     const getWeekNumberOfMonth = (date) => {
         const first = new Date(date.getFullYear(), date.getMonth(), 1);
-        const dayOffset = first.getDay(); // Sunday = 0
+        const dayOffset = first.getDay();
         return Math.floor((date.getDate() + dayOffset - 1) / 7) + 1;
     };
 
     const isWeeklyOff = (date, patterns) => {
-        const dow = date.getDay(); // Sunday = 0
+        if (!patterns.length) return false;
+        const dow = date.getDay();
         const weekNum = getWeekNumberOfMonth(date);
         for (const off of patterns) {
             if (off.dayOfWeek !== dow) continue;
             if (off.isFixed) return true;
-            if (
-                off.isAlternate &&
-                off.weekNumbers?.split(',').map(Number).includes(weekNum)
-            ) {
+            if (off.isAlternate && off.weekNumbers?.split(',').map(Number).includes(weekNum)) {
                 return true;
             }
         }
@@ -121,13 +131,11 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
     };
 
     const allDates = getDateArray(startDate, endDate);
-    console.log('Date Range:', allDates.map(d => d.toISOString().split('T')[0]));
-
     const stats = {
         totalDays: allDates.length,
         workingDays: 0,
         presentDays: 0,
-        halfDayCount:0,
+        halfDayCount: 0,
         paidLeaveDays: 0,
         unpaidLeaveDays: 0,
         holidays: 0,
@@ -139,58 +147,36 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
 
     for (const d of allDates) {
         const dateStr = d.toISOString().split('T')[0];
-        console.log(`Processing ${dateStr}...`);
-
         if (holidayDates.includes(dateStr)) {
             stats.holidays++;
-            console.log('→ Holiday');
         } else if (isWeeklyOff(d, weeklyOffs)) {
             stats.weeklyOffs++;
-            console.log('→ Weekly Off');
         } else {
             stats.workingDays++;
             if (paidLeaveDates.has(dateStr)) {
                 stats.paidLeaveDays++;
-                console.log('→ Paid Leave');
             } else if (unpaidLeaveDates.has(dateStr)) {
                 stats.unpaidLeaveDays++;
-                console.log('→ Unpaid Leave');
             } else {
                 const att = attendanceMap[dateStr];
-
                 if (att?.status === 'Present' || att?.status === 'Unscheduled') {
                     stats.presentDays++;
-                    const hours = parseFloat(att.workingHours || 0);
-                    const hoursOt = parseFloat(att.overtimeHours || 0);
-                    stats.totalHoursWorked += hours;
-                    stats.totalOvertimeWorked += hoursOt;
-                    console.log(`→ Present (${hours} hours)`);
-
+                    stats.totalHoursWorked += parseFloat(att.workingHours || 0);
+                    stats.totalOvertimeWorked += parseFloat(att.overtimeHours || 0);
                 } else if (att?.status === 'Half-Day') {
-                    stats.halfDayCount++;  // ✅ Count half-day separately
-                    stats.presentDays += 0.5;  // ✅ Optional: Add to overall presence if required
-                    const hours = parseFloat(att.workingHours || 0);
-                    const hoursOt = parseFloat(att.overtimeHours || 0);
-                    stats.totalHoursWorked += hours;
-                    stats.totalOvertimeWorked += hoursOt;
-                    console.log(`→ Half-Day (${hours} hours)`);
-
-                } else if (att?.checkIn && !att?.checkOut) {
-                    stats.halfDayCount++;  // ✅ Consider check-in only as half-day too
+                    stats.halfDayCount++;
                     stats.presentDays += 0.5;
-                    console.log('→ Check-in only (treated as Half-Day)');
-
+                    stats.totalHoursWorked += parseFloat(att.workingHours || 0);
+                    stats.totalOvertimeWorked += parseFloat(att.overtimeHours || 0);
+                } else if (att?.checkIn && !att?.checkOut) {
+                    stats.halfDayCount++;
+                    stats.presentDays += 0.5;
                 } else {
                     stats.absentDays++;
-                    console.log('→ Absent');
                 }
-
-
             }
         }
     }
-
-    console.log('Final Stats:', stats);
 
     return {
         userId,
@@ -199,3 +185,4 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
         ...stats,
     };
 };
+
