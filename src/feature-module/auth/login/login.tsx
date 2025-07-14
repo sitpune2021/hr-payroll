@@ -92,7 +92,7 @@ const Login = () => {
         navigation(routes.adminDashboard);
       }
     } catch (error: any) {
-      toast('Info', error.response.data.message, 'danger');
+      toast('Info', error?.response?.data?.message, 'danger'); 
       console.log(error);
     }
 

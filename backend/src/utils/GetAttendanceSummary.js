@@ -165,7 +165,7 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
                     stats.totalOvertimeWorked += parseFloat(att.overtimeHours || 0);
                 } else if (att?.status === 'Half-Day') {
                     stats.halfDayCount++;
-                    stats.presentDays += 0.5;
+                    // stats.presentDays += 0.5;
                     stats.totalHoursWorked += parseFloat(att.workingHours || 0);
                     stats.totalOvertimeWorked += parseFloat(att.overtimeHours || 0);
                 } else if (att?.checkIn && !att?.checkOut) {
