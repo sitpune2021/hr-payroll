@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '../../../core/data/redux/store'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Password from 'antd/es/input/Password';
+import { isValidContact, isValidEmail, isValidInteger, isValidName } from '../../../utils/Validators';
 
 const Companies = () => {
   const dispatch = useAppDispatch();
@@ -220,81 +221,125 @@ const Companies = () => {
   };
 
 
-  const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
 
-    const { companyName, companyEmail, companyPhone, subscriptionStartDate, subscriptionEndDate, allowedNoOfUsers } = addCompanyFormData;
-    const newErrors: any = {};
+const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    if (!companyName.trim()) newErrors.companyName = "Company Name is required";
-    if (!companyEmail.trim()) {
-      newErrors.companyEmail = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(companyEmail)) {
-      newErrors.companyEmail = "Enter a valid email address";
-    }
+  const {
+    companyName,
+    companyEmail,
+    companyPhone,
+    subscriptionStartDate,
+    subscriptionEndDate,
+    allowedNoOfUsers,
+    firstName,
+    lastName,
+    password,
+  } = addCompanyFormData;
 
-    if (!companyPhone.trim()) {
-      newErrors.companyPhone = "Phone Number is required";
-    } else if (!/^[0-9]{10}$/.test(companyPhone)) {
-      newErrors.companyPhone = "Enter a valid 10-digit phone number";
-    }
-    if (!subscriptionStartDate.trim()) newErrors.subscriptionStartDate = "Subscription start date is required";
-    if (!subscriptionEndDate.trim()) newErrors.subscriptionEndDate = "Subscription end date is required";
-    if (!allowedNoOfUsers.trim()) newErrors.allowedNoOfUsers = "Number of users required";
+  const newErrors: any = {};
 
-    if (!addCompanyFormData.firstName.trim()) newErrors.firstName = "First Name is required";
-    if (!addCompanyFormData.lastName.trim()) newErrors.lastName = "Last Name is required";
-    if (!addCompanyFormData.password.trim()) newErrors.password = "Password is required";
-    if (addCompanyFormData.password !== confirmedPassword) newErrors.conformPassword = "Password does not match";
+  // ✅ Use your utility functions here:
+  if (!companyName.trim()) {
+    newErrors.companyName = "Company Name is required";
+  } else if (!isValidName(companyName)) {
+    newErrors.companyName = "Company Name must contain letters only";
+  }
 
+  if (!companyEmail.trim()) {
+    newErrors.companyEmail = "Email is required";
+  } else if (!isValidEmail(companyEmail)) {
+    newErrors.companyEmail = "Enter a valid email address";
+  }
 
+  if (!companyPhone.trim()) {
+    newErrors.companyPhone = "Phone Number is required";
+  } else if (!isValidContact(companyPhone)) {
+    newErrors.companyPhone = "Enter a valid 10-digit phone number starting with 6-9";
+  }
 
-    if (!addCompantImage) {
-      newErrors.companyImage = "Company image is required";
-    }
+  if (!subscriptionStartDate.trim()) {
+    newErrors.subscriptionStartDate = "Subscription start date is required";
+  }
+  if (!subscriptionEndDate.trim()) {
+    newErrors.subscriptionEndDate = "Subscription end date is required";
+  }
 
-    setFormErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
+  if (!allowedNoOfUsers.trim()) {
+    newErrors.allowedNoOfUsers = "Number of users is required";
+  } else if (!isValidInteger(allowedNoOfUsers)) {
+    newErrors.allowedNoOfUsers = "Number of users must be an integer";
+  }
 
-    // prepare FormData
-    const payload = new FormData();
-    Object.entries(addCompanyFormData).forEach(([key, value]) => {
-      payload.append(key, value);
+  if (!firstName.trim()) {
+    newErrors.firstName = "First Name is required";
+  } else if (!isValidName(firstName)) {
+    newErrors.firstName = "First Name must contain letters only";
+  }
+
+  if (!lastName.trim()) {
+    newErrors.lastName = "Last Name is required";
+  } else if (!isValidName(lastName)) {
+    newErrors.lastName = "Last Name must contain letters only";
+  }
+
+  if (!password.trim()) {
+    newErrors.password = "Password is required";
+  }
+
+  if (password !== confirmedPassword) {
+    newErrors.conformPassword = "Password does not match";
+  }
+
+  if (!addCompantImage) {
+    newErrors.companyImage = "Company image is required";
+  }
+
+  setFormErrors(newErrors);
+  if (Object.keys(newErrors).length > 0) return;
+
+  // ✅ Prepare FormData
+  const payload = new FormData();
+  Object.entries(addCompanyFormData).forEach(([key, value]) => {
+    payload.append(key, value);
+  });
+
+  if (addCompantImage) {
+    payload.append("companyImage", addCompantImage);
+  }
+
+  try {
+    const response = await axiosClient.post(ADD_NEW_COMPANY, payload, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
 
-    if (addCompantImage) {
-      payload.append("companyImage", addCompantImage);
-    }
-
-    try {
-      const response = await axiosClient.post(ADD_NEW_COMPANY, payload, {
-        headers: { "Content-Type": "multipart/form-data" },
+    if (response.status === 201) {
+      dispatch(fetchCompanies());
+      toast("Info", response.data.message, "success");
+      setAddCompanyFormData({
+        companyName: "",
+        companyAddress: "",
+        companyPhone: "",
+        companyEmail: "",
+        companyWebsite: "",
+        subscriptionStartDate: "",
+        subscriptionEndDate: "",
+        allowedNoOfUsers: "",
+        firstName: "",
+        lastName: "",
+        password: "",
       });
-
-      if (response.status === 201) {
-        dispatch(fetchCompanies());
-        toast('Info', response.data.message, 'success');
-        setAddCompanyFormData({
-          companyName: "",
-          companyAddress: "",
-          companyPhone: "",
-          companyEmail: "",
-          companyWebsite: "",
-          subscriptionStartDate: "",
-          subscriptionEndDate: "",
-          allowedNoOfUsers: "",
-          firstName: "",
-          lastName: "",
-          password: ""
-        }
-        )
-        setAddCompanyImage(null)
-      }
-
-    } catch (error: any) {
-      toast('Error', error.response?.data?.message || 'Something went wrong', 'danger');
+      setAddCompanyImage(null);
     }
-  };
+  } catch (error: any) {
+    toast(
+      "Error",
+      error.response?.data?.message || "Something went wrong",
+      "danger"
+    );
+  }
+};
+
 
 
   const [totalChart] = React.useState<any>({

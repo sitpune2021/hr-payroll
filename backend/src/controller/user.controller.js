@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import models from '../models/index.js';
+import models, { sequelize } from '../models/index.js';
 import { where, Op, Sequelize } from 'sequelize';
 import * as XLSX from 'xlsx'
 import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js';
@@ -9,7 +9,7 @@ import { saveImageFile } from '../utils/imageUtils.js';
 const { Permission, Role, User, Company, Department , UserLeaveQuota } = models;
 
 const addNewUser = async (req, res) => {
-  const transaction = await Sequelize.transaction();
+  const transaction = await sequelize.transaction();
   try {
     let {
       firstName, lastName, contact, email, gender, Designation, roleId,
