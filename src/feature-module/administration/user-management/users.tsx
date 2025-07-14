@@ -2157,70 +2157,71 @@ const Users = () => {
                             <Tabs style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                 <TabList>
                                     <Tab>Personal Info</Tab>
-                                    <Tab>Attendance & salary</Tab>
+                                    <Tab>Attendance</Tab>
+                                    <Tab>salary</Tab>
                                 </TabList>
 
                                 <TabPanel>
-                            <div className="p-3">
-                                <div className="d-flex justify-content-between align-items-center rounded bg-light p-3">
-                                    <div className="file-name-icon d-flex align-items-center">
-                                        <div>
-                                            <p className="text-gray-9 fw-medium mb-0">
-                                                {viewUserDetails?.firstName} {viewUserDetails?.lastName}
-                                            </p>
-                                            <p>{viewUserDetails?.email}</p>
-                                        </div>
-                                    </div>
+                                    <div className="p-3">
+                                        <div className="d-flex justify-content-between align-items-center rounded bg-light p-3">
+                                            <div className="file-name-icon d-flex align-items-center">
+                                                <div>
+                                                    <p className="text-gray-9 fw-medium mb-0">
+                                                        {viewUserDetails?.firstName} {viewUserDetails?.lastName}
+                                                    </p>
+                                                    <p>{viewUserDetails?.email}</p>
+                                                </div>
+                                            </div>
 
-                                </div>
-                            </div>
-                            <div className="p-3">
-                                <p className="text-gray-9 fw-medium">Basic Info</p>
-                                <div className="pb-1 border-bottom mb-4">
-                                    <div className="row align-items-center">
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Phone Number</p>
-                                                <p className="text-gray-9">{viewUserDetails?.contact}</p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Role</p>
-                                                <p className="text-gray-9">{getRoleNameByRoleId(viewUserDetails?.roleId)}</p>
-                                            </div>
                                         </div>
                                     </div>
-                                    <div className="row align-items-center">
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Company</p>
-                                                <p className="text-gray-9">{getCompanyNameById(viewUserDetails?.companyId)}</p>
+                                    <div className="p-3">
+                                        <p className="text-gray-9 fw-medium">Basic Info</p>
+                                        <div className="pb-1 border-bottom mb-4">
+                                            <div className="row align-items-center">
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <p className="fs-12 mb-0">Phone Number</p>
+                                                        <p className="text-gray-9">{viewUserDetails?.contact}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <p className="fs-12 mb-0">Role</p>
+                                                        <p className="text-gray-9">{getRoleNameByRoleId(viewUserDetails?.roleId)}</p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Branch</p>
-                                                <p className="text-gray-9">{geBranchNameById(viewUserDetails?.branchId)}</p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Birth Date</p>
-                                                <p className="text-gray-9">
-                                                    {formatDate(viewUserDetails?.birthDate)}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-6">
-                                            <div className="mb-3">
-                                                <p className="fs-12 mb-0">Created Date</p>
-                                                <p className="text-gray-9">
-                                                    {formatDate(viewUserDetails?.createdAt)}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        {/* <div className="col-md-4">
+                                            <div className="row align-items-center">
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <p className="fs-12 mb-0">Company</p>
+                                                        <p className="text-gray-9">{getCompanyNameById(viewUserDetails?.companyId)}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <p className="fs-12 mb-0">Branch</p>
+                                                        <p className="text-gray-9">{geBranchNameById(viewUserDetails?.branchId)}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <p className="fs-12 mb-0">Birth Date</p>
+                                                        <p className="text-gray-9">
+                                                            {formatDate(viewUserDetails?.birthDate)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="mb-3">
+                                                        <p className="fs-12 mb-0">Created Date</p>
+                                                        <p className="text-gray-9">
+                                                            {formatDate(viewUserDetails?.createdAt)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {/* <div className="col-md-4">
                                             <div className="mb-3">
                                                 <p className="fs-12 mb-0">Merital Status</p>
                                                 <p className="text-gray-9">
@@ -2228,42 +2229,42 @@ const Users = () => {
                                                 </p>
                                             </div>
                                         </div> */}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div>
-                                <table className="table datanew table-bordered">
-                                    <thead className="table-header">
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Allowed Leaves</th>
-                                                <th>Taken Leaves</th>
-                                                <th>Balance Leaves</th>
-                                            </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th>Paid Leaves</th>
-                                            <td>{userLeaveStats.allowed.paidLeaveQuota}</td>
-                                            <td>{userLeaveStats.taken.paidLeavesTaken}</td>
-                                            <td>{userLeaveStats.balance.paidLeaveBalance}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Casual Leaves</th>
-                                            <td>{userLeaveStats.allowed.casualLeaveQuota}</td>
-                                            <td>{userLeaveStats.taken.casualLeavesTaken}</td>
-                                            <td>{userLeaveStats.balance.casualLeaveBalance}</td>
-                                        </tr>
-                                        <tr>
-                                            <th> Sick Leaves</th>
-                                            <td>{userLeaveStats.allowed.sickLeaveQuota}</td>
-                                            <td>{userLeaveStats.taken.sickLeavesTaken}</td>
-                                            <td>{userLeaveStats.balance.sickLeaveBalance}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                      </TabPanel>
+                                    <div>
+                                        <table className="table datanew table-bordered">
+                                            <thead className="table-header">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Allowed Leaves</th>
+                                                    <th>Taken Leaves</th>
+                                                    <th>Balance Leaves</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th>Paid Leaves</th>
+                                                    <td>{userLeaveStats.allowed.paidLeaveQuota}</td>
+                                                    <td>{userLeaveStats.taken.paidLeavesTaken}</td>
+                                                    <td>{userLeaveStats.balance.paidLeaveBalance}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Casual Leaves</th>
+                                                    <td>{userLeaveStats.allowed.casualLeaveQuota}</td>
+                                                    <td>{userLeaveStats.taken.casualLeavesTaken}</td>
+                                                    <td>{userLeaveStats.balance.casualLeaveBalance}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th> Sick Leaves</th>
+                                                    <td>{userLeaveStats.allowed.sickLeaveQuota}</td>
+                                                    <td>{userLeaveStats.taken.sickLeavesTaken}</td>
+                                                    <td>{userLeaveStats.balance.sickLeaveBalance}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </TabPanel>
 
                                 <TabPanel>
                                     <div className="container mt-1">
@@ -2303,8 +2304,129 @@ const Users = () => {
                                             </button>
                                         </div>
                                     </div>
-                                    
-                                      <div className="p-3">
+
+                                    <div className="p-3">
+                                        <div
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: "100%",
+                                                height: "300px",
+                                                overflow: "auto",
+                                            }}
+                                        >
+                                            <table className="table datanew table-bordered">
+                                                <thead className="table-header">
+                                                    <tr>
+                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Date</th>
+                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Day</th>
+                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Status</th>
+                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Working Hrs</th>
+                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Overtime Hrs</th>
+                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Check In</th>
+                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Check Out</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {logs.map((log, index) => (
+                                                        <tr key={index}>
+                                                            <td>{formatToDDMonthNameYYYY(log.date)}</td>
+                                                            <td>{log.day}</td>
+                                                            <td>{log.status}</td>
+                                                            <td>{log.workingHours}</td>
+                                                            <td>{log.overtimeHours}</td>
+                                                            <td>{log.checkIn ? new Date(log.checkIn).toLocaleTimeString() : "-"}</td>
+                                                            <td>{log.checkOut ? new Date(log.checkOut).toLocaleTimeString() : "-"}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        {/* ✅ Attendance Summary Below Table */}
+                                        {attendanceSummary && (
+                                            <div className="mt-4">
+                                                <h5>Attendance Summary</h5>
+                                                <table className="table table-bordered w-auto">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>Total Days</th>
+                                                            <td>{attendanceSummary.totalDays}</td>
+                                                            <th>Working Days</th>
+                                                            <td>{attendanceSummary.workingDays}</td>
+                                                            <th>Present Days</th>
+                                                            <td>{attendanceSummary.presentDays}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Half Days</th>
+                                                            <td>{attendanceSummary.halfDayCount}</td>
+                                                            <th>Paid Leave</th>
+                                                            <td>{attendanceSummary.paidLeaveDays}</td>
+                                                            <th>Unpaid Leave</th>
+                                                            <td>{attendanceSummary.unpaidLeaveDays}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Holidays</th>
+                                                            <td>{attendanceSummary.holidays}</td>
+                                                            <th>Weekly Offs</th>
+                                                            <td>{attendanceSummary.weeklyOffs}</td>
+                                                            <th>Absent Days</th>
+                                                            <td>{attendanceSummary.absentDays}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Total Hours Worked</th>
+                                                            <td>{attendanceSummary.totalHoursWorked}</td>
+                                                            <th>Overtime Hours</th>
+                                                            <td>{attendanceSummary.totalOvertimeWorked}</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
+                                    </div>
+                                </TabPanel>
+
+                                  <TabPanel>
+                                    <div className="container mt-1">
+
+                                        <div className="d-flex align-items-center gap-3 mb-3">
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                value={startDate}
+                                                onChange={(e) => setStartDate(e.target.value)}
+                                                style={{ maxWidth: "200px" }}
+                                            />
+
+                                            <input
+                                                type="date"
+                                                className="form-control"
+                                                value={endDate}
+                                                onChange={(e) => setEndDate(e.target.value)}
+                                                style={{ maxWidth: "200px" }}
+                                            />
+
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={() =>
+                                                    exportAttendanceLogsToPDF(
+                                                        logs,
+                                                        getCompanyNameById(viewUserDetails?.companyId),
+                                                        geBranchNameById(viewUserDetails?.branchId),
+                                                        (viewUserDetails?.firstName + " " + viewUserDetails?.lastName) || "",
+                                                        startDate,
+                                                        endDate,
+                                                        attendanceSummary
+                                                    )
+                                                }
+                                            >
+                                                Download PDF
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-3">
                                         <div
                                             style={{
                                                 width: "100%",
