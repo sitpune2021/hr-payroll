@@ -7,14 +7,14 @@ import { addNewUser, fetchCompanysUsers, getUsersList, updateUserCOntrller, uplo
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-
-router.route("/addUser").post([verifyToken, checkPermission('AddUser'),
+// checkPermission('AddUser')
+router.route("/addUser").post([verifyToken,
   upload.fields([
     { name: 'profilePhoto', maxCount: 1 },
     { name: 'bankDetails', maxCount: 1 },
     { name: 'adhaarCard', maxCount: 1 },
     { name: 'panCard', maxCount: 1 },
-    { name: 'educationalQulif', maxCount: 1 }
+    { name: 'educationalQualification', maxCount: 1 }
   ])
 ], addNewUser);
 router.route("/getlist").get([verifyToken], getUsersList);
