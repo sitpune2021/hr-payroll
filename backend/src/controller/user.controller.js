@@ -20,6 +20,27 @@ const addNewUser = async (req, res) => {
       alternateMobileNO, pfNumber
     } = req.body;
 
+    // Required fields validation
+if (!firstName || !firstName.trim()) {
+  return res.status(400).json({ message: "First name is required" });
+}
+if (!lastName || !lastName.trim()) {
+  return res.status(400).json({ message: "Last name is required" });
+}
+if (!contact || !/^\d{10}$/.test(contact)) {
+  return res.status(400).json({ message: "Valid 10-digit contact number is required" });
+}
+if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  return res.status(400).json({ message: "Valid email is required" });
+}
+if (!roleId) {
+  return res.status(400).json({ message: "Role is required" });
+}
+if (!companyId) {
+  return res.status(400).json({ message: "Company is required" });
+}
+
+
     const clean = (val) => val === '' || val === undefined ? null : val;
     [
       birthDate, joiningDate, roleId, branchId, departmentId, gender,
