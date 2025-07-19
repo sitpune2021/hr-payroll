@@ -12,13 +12,77 @@ import RequestModals from "../../../core/modals/requestModal";
 import TodoModal from "../../../core/modals/todoModal";
 import CollapseHeader from "../../../core/common/collapse-header/collapse-header";
 import CommonSelect from "../../../core/common/commonSelect";
+import { Branch } from "../../../core/data/redux/branchesSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../core/data/redux/store";
+import getAttendanceSummaryAdminDashStat, { SummaryItem } from "../../../utils/AttendanceStatAdminDash";
+import { fetchCompanyDateAttendance } from "../../../core/data/redux/companyDateAttendanceSlice";
+import { fetchCompanysUsersThunk } from "../../../core/data/redux/companysUsersSlice";
 
 const AdminDashboard = () => {
+
+  const dispatch = useDispatch<AppDispatch>();
+
   const routes = all_routes;
 
   const [isTodo, setIsTodo] = useState([false, false, false]);
 
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+
+  const [statSummary, setStatSumary] = useState<SummaryItem[]>([]);
+
+  const [allBranches, setAllBranches] = useState<Branch[]>([])
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
+
+  const user = useSelector((state: RootState) => state.auth.user);
+  const branchList: Branch[] = useSelector((state: RootState) => state.branches.branches);
+  const attendanceList = useSelector((state: RootState) => state.companyDateAttendance.data);
+  const companyUserList = useSelector((state: RootState) => state.companysEmployees.list);
+  const userSaved = useSelector((state: RootState) => state.auth.user);
+
+
+  useEffect(() => {
+    if (selectedBranch) {
+      const branchUsers = companyUserList.filter((user) => user.branchId === selectedBranch.id)
+      const userIds = branchUsers.map((user) => user.id);
+      const branchAttendance = attendanceList.filter((att) =>
+        userIds.includes(att.employeeId)
+      );
+
+      setStatSumary(getAttendanceSummaryAdminDashStat(branchUsers, branchAttendance));
+    } else {
+      setStatSumary(getAttendanceSummaryAdminDashStat(companyUserList, attendanceList));
+    }
+  }, [selectedBranch])
+
+
+
+  useEffect(() => {
+    if (userSaved?.companyId) {
+      dispatch(fetchCompanyDateAttendance({ companyId: userSaved.companyId, date: selectedDate }));
+      dispatch(fetchCompanysUsersThunk(userSaved.companyId));
+    }
+  }, [userSaved, selectedDate]);
+
+
+  useEffect(() => {
+    if (branchList.length > 0 && user?.companyId) {
+      const loggedUsersBranches = branchList.filter(
+        (branch) => branch.companyId === user?.companyId
+      );
+
+      if (user.companyId) {
+        setAllBranches(loggedUsersBranches);
+      } else {
+        setAllBranches(branchList);
+      }
+    }
+
+  }, [branchList, user?.companyId]);
+
+
   const [date, setDate] = useState(new Date());
+
 
   //New Chart
   const [empDepartment] = useState<any>({
@@ -323,8 +387,7 @@ const AdminDashboard = () => {
     { value: "vadgaon", label: "VADGAON" },
   ];
 
-  const [selectedBranch, setSelectedBranch] = useState(branchOptions[0]);
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
+
 
   return (
     <>
@@ -335,11 +398,21 @@ const AdminDashboard = () => {
           <div className="input-block w-100 d-flex align-items-center justify-content-flex-start gap-1" style={{ paddingLeft: 0, marginBottom: -10 }}>
             <h6 style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>Branch:</h6>
             <div style={{ width: "32%", borderColor: '#333' }}>
-              <CommonSelect
-                className="select"
-                options={branchOptions}
-                defaultValue={selectedBranch}
-              />
+              <select
+                className="form-control"
+                onChange={(e) => {
+                  const selectedId = parseInt(e.target.value);
+                  const branch = allBranches.find(b => b.id === selectedId) || null;
+                  setSelectedBranch(branch);
+                }}
+              >
+                <option value="ALL">ALL</option>
+                {
+                  allBranches.map(branch => (
+                    <option key={branch.id} value={branch.id}>{branch.name}</option>
+                  ))
+                }
+              </select>
             </div>
           </div>
 
@@ -412,16 +485,7 @@ const AdminDashboard = () => {
 
                   {/* Attendance Summary */}
                   <div className="row mt-4 px-3">
-                    {[
-                      { label: "Total", value: 101, color: "#8000FF" },
-                      { label: "Present", value: 87, color: "#00B050" },
-                      { label: "Absent", value: 14, color: "#FF0000" },
-                      { label: "Half Day", value: 0, color: "#FFC000" },
-                      { label: "Late Comers", value: 19, color: "#B266FF" },
-                      { label: "Early Leaving", value: 0, color: "#00B0F0" },
-                      { label: "On Break", value: 0, color: "#00FFFF" },
-                      { label: "On Leave", value: 0, color: "#FFD966" },
-                    ].map((item, index) => {
+                    {statSummary.map((item, index) => {
                       const isLastColumn = index % 4 === 3;
                       const isFirstRow = index < 4;
 
