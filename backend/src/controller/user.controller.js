@@ -6,7 +6,7 @@ import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js
 import { log } from 'console';
 import { saveImageFile } from '../utils/imageUtils.js';
 
-const { Permission, Role, User, Company, Department , UserLeaveQuota } = models;
+const { Permission, Role, User, Company, Department, UserLeaveQuota } = models;
 
 const addNewUser = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -21,24 +21,24 @@ const addNewUser = async (req, res) => {
     } = req.body;
 
     // Required fields validation
-if (!firstName || !firstName.trim()) {
-  return res.status(400).json({ message: "First name is required" });
-}
-if (!lastName || !lastName.trim()) {
-  return res.status(400).json({ message: "Last name is required" });
-}
-if (!contact || !/^\d{10}$/.test(contact)) {
-  return res.status(400).json({ message: "Valid 10-digit contact number is required" });
-}
-if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-  return res.status(400).json({ message: "Valid email is required" });
-}
-if (!roleId) {
-  return res.status(400).json({ message: "Role is required" });
-}
-if (!companyId) {
-  return res.status(400).json({ message: "Company is required" });
-}
+    if (!firstName || !firstName.trim()) {
+      return res.status(400).json({ message: "First name is required" });
+    }
+    if (!lastName || !lastName.trim()) {
+      return res.status(400).json({ message: "Last name is required" });
+    }
+    if (!contact || !/^\d{10}$/.test(contact)) {
+      return res.status(400).json({ message: "Valid 10-digit contact number is required" });
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ message: "Valid email is required" });
+    }
+    if (!roleId) {
+      return res.status(400).json({ message: "Role is required" });
+    }
+    if (!companyId) {
+      return res.status(400).json({ message: "Company is required" });
+    }
 
 
     const clean = (val) => val === '' || val === undefined ? null : val;
@@ -46,10 +46,10 @@ if (!companyId) {
       birthDate, joiningDate, roleId, branchId, departmentId, gender,
       basicSalary, geofencepoint, paymentMode, workingShift
     ] = [
-      clean(birthDate), clean(joiningDate), clean(roleId), clean(branchId),
-      clean(departmentId), clean(gender), clean(basicSalary),
-      clean(geofencepoint), clean(paymentMode), clean(workingShift)
-    ];
+        clean(birthDate), clean(joiningDate), clean(roleId), clean(branchId),
+        clean(departmentId), clean(gender), clean(basicSalary),
+        clean(geofencepoint), clean(paymentMode), clean(workingShift)
+      ];
 
     const company = await Company.findByPk(companyId);
     if (!company) return res.status(400).json({ message: "Company not found" });
@@ -154,26 +154,31 @@ const getUsersList = async (req, res) => {
       sortOrder = 'asc',
     } = req.query;
 
+    const loggedInUser = req.user; // assume this comes from JWT middleware
+    const isAdmin = loggedInUser?.role === 'SUPER_ADMIN'; // OR roleId === 1 etc.
+
     const whereClause = {};
 
-    // Apply filters
-    if (companyId) whereClause.companyId = companyId;
-    if (branchId) whereClause.branchId = branchId;
-    if (roleId) whereClause.roleId = roleId; // use Op.gt only if intentional
+    // Only admin can see all
+    if (!isAdmin) {
+      if (loggedInUser.companyId) {
+        whereClause.companyId = loggedInUser.companyId;
+      }
+      if (loggedInUser.branchId) {
+        whereClause.branchId = loggedInUser.branchId;
+      }
+    } 
 
+
+    // Pagination and sorting logic
     const offset = (parseInt(page) - 1) * parseInt(limit);
-
-    // Validate sort field
-    const validSortFields = [
-      'id', 'firstName', 'lastName', 'email', 'createdAt'
-    ];
+    const validSortFields = ['id', 'firstName', 'lastName', 'email', 'createdAt'];
     if (!validSortFields.includes(sortField)) sortField = 'id';
 
-    // Validate sort order
     const validSortOrders = ['asc', 'desc'];
     if (!validSortOrders.includes(sortOrder)) sortOrder = 'asc';
 
-    // Query the users
+    // Fetch data
     const { rows: users, count: total } = await User.findAndCountAll({
       where: whereClause,
       offset,
@@ -210,6 +215,7 @@ const getUsersList = async (req, res) => {
   }
 };
 
+
 const updateUserCOntrller = async (req, res) => {
   try {
     const id = req.params.userId;
@@ -244,19 +250,38 @@ const updateUserCOntrller = async (req, res) => {
     return res.status(500).json({ message: "Error updating user", error: error.message });
   }
 }
-
 const uploadUsersExcel = async (req, res) => {
   try {
     const file = req.file;
     const loggedInUser = req.user;
 
+    // ✅ Extract form fields from FormData (text fields come in req.body)
+    const { companyId, branchId, departmentId, roleId } = req.body;
+
     if (!file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const { validUsers, errors } = await validateUsersFromExcel(file.buffer, loggedInUser);
+    // ✅ Optional: Validate that all fields are present
+    if (!companyId || !branchId || !departmentId || !roleId) {
+      return res.status(400).json({ message: 'All form fields (companyId, branchId, departmentId, roleId) are required.' });
+    }
 
+    // ✅ Pass additional metadata to validator (if needed)
+    const { validUsers, errors } = await validateUsersFromExcel(
+      file.buffer,
+      loggedInUser,
+      {
+        companyId: parseInt(companyId),
+        branchId: branchId ? parseInt(branchId) : null,
+        departmentId: parseInt(departmentId),
+        roleId: parseInt(roleId),
+      }
+    );
+
+    // ✅ If validation errors exist, send Excel back
     if (errors.length > 0) {
+
       const errorSheet = XLSX.utils.json_to_sheet(errors);
       const errorBook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(errorBook, errorSheet, 'Errors');
@@ -268,7 +293,9 @@ const uploadUsersExcel = async (req, res) => {
       return res.status(400).send(buffer);
     }
 
+    // ✅ Save users (assumes validUsers already have necessary info)
     await User.bulkCreate(validUsers);
+
     return res.status(200).json({ message: 'All users uploaded successfully' });
 
   } catch (error) {
@@ -276,6 +303,7 @@ const uploadUsersExcel = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
+
 
 
 const fetchCompanysUsers = async (req, res) => {

@@ -47,6 +47,16 @@ const Users = () => {
     const [educationalQulif, setEducationalQulif] = useState<File | null>(null);
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
 
+    const [uploadExcelSelectedFormData, setUploadExcelSelectedFormData] = useState({
+        companyId: '',
+        branchId: '',
+        departmentId: '',
+        roleId: ''
+    });
+
+    const [uploadExcelFileData, setUploadExcelFileData] = useState<File | null>(null);
+
+
     const [employeeSearch, setEmployeeSearch] = useState("");
 
     const branchOptions = ['Branch 1', 'Branch 2', 'Branch 3', 'Branch 4']; // Dummy data
@@ -563,10 +573,28 @@ const Users = () => {
         return role ? role.name : 'Unknown Role';
     }
 
-    const handleExcelUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+
+    const handleExcelUpload = async () => {
         const startTime = performance.now(); // Start time in milliseconds
 
-        const file = event.target.files?.[0];
+        const { companyId, branchId, departmentId, roleId } = uploadExcelSelectedFormData;
+
+        if (!companyId || !branchId || !departmentId || !roleId) {
+            alert("All fields are required.");
+            return;
+        }
+
+        if (
+            isNaN(Number(companyId)) ||
+            isNaN(Number(branchId)) ||
+            isNaN(Number(departmentId)) ||
+            isNaN(Number(roleId))
+        ) {
+            alert("All IDs must be valid numbers.");
+            return;
+        }
+
+        const file = uploadExcelFileData;
         if (!file) return;
 
         const reader = new FileReader();
@@ -578,54 +606,19 @@ const Users = () => {
             const rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
             const errorRows: any[] = [];
-            const validUsers: any[] = [];
-
-            const loggedInUser = user;
-            const loggedInRoleName = loggedInUser?.role;
-            const loggedInRoleId = roleList.find(role => role.name === loggedInRoleName)?.id;
 
             rows.forEach((row, index) => {
                 const {
                     firstName,
                     lastName,
                     email,
-                    password,
-                    confirmPassword,
                     contact,
-                    birthDate,
-                    roleId,
-                    maritalStatus,
-                    companyId,
-                    branchId,
-                    departmentId
                 } = row;
 
                 let error = '';
 
-                if (!firstName || !lastName || !email || !password || !confirmPassword || !departmentId) {
+                if (!firstName || !lastName || !email || !contact) {
                     error = 'Required fields missing.';
-                } else if (password !== confirmPassword) {
-                    error = 'Passwords do not match.';
-                } else if (!companyId) {
-                    error = 'Company ID is required.';
-                } else if (parseInt(roleId) >= 3 && !branchId) {
-                    error = 'Branch ID is required for this role.';
-                }
-
-                if (!error && loggedInRoleId !== undefined && parseInt(roleId) <= loggedInRoleId) {
-                    error = `You cannot assign a role equal or higher than yours.`;
-                }
-
-                if (!error && loggedInUser?.companyId && parseInt(companyId) !== loggedInUser.companyId) {
-                    error = `You cannot assign another company.`;
-                }
-
-                if (!error && loggedInUser?.branchId && parseInt(branchId) !== loggedInUser.branchId) {
-                    error = `You cannot assign another branch.`;
-                }
-
-                if (!error && loggedInUser?.departmentId && parseInt(departmentId) <= loggedInUser.departmentId) {
-                    error = `You cannot assign add user with higher Authority.`;
                 }
 
 
@@ -636,26 +629,7 @@ const Users = () => {
                         lastName,
                         email,
                         contact,
-                        birthDate,
-                        roleId,
-                        companyId,
-                        branchId,
-                        departmentId,
                         Error: error,
-                    });
-                } else {
-                    validUsers.push({
-                        firstName,
-                        lastName,
-                        email,
-                        password,
-                        contact,
-                        birthDate,
-                        roleId,
-                        maritalStatus,
-                        companyId,
-                        branchId: branchId || null,
-                        departmentId
                     });
                 }
             });
@@ -674,6 +648,11 @@ const Users = () => {
             try {
                 const formData = new FormData();
                 formData.append('file', file);
+                formData.append('companyId', String(uploadExcelSelectedFormData.companyId));
+                formData.append('branchId', String(uploadExcelSelectedFormData.branchId));
+                formData.append('departmentId', String(uploadExcelSelectedFormData.departmentId));
+                formData.append('roleId', String(uploadExcelSelectedFormData.roleId));
+
                 const response = await axiosClient.post(UPLOAD_USERS_EXCEL, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                     responseType: 'blob',
@@ -826,15 +805,15 @@ const Users = () => {
                                 </div>
                             </div>
                             <div className="d-flex flex-row gap-2">
-                                <label className="btn btn-secondary d-flex align-items-center mb-0">
+                                <label
+                                    className="btn btn-secondary d-flex align-items-center mb-0"
+                                    data-bs-toggle="modal"
+                                    data-inert={true}
+                                    data-bs-target="#upload_excel_model"
+
+                                >
                                     <i className="fa fa-upload me-2" />
                                     Upload Excel
-                                    <input
-                                        type="file"
-                                        accept=".xls,.xlsx"
-                                        style={{ display: 'none' }}
-                                        onChange={handleExcelUpload}
-                                    />
                                 </label>
                                 {
                                     filteredLabels.includes('AddUser') &&
@@ -2387,7 +2366,7 @@ const Users = () => {
                                     </div>
                                 </TabPanel>
 
-                                  <TabPanel>
+                                <TabPanel>
                                     <div className="container mt-1">
 
                                         <div className="d-flex align-items-center gap-3 mb-3">
@@ -2516,9 +2495,138 @@ const Users = () => {
                 </div>
             </div >
             {/* /user Detail */}
+
+
+
+
+
+            {/* /Upload Bulk Empp Data */}
+            <div className="modal fade" id="upload_excel_model">
+                <div className="modal-dialog modal-dialog-centered modal-md">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h4 className="modal-title">Upload Excel Data</h4>
+                            <button
+                                type="button"
+                                className="btn-close custom-btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                            >
+                                <i className="ti ti-x" />
+                            </button>
+                        </div>
+                        <div className="modal-body pb-0">
+                            <div className="mb-3">
+                                <label className="form-label">Select Company</label>
+                                <select
+                                    className="form-select"
+                                    onChange={(e) =>
+                                        setUploadExcelSelectedFormData({ ...uploadExcelSelectedFormData, companyId: e.target.value })
+                                    }
+                                >
+                                    <option value="">--Select--</option>
+                                    {
+                                        allcompany.map(company => (
+                                            <option key={company.id} value={company.id}>{company.name}</option>
+                                        ))
+                                    }
+                                </select>
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Select Branch</label>
+                                <select
+                                    className="form-select"
+                                    onChange={(e) =>
+                                        setUploadExcelSelectedFormData({ ...uploadExcelSelectedFormData, branchId: e.target.value })
+                                    }
+                                >
+                                    <option value="">--Select--</option>{
+                                        allBranches.map(branch => (
+                                            <option key={branch.id} value={branch.id}>{branch.name}</option>
+                                        ))
+                                    }
+                                </select>
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Select Role</label>
+                                <select
+                                    className="form-select"
+                                    onChange={(e) =>
+                                        setUploadExcelSelectedFormData({ ...uploadExcelSelectedFormData, roleId: e.target.value })
+                                    }
+                                >
+                                    <option value="">--Select--</option>
+                                    {
+                                        filteredRoles.map(role => (
+                                            <option key={role.id} value={role.id}>{role.name}</option>
+                                        ))
+                                    }
+                                </select>
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Select Department</label>
+                                <select
+                                    className="form-select"
+                                    onChange={(e) =>
+                                        setUploadExcelSelectedFormData({ ...uploadExcelSelectedFormData, departmentId: e.target.value })
+                                    }
+                                >
+                                    <option value="">--Select--</option>
+                                    {
+                                        filteredDepartments.map(department => (
+                                            <option key={department.id} value={department.id}>{department.name}</option>
+                                        ))
+                                    }
+                                </select>
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Select Excel File</label>
+                                <input
+                                    type="file"
+                                    accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    className="form-control"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            const isExcel =
+                                                file.type === "application/vnd.ms-excel" ||
+                                                file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                                            if (!isExcel) {
+                                                alert("Please upload a valid Excel file (.xls or .xlsx)");
+                                                return;
+                                            }
+                                            setUploadExcelFileData(file);
+                                        }
+                                    }}
+                                />
+
+                            </div>
+
+                            <div className="text-center">
+                                <button
+                                    type='button'
+                                    onClick={handleExcelUpload}
+                                    className="btn btn-primary"
+                                >
+                                    Upload
+                                </button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+            {/* /Upload Bulk Empp Data */}
         </>
 
     )
 }
 
+
 export default Users
+

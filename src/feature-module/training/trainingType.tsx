@@ -4,7 +4,6 @@ import { all_routes } from "../router/all_routes";
 import CollapseHeader from "../../core/common/collapse-header/collapse-header";
 import { trainingTypeData } from "../../core/data/json/trainingTypeData";
 import Table from "../../core/common/dataTable/index";
-import TrainingTypeModal from "../../core/modals/trainingTypeModal";
 
 const TrainingType = () => {
   const routes = all_routes;
@@ -154,7 +153,6 @@ const TrainingType = () => {
       </div>
       {/* /Page Wrapper */}
 
-      <TrainingTypeModal />
     </>
   );
 };
