@@ -22,6 +22,7 @@ const RolesPermission = () => {
     const [name, setName] = useState('')
     const [companySelectedAddRole, setCompanySelectedAddRole] = useState<number | ''>('');
     const [allcompany, setAllCompany] = useState<Company[]>([])
+    const [allRoles, setAllRoles] = useState<Role[]>([])
     const roles = useSelector((state: RootState) => state.roles.list)
     const companyList = useAppSelector((state) => state.companies.list);
     const user = useSelector((state: RootState) => state.auth.user);
@@ -64,7 +65,19 @@ const RolesPermission = () => {
                 setAllCompany(companyList);
             }
         }
-    }, [user, companyList]);
+
+        if (roles.length > 0 && user && user.companyId) {
+            const userRoles = roles.filter(role => role.companyId === user.companyId);
+
+            if (userRoles) {
+                setAllRoles(userRoles);
+            } else {
+                setAllCompany([]);
+            }
+        }
+
+        
+    }, [user, companyList,roles]);
 
     return (
         <>
@@ -153,7 +166,7 @@ const RolesPermission = () => {
                                     </thead>
                                     <tbody>
                                         {
-                                            roles.map(role => (
+                                            allRoles.map(role => (
                                                 <tr key={role.id}>
                                                     <td>{role.id}</td>
                                                     <td>{role.name}</td>

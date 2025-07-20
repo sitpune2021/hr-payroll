@@ -63,15 +63,7 @@ const AppInitializer = ({ onReady }: { onReady: () => void }) => {
         await dispatch(fetchDepartments());
         await dispatch(fetchShifts());
         await dispatch(fetchPayrollTemplates({ companyId: userSaved.companyId }));
-        await dispatch(fetchUsers({
-          companyId: undefined,
-          branchId: undefined,
-          roleId: undefined,
-          page: 1,
-          limit: 10,
-          sortField,
-          sortOrder,
-        }));
+       
         onReady(); // ✅ Notify parent
       } else {
         // Redirect to login page if user is not logged in

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ImageWithBasePath from "../../../core/common/imageWithBasePath";
 import { all_routes } from "../../router/all_routes";
 import "slick-carousel/slick/slick.css";
@@ -22,6 +22,7 @@ import { fetchCompanysUsersThunk } from "../../../core/data/redux/companysUsersS
 const AdminDashboard = () => {
 
   const dispatch = useDispatch<AppDispatch>();
+  const nevigate = useNavigate();
 
   const routes = all_routes;
 
@@ -53,7 +54,7 @@ const AdminDashboard = () => {
     } else {
       setStatSumary(getAttendanceSummaryAdminDashStat(companyUserList, attendanceList));
     }
-  }, [selectedBranch])
+  }, [selectedBranch, companyUserList, attendanceList])
 
 
 
@@ -82,6 +83,11 @@ const AdminDashboard = () => {
 
 
   const [date, setDate] = useState(new Date());
+
+  const formatDate = (date:any) => {
+  return date.toISOString().split("T")[0];
+};
+
 
 
   //New Chart
@@ -454,9 +460,18 @@ const AdminDashboard = () => {
                       style={{
                         border: "1px solid #E0E0E0",
                         backgroundColor: "#fff",
+                        width: "fit-content",
                       }}
                     >
-                      <i className="ti ti-chevron-left text-primary" style={{ fontSize: "18px" }}></i>
+                      <i
+                        className="ti ti-chevron-left text-primary"
+                        style={{ fontSize: "18px", cursor: "pointer" }}
+                        onClick={() =>
+                          setSelectedDate((prev) =>
+                            formatDate(new Date(new Date(prev).setDate(new Date(prev).getDate() - 1)))
+                          )
+                        }
+                      ></i>
 
                       <input
                         type="date"
@@ -471,8 +486,17 @@ const AdminDashboard = () => {
                         }}
                       />
 
-                      <i className="ti ti-chevron-right text-primary" style={{ fontSize: "18px" }}></i>
+                      <i
+                        className="ti ti-chevron-right text-primary"
+                        style={{ fontSize: "18px", cursor: "pointer" }}
+                        onClick={() =>
+                          setSelectedDate((prev) =>
+                            formatDate(new Date(new Date(prev).setDate(new Date(prev).getDate() + 1)))
+                          )
+                        }
+                      ></i>
                     </div>
+
                   </div>
 
                   {/*Full-Width Bottom Border */}
@@ -533,15 +557,22 @@ const AdminDashboard = () => {
                 />
                 {/* Footer */}
                 <div className="text-end mt-3">
-                  <a
-                    href="#"
-                    className="text-primary"
-                    style={{ fontWeight: 500, fontSize: "16px" }}
+                  <button
+                    onClick={() => nevigate("/attendance")}
+                    className="p-0 m-0 border-0 bg-transparent text-primary"
+                    style={{
+                      fontWeight: 500,
+                      fontSize: "16px",
+                      outline: "none",
+                      boxShadow: "none",
+                      cursor: "pointer",
+                    }}
                   >
                     Detailed Attendance View &nbsp;
                     <i className="ti ti-arrow-right"></i>
-                  </a>
+                  </button>
                 </div>
+
               </div>
             </div>
 

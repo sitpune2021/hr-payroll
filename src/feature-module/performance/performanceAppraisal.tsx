@@ -5,11 +5,11 @@ import CollapseHeader from "../../core/common/collapse-header/collapse-header";
 import { performanceAppraisalData } from "../../core/data/json/performanceAppraisalData";
 import ImageWithBasePath from "../../core/common/imageWithBasePath";
 import Table from "../../core/common/dataTable/index";
-import PerformanceAppraisalModal from "../../core/modals/performanceAppraisalModal";
+// import PerformanceAppraisalModal from "../../core/modals/performanceAppraisalModal";
 
-const PerformanceAppraisal = () => {
+const PerformanceAppraisal = () => { 
     const routes = all_routes;
-    const data = performanceAppraisalData
+    const data = performanceAppraisalData    
     const columns = [
         {
           title: "Name",
@@ -202,7 +202,6 @@ const PerformanceAppraisal = () => {
       </div>
       {/* /Page Wrapper */}
 
-      <PerformanceAppraisalModal />
     </>
   );
 };

@@ -188,43 +188,125 @@ const markNewAttendance = async (req, res) => {
 
 
 
-const uploadAttendanceFile = async (req, res) => {
+const uploadAttendanceExcel = async (req, res) => {
   try {
-    const file = req.file;
-
-    if (!file) {
-      return res.status(400).json({ message: 'No file uploaded.' });
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (!['.csv', '.xls', '.xlsx'].includes(ext)) {
-      return res.status(400).json({ message: 'Unsupported file format.' });
-    }
-
-    const workbook = xlsx.read(file.buffer, { type: 'buffer' });
+    const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const rows = xlsx.utils.sheet_to_json(sheet); // converts to array of objects
+    const worksheet = workbook.Sheets[sheetName];
+    const jsonData = xlsx.utils.sheet_to_json(worksheet);
 
-    const results = [];
+    const errors = [];
+    const validData = [];
 
-    for (const row of rows) {
-      const employeeId = row.employeeId || row['Employee ID'];
-      const punchDatetime = row.punchDatetime || row['Punch Time'];
+    for (let [index, row] of jsonData.entries()) {
+      const rowIndex = index + 2; // considering header row is 1
 
-      if (!employeeId || !punchDatetime) {
-        results.push({ employeeId, message: 'Missing required fields', success: false });
-        continue;
+      const {
+        employeeId,
+        date,
+        checkIn,
+        checkOut,
+        status,
+        isLate,
+        isEarlyLeave,
+        remarks
+      } = row;
+
+      let error = { Row: rowIndex };
+      let hasError = false;
+
+      // Validate employeeId
+      if (!employeeId || typeof employeeId !== 'number') {
+        error.EmployeeId = 'Invalid or missing employeeId';
+        hasError = true;
+      } else {
+        const user = await User.findOne({ where: { id: employeeId, companyId: req.user.companyId } });
+        if (!user) {
+          error.EmployeeId = 'Employee does not belong to company';
+          hasError = true;
+        }
       }
 
-      const result = await processPunch(employeeId, punchDatetime);
-      results.push(result);
+      // Validate date
+      if (!date || isNaN(Date.parse(date))) {
+        error.Date = 'Invalid or missing date';
+        hasError = true;
+      }
+
+      // Either (checkIn + checkOut) or status must be present
+      if ((!checkIn || !checkOut) && !status) {
+        error.Attendance = 'Either checkIn/checkOut or status is required';
+        hasError = true;
+      }
+
+      // Validate status if present
+      const allowedStatus = ['Present', 'Unscheduled', 'Absent', 'Half-Day', 'Leave'];
+      if (status && !allowedStatus.includes(status)) {
+        error.Status = 'Invalid status';
+        hasError = true;
+      }
+
+      if (hasError) {
+        errors.push(error);
+      } else {
+        let workingHours = 0;
+
+        if (checkIn && checkOut) {
+          const inTime = new Date(`1970-01-01T${checkIn}`);
+          const outTime = new Date(`1970-01-01T${checkOut}`);
+          const diffMs = outTime - inTime;
+          workingHours = diffMs > 0 ? Math.round(diffMs / (1000 * 60 * 60) * 100) / 100 : 0; // rounded to 2 decimals
+        } else if (status === 'Present') {
+          workingHours = 8;
+        } else if (status === 'Half-Day') {
+          workingHours = 4;
+        }
+
+        validData.push({
+          employeeId,
+          date,
+          checkIn: checkIn || null,
+          checkOut: checkOut || null,
+          status: status || 'Present',
+          isLate: Boolean(isLate),
+          isEarlyLeave: Boolean(isEarlyLeave),
+          remarks: remarks || null,
+          workingHours
+        });
+
+      }
     }
 
-    return res.status(200).json({ message: 'File processed.', results });
-  } catch (err) {
-    console.error('Error in uploadAttendanceFile:', err);
-    return res.status(500).json({ message: 'Server error', error: err.message });
+    // If errors found, return Excel file with errors
+    if (errors.length > 0) {
+      const errorWorkbook = new ExcelJS.Workbook();
+      const errorSheet = errorWorkbook.addWorksheet('Errors');
+
+      const headers = Object.keys(errors[0]);
+      errorSheet.addRow(headers);
+      errors.forEach(err => errorSheet.addRow(headers.map(h => err[h] || '')));
+
+      const errorFilePath = path.join(__dirname, '../../uploads', 'attendance_upload_errors.xlsx');
+      await errorWorkbook.xlsx.writeFile(errorFilePath);
+
+      res.setHeader('Content-Disposition', 'attachment; filename=attendance_upload_errors.xlsx');
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      return res.send(fs.readFileSync(errorFilePath));
+    }
+
+    // Save valid records
+    for (const data of validData) {
+      await Attendance.upsert({ ...data });
+    }
+
+    res.status(200).json({ message: 'Attendance uploaded successfully', saved: validData.length });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ message: 'Server error while uploading attendance' });
   }
 };
 
@@ -295,4 +377,4 @@ const getUserAttendanceLogsByStartEndDate = async (req, res) => {
 
 
 
-export { markNewAttendance, uploadAttendanceFile, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUserAttendanceLogsByStartEndDate };
+export { markNewAttendance, uploadAttendanceExcel, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUserAttendanceLogsByStartEndDate };

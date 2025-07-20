@@ -56,6 +56,9 @@ export const FETCH_ATTENDANCE_LOGS_USER  =  "/api/attendance/attendanceLogsByUse
 
 export const FETCH_ATTENDANCE_SUMMARY_USER  =  "/api/attendance/userAttendanceDetailsStartDateEndDateUserID"
 
+export const ASSIGN_SHIFT_TO_EMPLOYEE_FROM_DT_to_dt  =  "/api/employee-shift/assign"
+
+export const UPLOAD_ATTENDANCE_EXCEL  =  "/api/attendance/upload-attendance"
 
 
 
