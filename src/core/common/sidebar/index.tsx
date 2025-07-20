@@ -149,6 +149,7 @@ const Sidebar = () => {
           <Link to="routes.index" className="dark-logo">
             <ImageWithBasePath src="assets/img/logo-white.svg" alt="Logo" />
           </Link>
+          <h3 className="company-name">Company Name</h3>
         </div>
         <div className="modern-profile p-3 pb-0">
           <div className="text-center rounded bg-light p-3 mb-4 user-profile">
@@ -240,7 +241,7 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-        <Scrollbars>
+        <Scrollbars style={{backgroundColor:'rgba(14, 152, 249,.1)'}}>
           <div className="sidebar-inner slimscroll">
             <div id="sidebar-menu" className="sidebar-menu">
               <ul>

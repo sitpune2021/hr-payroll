@@ -19,6 +19,10 @@
         background: $white;
         top: 50px;
     }
+    .company-name{
+        text-align: center;
+        margin-top: 4px;
+    }
     .sidebar-logo {
         position: fixed;
         height: 50px;
@@ -26,6 +30,13 @@
         padding: 16px 16px 0;
         .logo {
             display: block;
+        }
+        .logo-normal{
+            border-radius: 50%;
+            overflow: hidden;
+            width: 80px;
+            margin: 0 auto;
+            border: 1px solid rgba(0, 0, 0, 0.7);
         }
         .logo-small {
             display: none;
@@ -53,7 +64,7 @@
         width: 100%;
     }
     .sidebar-menu{
-        margin-top: 100px;
+        margin-top: 140px;
         padding: 0 16px;
         > ul{
             > li{
@@ -67,7 +78,7 @@
                         &.submenu {
                             > a {
                                 &:hover {
-                                    background: rgba(14, 152, 249,.1);
+                                    background: rgba(14, 152, 249,.3);
                                 }
                             }
                         }
@@ -308,13 +319,13 @@
                     
                     a {
                         &.subdrop {
-                            background-color: rgba(14, 152, 249,.2);
+                            background-color: rgba(14, 152, 249,.3);
                             i {
                                 color: $primary;
                             }
                         }
                         &.active {
-                            background: rgba(14, 152, 249,.1);
+                            background: rgba(14, 152, 249,.3);
                             border-radius: 5px;
                             i {
                                 color: $primary
