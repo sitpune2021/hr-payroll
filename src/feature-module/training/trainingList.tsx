@@ -5,7 +5,6 @@ import CollapseHeader from "../../core/common/collapse-header/collapse-header";
 import { trainingListData } from "../../core/data/json/trainingListData";
 import Table from "../../core/common/dataTable/index";
 import ImageWithBasePath from "../../core/common/imageWithBasePath";
-import TrainingListModal from "../../core/modals/trainingListModal";
 
 const TrainingList = () => {
   const routes = all_routes;
@@ -247,7 +246,6 @@ const TrainingList = () => {
       </div>
       {/* /Page Wrapper */}
       
-      <TrainingListModal />
     </>
   );
 };

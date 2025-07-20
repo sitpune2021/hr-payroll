@@ -18,6 +18,7 @@ axiosClient.interceptors.response.use(
     if (error.response?.status === 401) {
       console.warn("Unauthorized - maybe token expired?");
       // Optionally redirect to login or show modal 
+       window.location.href = "/login";
     }
     return Promise.reject(error);
   }
