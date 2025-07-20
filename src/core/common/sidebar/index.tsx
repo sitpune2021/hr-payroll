@@ -141,7 +141,7 @@ const Sidebar = () => {
       >
         <div className="sidebar-logo">
           <Link to="index" className="logo logo-normal">
-            <img style={{height:'50px'}} src="assets/img/namedLogo.jpg" alt="Logo" />
+            <img style={{height:'80px'}} src="assets/img/namedLogo.jpg" alt="Logo" />
           </Link>
           <Link to="routes.index" className="logo-small">
             <ImageWithBasePath src="assets/img/logo-small.svg" alt="Logo" />
