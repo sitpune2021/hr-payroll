@@ -806,11 +806,11 @@ const Users = () => {
                             </div>
                             <div className="d-flex flex-row gap-2">
                                 <label
-                                    className="btn btn-secondary d-flex align-items-center mb-0"
+                                    className="btn d-flex align-items-center mb-0"
                                     data-bs-toggle="modal"
                                     data-inert={true}
                                     data-bs-target="#upload_excel_model"
-
+                                    style={{ backgroundColor: 'rgb(255, 165, 0q )', border: 'rgb(255, 165, 0)' }}
                                 >
                                     <i className="fa fa-upload me-2" />
                                     Upload Excel
@@ -828,23 +828,23 @@ const Users = () => {
                                         Add New Employee
                                     </Link>
                                 }
-                                <label className="btn btn-secondary d-flex align-items-center mb-0" style={{ backgroundColor: '#03C95A', border: 'none', outline: 'none' }}>
+                                <label className="btn btn-success d-flex align-items-center mb-0">
                                     <i className="fa fa-chart-simple me-2" />
                                     Organization Chart
                                 </label>
                             </div>
 
-
+                            {/* 
                             <div className="head-icons ms-2 mb-0">
                                 <CollapseHeader />
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                     {/* /Breadcrumb */}
                     {/* Performance Indicator list */}
                     <div className="card">
                         <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-                            <h5>Users List</h5>
+                            <h4>Employee List</h4>
                             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3 w-100">
                                 {/* <div className='mx-3'>
                                     <select
@@ -908,10 +908,10 @@ const Users = () => {
                                 </div> */}
 
 
-                                <div className='d-flex align-items-center' style={{ minWidth: '50%' }}>
+                                <div className='d-flex align-items-center' style={{ minWidth: '50%', fontSize: '16px' }}>
                                     <div className='emp-search-bar' style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '6px', width: '100%' }}>
                                         <i className='fas fa-search' style={{ padding: '0 0 0 12px' }}></i>
-                                        <input style={{ minWidth: "320px", border: 'none' }} type="text" value={employeeSearch} className="form-control me-2" placeholder="Search Employees..." onChange={(e) => setEmployeeSearch(e.target.value)} />
+                                        <input style={{ minWidth: "320px", border: 'none', fontSize: '16px' }} type="text" value={employeeSearch} className="form-control me-2" placeholder="Search Employees..." onChange={(e) => setEmployeeSearch(e.target.value)} />
                                         {employeeSearch && <i className='fas fa-times' style={{ padding: '0 20px 0 0', cursor: 'pointer' }} onClick={() => setEmployeeSearch("")}></i>}
                                         <span style={{ borderLeft: '1px solid rgba(0, 0, 0, 0.8)', height: '30px' }}></span>
                                         <div>
@@ -958,7 +958,7 @@ const Users = () => {
                                         </li>
                                     </ul>
                                 </div>
-                                <div className="dropdown">
+                                {/* <div className="dropdown">
                                     <Link
                                         to="#"
                                         className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
@@ -979,7 +979,7 @@ const Users = () => {
                                             </li>
                                         ))}
                                     </ul>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                         <div className="card-body p-3">
@@ -987,33 +987,33 @@ const Users = () => {
                                 <table className="table datanew table-bordered">
                                     <thead className="table-header">
                                         <tr>
-                                            <th className='py-3'>User ID</th>
-                                            <th className='py-3'>Name</th>
-                                            <th className='py-3'>Contact</th>
-                                            <th className='py-3'>Company</th>
-                                            <th className='py-3'>Branch</th>
-                                            <th className='py-3'>Department</th>
-                                            <th className='py-3'>Role</th>
-                                            <th className='py-3'>Actions</th>
+                                            <th className='py-3' style={{ fontSize: '15px' }}>Employee ID</th>
+                                            <th className='py-3' style={{ fontSize: '15px' }}>Employee Name</th>
+                                            <th className='py-3' style={{ fontSize: '15px' }}>Contact</th>
+                                            {/* <th className='py-3' style={{ fontSize: '15px' }}>Company</th> */}
+                                            <th className='py-3' style={{ fontSize: '15px' }}>Branch</th>
+                                            <th className='py-3' style={{ fontSize: '15px' }}>Department</th>
+                                            <th className='py-3' style={{ fontSize: '15px' }}>Role</th>
+                                            <th className='py-3' style={{ fontSize: '15px' }}>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {
                                             getSortedFilteredData().map(user => (
                                                 <tr key={user.id}>
-                                                    <td>{user.id}</td>
-                                                    <td>{user.firstName + " " + user.lastName}</td>
-                                                    <td>{user.contact}</td>
-                                                    <td>{getCompanyNameById(user.companyId)}</td>
-                                                    <td>{geBranchNameById(user.branchId)}</td>
-                                                    <td>{user.departmentId}</td>
-                                                    <td>{getRoleNameByRoleId(user.roleId) || "**"}</td>
+                                                    <td style={{ fontSize: '14px' }}>{user.id}</td>
+                                                    <td style={{ fontSize: '14px' }}>{user.firstName + " " + user.lastName}</td>
+                                                    <td style={{ fontSize: '14px' }}>{user.contact}</td>
+                                                    {/* <td>{getCompanyNameById(user.companyId)}</td> */}
+                                                    <td style={{ fontSize: '14px' }}>{geBranchNameById(user.branchId)}</td>
+                                                    <td style={{ fontSize: '14px' }}>{user.departmentId}</td>
+                                                    <td style={{ fontSize: '14px' }}>{getRoleNameByRoleId(user.roleId) || "**"}</td>
                                                     <td>
                                                         <div className="action-icon d-inline-flex">
                                                             <Link to="#" onClick={() =>
                                                                 setViewUserDetails(user)
                                                             } className="me-2" data-bs-toggle="modal" data-bs-target="#user_detail">
-                                                                <i className="ti ti-eye" />
+                                                                <i className="ti ti-eye" style={{ fontSize: '20px' }} />
                                                             </Link>
                                                             <Link
                                                                 to="#"
@@ -1023,10 +1023,10 @@ const Users = () => {
                                                                 onClick={() => setEditUserData(user)}
                                                                 data-bs-target="#edit_user"
                                                             >
-                                                                <i className="ti ti-edit" />
+                                                                <i className="ti ti-edit" style={{ fontSize: '20px' }} />
                                                             </Link>
                                                             <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
-                                                                <i className="ti ti-trash" />
+                                                                <i className="ti ti-trash" style={{ fontSize: '20px' }} />
                                                             </Link>
                                                         </div>
                                                     </td>
