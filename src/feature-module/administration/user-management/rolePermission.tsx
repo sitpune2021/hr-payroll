@@ -74,6 +74,8 @@ const RolesPermission = () => {
             } else {
                 setAllCompany([]);
             }
+        }else if(user && !user.companyId){
+            setAllRoles(roles);
         }
 
         
