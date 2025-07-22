@@ -21,7 +21,7 @@ import { isValidContact, isValidEmail, isValidInteger, isValidName } from '../..
 const Companies = () => {
   const dispatch = useAppDispatch();
 
-  const [sortOption, setSortOption] = useState('Recently Added');
+  const [sortOption, setSortOption] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
 
 
@@ -63,7 +63,9 @@ const Companies = () => {
       data = data.filter(company => company.isActive === false);
     }
 
-    if (sortOption === 'Recently Added') {
+    if(sortOption==='All'){
+      return data;
+    } else if (sortOption === 'Recently Added') {
       data.sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
     } else if (sortOption === 'Ascending') {
       data.sort((a, b) => a.name.localeCompare(b.name));
@@ -909,7 +911,7 @@ const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                     Sort By : {sortOption}
                   </Link>
                   <ul className="dropdown-menu dropdown-menu-end p-3">
-                    {['Recently Added', 'Ascending', 'Descending', 'Last Month', 'Last 7 Days'].map((option) => (
+                    {['All','Recently Added', 'Ascending', 'Descending', 'Last Month', 'Last 7 Days'].map((option) => (
                       <li key={option}>
                         <Link
                           to="#"

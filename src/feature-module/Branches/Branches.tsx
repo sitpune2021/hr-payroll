@@ -141,8 +141,10 @@ const Branches = () => {
             if (user.companyId) {
                 setAllBranches(loggedUsersBranches);
             } else {
-                setAllBranches(getSortedFilteredData());
+                setAllBranches(getSortedFilteredData);
             }
+        } else if(!user?.companyId){
+            setAllBranches(branchList)
         }
 
     }, [branchList, companyList, payrollTempList, user?.companyId, sortOption, statusFilter, start, end]);

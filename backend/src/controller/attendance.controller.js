@@ -376,5 +376,34 @@ const getUserAttendanceLogsByStartEndDate = async (req, res) => {
 };
 
 
+const getUsersAttendancePerDay = async (req, res) => {
+  try {
+    const { userId, date } = req.params;
 
-export { markNewAttendance, uploadAttendanceExcel, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUserAttendanceLogsByStartEndDate };
+    const attendanceList = await Attendance.findAll({
+      where: { date },
+      include: [
+        {
+          model: User,
+          where: { id: userId }, // or use 'userId' if your FK is named like that
+          attributes: [],
+        },
+      ],
+      attributes: {
+        exclude: ['createdAt', 'updatedAt'],
+      },
+    });
+
+    return res.status(200).json(attendanceList);
+  } catch (error) {
+    console.error('Error fetching attendance:', error);
+    return res.status(500).json({
+      message: 'Failed to fetch attendance data',
+      error: error.message,
+    });
+  }
+};
+
+
+
+export { getUsersAttendancePerDay,markNewAttendance, uploadAttendanceExcel, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUserAttendanceLogsByStartEndDate };
