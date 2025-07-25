@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyToken } from "../config/authMiddleware.js";
-import { applyLeave, fetchUsersLeaveRecordStats, getCompanyLeaveRecords, updateLeaveStatus } from "../controller/leaveRecordController.js";
+import { applyLeave, editLeaveIfApplied, fetchUsersLeaveRecordStats, getCompanyLeaveRecords, getLeaveById, updateLeaveStatus, userLeaveDetailsController } from "../controller/leaveRecordController.js";
 
 
 
@@ -13,6 +13,14 @@ import { applyLeave, fetchUsersLeaveRecordStats, getCompanyLeaveRecords, updateL
     router.route("/fetchusersLeaverecordstats/:userId").get( fetchUsersLeaveRecordStats );
 
     router.route("/fetchCompanyLeaverecord").get( getCompanyLeaveRecords );
+
+    router.route("/userLeaveDetails").get( userLeaveDetailsController );
+    
+    router.route("/leaves/:leaveId").get( getLeaveById );
+
+    router.route("/leaves/:leaveId").put( editLeaveIfApplied );
+
+
  
 
 

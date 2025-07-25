@@ -213,5 +213,133 @@ const getCompanyLeaveRecords = async (req, res) => {
 };
 
 
+const userLeaveDetailsController = async (req, res) => {
+  try {
+    const { userId, fromDate, toDate } = req.query;
 
-export { applyLeave, updateLeaveStatus, fetchUsersLeaveRecordStats, getCompanyLeaveRecords }
+    if (!userId || !fromDate || !toDate) {
+      return res.status(400).json({ message: "Missing required query parameters" });
+    }
+
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    to.setHours(23, 59, 59, 999); // Include full day
+
+    if (isNaN(from) || isNaN(to)) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
+
+    const leaveRecords = await LeaveRecord.findAll({
+      where: {
+        userId,
+        createdAt: {
+          [Op.between]: [from, to],
+        },
+      },
+      include: [
+        {
+          model: User,
+          as: 'employee',
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+        },
+        {
+          model: User,
+          as: 'approver',
+          attributes: ['id', 'firstName', 'lastName'],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    return res.status(200).json(leaveRecords);
+  } catch (error) {
+    console.error("Error fetching user leave records:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+const getLeaveById = async (req, res) => {
+  try {
+    const { leaveId } = req.params;
+
+    if (!leaveId) {
+      return res.status(400).json({ message: "Leave ID is required" });
+    }
+
+    const leave = await LeaveRecord.findByPk(leaveId, {
+      include: [
+        {
+          model: User,
+          as: 'employee',
+          attributes: ['id', 'firstName', 'lastName', 'email'],
+        },
+        {
+          model: User,
+          as: 'approver',
+          attributes: ['id', 'firstName', 'lastName'],
+        },
+      ],
+    });
+
+    if (!leave) {
+      return res.status(404).json({ message: "Leave not found" });
+    }
+
+    return res.status(200).json(leave);
+  } catch (error) {
+    console.error("Error fetching leave by ID:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+const editLeaveIfApplied = async (req, res) => {
+  try {
+    const { leaveId } = req.params;
+    const { leaveType, fromDate, toDate, reason } = req.body;
+
+    const leave = await LeaveRecord.findByPk(leaveId);
+
+    if (!leave) {
+      return res.status(404).json({ message: 'Leave not found' });
+    }
+
+    if (leave.status !== 'Applied') {
+      return res.status(403).json({ message: 'Only leaves with status "Applied" can be edited' });
+    }
+
+    // Validate dates
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
+
+    if (isNaN(start) || isNaN(end)) {
+      return res.status(400).json({ message: 'Invalid date format' });
+    }
+
+    if (end < start) {
+      return res.status(400).json({ message: 'To Date cannot be before From Date' });
+    }
+
+    const oneDay = 1000 * 60 * 60 * 24;
+    const totalDays = Math.round((end - start) / oneDay) + 1;
+
+    // Update values
+    leave.leaveType = leaveType;
+    leave.fromDate = fromDate;
+    leave.toDate = toDate;
+    leave.totalDays = totalDays;
+    leave.reason = reason;
+
+    await leave.save();
+
+    return res.status(200).json({ message: 'Leave updated successfully', leave });
+
+  } catch (error) {
+    console.error('Edit Leave Error:', error);
+    return res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+
+
+
+export { editLeaveIfApplied,getLeaveById,userLeaveDetailsController,applyLeave, updateLeaveStatus, fetchUsersLeaveRecordStats, getCompanyLeaveRecords }
