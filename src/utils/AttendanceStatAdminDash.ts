@@ -26,31 +26,32 @@ const getAttendanceSummaryAdminDashStat = (
   attendanceRecords.forEach((record) => {
     attendedEmployeeIds.add(record.employeeId);
 
-    switch (record.status) {
-      case "Present":
-        summary.Present++;
-        break;
-      case "Absent":
-        summary.Absent++; // Optional: if your punch log includes explicit absents
-        break;
-      case "Half-Day":
-        summary["Half Day"]++;
-        break;
-      case "On Break":
-        summary["On Break"]++;
-        break;
-      case "Leave":
-      case "On Leave":
-        summary["On Leave"]++;
-        break;
-    }
+    const isOnLeave = record.status === "Leave" || record.status === "On Leave";
+    const isOnBreak = record.status === "On Break";
+    const isHalfDay = record.status === "Half-Day";
 
-    if (record.isLate) summary["Late Comers"]++;
-    if (record.isEarlyLeave) summary["Early Leaving"]++;
+    if (isOnLeave) {
+      summary["On Leave"]++;
+    } else if (isOnBreak) {
+      summary["On Break"]++;
+    } else {
+      // Default to Present if not Leave or Break
+      summary.Present++;
+
+      // Mark additional attributes
+      if (isHalfDay) summary["Half Day"]++;
+      if (record.isLate) summary["Late Comers"]++;
+      if (record.isEarlyLeave) summary["Early Leaving"]++;
+    }
   });
 
-  // Calculate absent if not recorded in punch logs
-  summary.Absent = employees.filter(emp => !attendedEmployeeIds.has(emp.id)).length;
+  // Absent = employees who didn’t punch in at all (not even leave or break)
+  summary.Absent = employees.filter(emp => {
+    return !attendanceRecords.some(record =>
+      record.employeeId === emp.id &&
+      (record.status === "Present" || record.status === "Half-Day" || record.status === "On Break" || record.status === "Leave" || record.status === "On Leave")
+    );
+  }).length;
 
   const colorMap: Record<string, string> = {
     "Total": "#8000FF",
@@ -69,5 +70,6 @@ const getAttendanceSummaryAdminDashStat = (
     color: colorMap[label]
   }));
 };
+
 
 export default getAttendanceSummaryAdminDashStat;

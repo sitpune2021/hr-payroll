@@ -6,21 +6,43 @@ import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js
 import { log } from 'console';
 import { saveImageFile } from '../utils/imageUtils.js';
 
-const { Permission, Role, User, Company, Department, UserLeaveQuota } = models;
+const { Permission, Role, User,Branch, Company, Department, UserLeaveQuota } = models;
 
 const addNewUser = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
     let {
       firstName, lastName, contact, email, gender, Designation, roleId,
-      companyId, branchId, departmentId, reportingPerson, joiningDate,
+      companyId, branchId, departmentId, reportingManagerId, joiningDate,
       birthDate, attendanceMode, shiftRotationalFixed, workingShift,
       sendWhatsapp, geofencepoint, leaveTemplate, paymentMode, paymentDate,
       basicSalary, payrollTemplate, tempAddress, permenentAddress, bloodGroup,
       alternateMobileNO, pfNumber
     } = req.body;
 
-    // Required fields validation
+    const parseOrNull = (val) => {
+      if (val === undefined || val === null || val === '') return null;
+      const parsed = parseInt(val);
+      return isNaN(parsed) ? null : parsed;
+    };
+
+    // Parse integers safely
+    reportingManagerId = parseOrNull(reportingManagerId);
+    roleId = parseOrNull(roleId);
+    branchId = parseOrNull(branchId);
+    departmentId = parseOrNull(departmentId);
+    workingShift = parseOrNull(workingShift);
+    leaveTemplate = parseOrNull(leaveTemplate);
+    payrollTemplate = parseOrNull(payrollTemplate);
+
+    // Parse floats safely
+    basicSalary = (basicSalary === '' || isNaN(parseFloat(basicSalary))) ? null : parseFloat(basicSalary);
+
+    // Parse dates safely
+    joiningDate = joiningDate ? new Date(joiningDate) : null;
+    birthDate = birthDate ? new Date(birthDate) : null;
+    paymentDate = paymentDate ? new Date(paymentDate) : null;
+
     if (!firstName || !firstName.trim()) {
       return res.status(400).json({ message: "First name is required" });
     }
@@ -39,17 +61,6 @@ const addNewUser = async (req, res) => {
     if (!companyId) {
       return res.status(400).json({ message: "Company is required" });
     }
-
-
-    const clean = (val) => val === '' || val === undefined ? null : val;
-    [
-      birthDate, joiningDate, roleId, branchId, departmentId, gender,
-      basicSalary, geofencepoint, paymentMode, workingShift
-    ] = [
-        clean(birthDate), clean(joiningDate), clean(roleId), clean(branchId),
-        clean(departmentId), clean(gender), clean(basicSalary),
-        clean(geofencepoint), clean(paymentMode), clean(workingShift)
-      ];
 
     const company = await Company.findByPk(companyId);
     if (!company) return res.status(400).json({ message: "Company not found" });
@@ -89,7 +100,6 @@ const addNewUser = async (req, res) => {
       companyId,
       branchId,
       departmentId,
-      reportingPerson,
       joiningDate,
       birthDate,
       attendanceMode,
@@ -113,24 +123,19 @@ const addNewUser = async (req, res) => {
       panCard,
       bankDetails,
       educationalQualification,
+      reportingManagerId
     }, { transaction });
-
-    const currentYear = new Date().getFullYear();
-
-
-    // await addEmployee(newUser.id, newUser.firstName + " " + newUser.lastName, newUser.gender, newUser.designation)
 
     await UserLeaveQuota.create({
       userId: newUser.id,
       paidLeavesTaken: 0,
       sickLeavesTaken: 0,
       casualLeavesTaken: 0,
-      year: currentYear,
+      year: new Date().getFullYear(),
       month: null
     }, { transaction });
 
     await transaction.commit();
-
     return res.status(201).json({ message: "User added successfully", user: newUser });
 
   } catch (error) {
@@ -139,6 +144,7 @@ const addNewUser = async (req, res) => {
     return res.status(500).json({ message: "Error adding new user", error: error.message });
   }
 };
+
 
 
 
@@ -167,7 +173,7 @@ const getUsersList = async (req, res) => {
       if (loggedInUser.branchId) {
         whereClause.branchId = loggedInUser.branchId;
       }
-    } 
+    }
 
 
     // Pagination and sorting logic
@@ -187,14 +193,14 @@ const getUsersList = async (req, res) => {
       attributes: [
         'id', 'firstName', 'lastName', 'contact', 'email',
         'gender', 'designation', 'roleId', 'companyId',
-        'branchId', 'departmentId', 'reportingPerson',
+        'branchId', 'departmentId',
         'joiningDate', 'birthDate', 'attendanceMode',
         'shiftRotationalFixed', 'workingShift', 'sendAttTOWhatsapp',
         'geofencepoint', 'leaveTemplateId', 'paymentMode',
         'paymentDate', 'basicSalary',
         'payrollTemplate', 'temporaryAddress', 'PermenantAddress',
         'BloodGroup', 'alternatePhone', 'PFAccountDetails',
-        'bankDetails', 'adhaarCard', 'panCard',
+        'bankDetails', 'adhaarCard', 'panCard', "reportingManagerId",
         'educationalQualification', 'createdAt', 'updatedAt'
       ],
     });
@@ -344,5 +350,163 @@ const fetchCompanysUsers = async (req, res) => {
   }
 };
 
+const getTeamByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
 
-export { addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel, fetchCompanysUsers }
+    // 1. Fetch the user with reporting manager
+    const user = await User.findByPk(userId, {
+      attributes: ['id', 'firstName', 'lastName', 'designation', 'email','contact','reportingManagerId']
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const team = [];
+
+    // 2. Include manager (if exists)
+    if (user.reportingManagerId) {
+      const manager = await User.findByPk(user.reportingManagerId, {
+        attributes: ['id', 'firstName', 'lastName', 'designation', 'email','contact']
+      });
+
+      if (manager) {
+        team.push({
+          id: manager.id,
+          name: `${manager.firstName} ${manager.lastName}`,
+          email: manager.email,
+          contact: manager.contact,
+          designation: manager.designation,
+          type: 'manager'
+        });
+      }
+
+      // 3. Fetch all colleagues who report to the same manager
+      const peers = await User.findAll({
+        where: {
+          reportingManagerId: user.reportingManagerId
+        },
+        attributes: ['id', 'firstName', 'lastName', 'designation', 'email','contact']
+      });
+
+      for (const peer of peers) {
+        team.push({
+          id: peer.id,
+          name: `${peer.firstName} ${peer.lastName}`,
+          email: peer.email,
+          contact: peer.contact,
+          designation: peer.designation,
+          type: 'teamMember'
+        });
+      }
+
+    } else {
+      // No manager: only include self
+      team.push({
+        id: user.id,
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        designation: user.designation,
+        type: 'teamMember'
+      });
+    }
+
+    return res.json({ team });
+
+  } catch (error) {
+    console.error("Error fetching team:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getOrganizationTree = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Step 1: Get current user to extract companyId and branchId
+    const currentUser = await User.findByPk(userId);
+
+    if (!currentUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { companyId, branchId } = currentUser;
+
+    if (!companyId || !branchId) {
+      return res.status(400).json({ message: "Company ID or Branch ID missing for user" });
+    }
+
+    // Step 2: Fetch all users in the same company
+    const usersInCompany = await User.findAll({
+      where: { companyId },
+      attributes: ['id', 'firstName', 'lastName', 'designation', 'reportingManagerId', 'companyId', 'branchId'],
+      include: [
+        { model: Company, attributes: ['id', 'name'] },
+        { model: Branch, attributes: ['id', 'name'], required: false }
+      ]
+    });
+
+    // Step 3: Filter users in branch from company list
+    const usersInBranch = usersInCompany.filter(u => u.branchId === branchId);
+
+    // Step 4: Build maps for company and branch trees
+    const buildUserMap = (users) => {
+      const userMap = {};
+      users.forEach(user => {
+        userMap[user.id] = {
+          id: user.id,
+          name: `${user.firstName} ${user.lastName}`,
+          designation: user.designation,
+          company: user.Company ? { id: user.Company.id, name: user.Company.name } : null,
+          branch: user.Branch ? { id: user.Branch.id, name: user.Branch.name } : null,
+          team: []
+        };
+      });
+      return userMap;
+    };
+
+    const buildManagerMap = (users) => {
+      const managerMap = {};
+      users.forEach(user => {
+        const mgrId = user.reportingManagerId;
+        if (!managerMap[mgrId]) managerMap[mgrId] = [];
+        managerMap[mgrId].push(user.id);
+      });
+      return managerMap;
+    };
+
+    const buildTree = (managerMap, userMap, rootManagerId = null) => {
+      const children = managerMap[rootManagerId] || [];
+      return children.map(id => {
+        const userNode = userMap[id];
+        userNode.team = buildTree(managerMap, userMap, id);
+        return userNode;
+      });
+    };
+
+    // Company Tree
+    const companyUserMap = buildUserMap(usersInCompany);
+    const companyManagerMap = buildManagerMap(usersInCompany);
+    const companyTree = buildTree(companyManagerMap, companyUserMap);
+
+    // Branch Tree
+    const branchUserMap = buildUserMap(usersInBranch);
+    const branchManagerMap = buildManagerMap(usersInBranch);
+    const branchTree = buildTree(branchManagerMap, branchUserMap);
+
+    return res.json({
+      companyTree,
+      branchTree
+    });
+
+  } catch (error) {
+    console.error("Error building organization tree:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
+
+export { getOrganizationTree,getTeamByUserId, addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel, fetchCompanysUsers }

@@ -17,6 +17,7 @@ export interface CompanyUser {
   departmentId: number;
   workingShift: number | null;
   profilePhoto: string | null;
+  reportingManagerId: number | null;
 }
 
 interface CompanyUsersState {
@@ -37,6 +38,8 @@ export const fetchCompanysUsersThunk = createAsyncThunk<CompanyUser[], number>(
   'companysUsers/fetchCompanyUsers',
   async (companyId: number) => {
     const response = await axiosClient.get<CompanyUser[]>(`${FETCH_COMPANYS_EMPLOYEES}${companyId}`);
+    console.log(response);
+    
     return response.data;
   }
 );

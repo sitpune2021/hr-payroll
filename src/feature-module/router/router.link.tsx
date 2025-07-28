@@ -239,7 +239,6 @@ import CompaniesGrid from "../crm/companies/companiesGrid";
 import ContactDetails from "../crm/contacts/contactDetails";
 import ContactList from "../crm/contacts/contactList";
 import ContactGrid from "../crm/contacts/contactGrid";
-import CompaniesList from "../crm/companies/companiesList";
 import CompaniesDetails from "../crm/companies/companiesDetails";
 import LeadsGrid from "../crm/leads/leadsGrid";
 import LeadsList from "../crm/leads/leadsList";
@@ -1711,11 +1710,6 @@ export const publicRoutes = [
     label: 'Companies',
     path: routes.companiesGrid,
     element: <CompaniesGrid />,
-    route: Route,
-  },
-  {
-    path: routes.companiesList,
-    element: <CompaniesList />,
     route: Route,
   },
   {

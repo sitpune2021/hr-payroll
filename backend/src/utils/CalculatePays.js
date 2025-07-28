@@ -1,56 +1,109 @@
-
 import models from '../models/index.js';
 import { getAttendanceSummary } from './GetAttendanceSummary.js';
 
-const { User, Attendance } = models;
+const { User, PayrollComponent, PayrollTemplate } = models;
 
 export const calculatePay = async (userId, startDate, endDate) => {
-    // Get attendance summary
-    const summary = await getAttendanceSummary(userId, startDate, endDate);
+  const summary = await getAttendanceSummary(userId, startDate, endDate);
 
-    // Fetch user to access basicSalary and paymentMode
-    const user = await User.findByPk(userId);
-    if (!user) throw new Error('User not found');
+  const user = await User.findByPk(userId, {
+    include: [{ model: PayrollTemplate, include: [PayrollComponent] }],
+  });
 
-    const paymentMode = user.paymentMode || 'Month'; // Month, Day, Hour
-    const basicSalary = user.basicSalary || 0;
+  if (!user) throw new Error('User not found');
 
-    const eligiblePaidDays = summary.presentDays + summary.paidLeaveDays + summary.holidays + summary.weeklyOffs;
+  const { paymentMode = 'Month', basicSalary = 0 } = user;
+  const eligiblePaidDays =
+    summary.presentDays + summary.paidLeaveDays + summary.holidays + summary.weeklyOffs;
 
-    let grossPay = 0;
-    let perDayRate = 0;
-    let hourlyRate = 0;
-    let totalHoursWorked = 0;
+  let perDayRate = 0;
+  let hourlyRate = 0;
+  let totalHoursWorked = summary.totalHoursWorked || 0;
+  let grossPay = 0;
 
-    if (paymentMode === 'Month') {
-        // Assume 30-day month
-        perDayRate = basicSalary / 30;
-        grossPay = perDayRate * eligiblePaidDays;
-    } else if (paymentMode === 'Day') {
-        perDayRate = basicSalary;
-        grossPay = perDayRate * eligiblePaidDays;
-    } else if (paymentMode === 'Hour') {
-        // Sum up hours worked from attendance
+  // Calculate base pay
+  if (paymentMode === 'Month') {
+    perDayRate = basicSalary / 30;
+    grossPay = perDayRate * eligiblePaidDays;
+  } else if (paymentMode === 'Day') {
+    perDayRate = basicSalary;
+    grossPay = perDayRate * eligiblePaidDays;
+  } else if (paymentMode === 'Hour') {
+    hourlyRate = basicSalary;
+    grossPay = hourlyRate * totalHoursWorked;
+  }
 
-        totalHoursWorked = summary.totalHoursWorked;
+  let allowanceTotal = 0;
+  let deductionTotal = 0;
+  let bonusTotal = 0;
+  const payrollComponentsBreakdown = [];
 
-        hourlyRate = basicSalary;
-        grossPay = hourlyRate * totalHoursWorked;
+  if (user.payrollTemplate && user.PayrollTemplate?.PayrollComponents) {
+    for (const component of user.PayrollTemplate.PayrollComponents) {
+      const base = grossPay;
+      let amount = 0;
+
+      if (component.amountType === 'Fixed') {
+        amount = component.value;
+      } else if (component.amountType === 'Percentage') {
+        amount = (component.value / 100) * base;
+      }
+
+      if (component.type === 'Allowance') {
+        allowanceTotal += amount;
+      } else if (component.type === 'Deduction') {
+        deductionTotal += amount;
+      } else if (component.type === 'Bonus') {
+        bonusTotal += amount;
+      }
+
+      payrollComponentsBreakdown.push({
+        name: component.name,
+        type: component.type,
+        amountType: component.amountType,
+        value: component.value,
+        calculatedAmount: Number(amount.toFixed(2)),
+      });
     }
+  }
 
-    // Final result
-    return {
-        userId,
-        name: `${user.firstName} ${user.lastName}`,
-        startDate,
-        endDate,
-        paymentMode,
-        basicSalary,
-        perDayRate: Number(perDayRate.toFixed(2)),
-        hourlyRate: Number(hourlyRate.toFixed(2)),
-        eligiblePaidDays,
-        totalHoursWorked,
-        grossPay: Number(grossPay.toFixed(2)),
-        ...summary, // include breakdown: presentDays, holidays, etc.
-    };
+  const finalPay = grossPay + allowanceTotal + bonusTotal - deductionTotal;
+
+  const calculationDescription = `
+Payment Mode: ${paymentMode}
+Basic Salary: ${basicSalary}
+Per Day Rate: ${perDayRate.toFixed(2)}
+Hourly Rate: ${hourlyRate.toFixed(2)}
+Eligible Paid Days: ${eligiblePaidDays}
+Total Hours Worked: ${totalHoursWorked}
+Gross Pay: ${grossPay.toFixed(2)}
+
+Add Allowances: ${allowanceTotal.toFixed(2)}
+Add Bonuses: ${bonusTotal.toFixed(2)}
+Subtract Deductions: ${deductionTotal.toFixed(2)}
+
+Final Pay = Gross Pay + Allowances + Bonuses - Deductions = ${finalPay.toFixed(2)}
+  `.trim();
+
+  return {
+    userId,
+    name: `${user.firstName} ${user.lastName}`,
+    startDate,
+    endDate,
+    paymentMode,
+    basicSalary,
+    perDayRate: Number(perDayRate.toFixed(2)),
+    hourlyRate: Number(hourlyRate.toFixed(2)),
+    eligiblePaidDays,
+    totalHoursWorked,
+    grossPay: Number(grossPay.toFixed(2)),
+    allowanceTotal: Number(allowanceTotal.toFixed(2)),
+    deductionTotal: Number(deductionTotal.toFixed(2)),
+    bonusTotal: Number(bonusTotal.toFixed(2)),
+    finalPay: Number(finalPay.toFixed(2)),
+    payrollComponentsBreakdown,
+    calculationDescription,
+    ...summary,
+  };
 };
+

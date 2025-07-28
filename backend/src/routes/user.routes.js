@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from 'multer';
 import { checkPermission, verifyToken } from "../config/authMiddleware.js";
-import { addNewUser, fetchCompanysUsers, getUsersList, updateUserCOntrller, uploadUsersExcel } from "../controller/user.controller.js";
+import { addNewUser, fetchCompanysUsers, getOrganizationTree, getTeamByUserId, getUsersList, updateUserCOntrller, uploadUsersExcel } from "../controller/user.controller.js";
 
 
 const router = Router();
@@ -22,6 +22,11 @@ router.route("/editUser/:userId").put([verifyToken, checkPermission('EditUser')]
 router.route('/uploaduserexcel').post([verifyToken, checkPermission('AddUser'), upload.single('file')], uploadUsersExcel);
 
 router.route("/getcompanyusers/:companyId").get([verifyToken], fetchCompanysUsers);
+
+router.route("/team/:userId").get([verifyToken], getTeamByUserId);
+router.route("/orgtree/:userId").get([verifyToken], getOrganizationTree);
+
+
 
 
 

@@ -1,4 +1,6 @@
+import { log } from 'console';
 import models from '../models/index.js';
+import { text } from 'stream/consumers';
 
 const { Role, Permission, RolePermission, Company, PayrollTemplate,PayrollComponent } = models
 
@@ -66,7 +68,8 @@ const editPayrollTemplateWithComponents = async (req, res) => {
             companyId,
             components = [],
         } = req.body;
-        
+        console.log(templateName,components,templateId,companyId);
+                
 
         // Step 1: Update the payroll template
         await PayrollTemplate.update(

@@ -1,6 +1,6 @@
 
 import { Router } from 'express';
-import { getUserDataController, loginController, registerController } from '../controller/auth.controller.js';
+import { getUserDataController, loginController, logoutController, registerController } from '../controller/auth.controller.js';
 import { checkRole, verifyToken } from '../config/authMiddleware.js';
 
 const router =  Router();
@@ -9,6 +9,9 @@ const router =  Router();
 router.route('/login').post(loginController) 
 router.route('/register').post(registerController) 
 router.route("/getUser").get([verifyToken], getUserDataController);
+
+router.route("/logout").post(logoutController);
+
 
 
 

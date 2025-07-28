@@ -26,6 +26,8 @@ import ImageWithBasePath from '../../../core/common/imageWithBasePath';
 import { fetchLeaveTemplates, LeaveTemplates } from '../../../core/data/redux/leaveTemplateSlice';
 import { exportAttendanceLogsToPDF } from '../../reports/exportAttendanceLogsToPDF';
 import { formatToDDMonthNameYYYY } from '../../../utils/formatDateDDMonthNameYYYY';
+import SalarySlip, { SalaryData } from '../../../utils/SalarySlip';
+import { fetchCompanysUsersThunk } from '../../../core/data/redux/companysUsersSlice';
 type PasswordField = "password" | "confirmPassword";
 
 const Users = () => {
@@ -46,6 +48,12 @@ const Users = () => {
     const [panCard, setPanCard] = useState<File | null>(null);
     const [educationalQulif, setEducationalQulif] = useState<File | null>(null);
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+    const [searchText, setSearchText] = useState('');
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    // This assumes you have allEmployees fetched somewhere
+    // If not, fetch and setAllEmployees from your API
+
 
     const [uploadExcelSelectedFormData, setUploadExcelSelectedFormData] = useState({
         companyId: '',
@@ -289,6 +297,7 @@ const Users = () => {
     const payrollTemplates = useSelector((state: RootState) => state.payrollTemplate.templates);
     const shiftsList = useSelector((state: RootState) => state.shifts.shifts);
     const leaveTemplateList = useAppSelector((state) => state.leaveTemplate.templates);
+      const companyUserList = useSelector((state: RootState) => state.companysEmployees.list);
 
     useEffect(() => {
         if (payrollTemplates.length > 0) {
@@ -391,7 +400,6 @@ const Users = () => {
         companyId: '',
         branchId: '',
         departmentId: '',
-        reportingPerson: '',
         joiningDate: '',
         birthDate: '',
         attendanceMode: '',
@@ -408,7 +416,8 @@ const Users = () => {
         permenentAddress: '',
         bloodGroup: '',
         alternateMobileNO: '',
-        pfNumber: ''
+        pfNumber: '',
+        reportingManagerId:''
     });
 
     const [formErrors, setFormErrors] = useState({
@@ -484,7 +493,6 @@ const Users = () => {
             companyId,
             branchId,
             departmentId,
-            reportingPerson,
             joiningDate,
             birthDate,
             attendanceMode,
@@ -533,11 +541,6 @@ const Users = () => {
         if (adhaarCard) payload.append("adhaarCard", adhaarCard);
         if (panCard) payload.append("panCard", panCard);
         if (educationalQulif) payload.append("educationalQulif", educationalQulif);
-
-
-
-
-
 
         try {
             console.log(formDactaAddUser);
@@ -744,9 +747,37 @@ const Users = () => {
         return data;
     };
 
+    const [salaryData, setSalaryData] = useState<SalaryData | null>(null);
 
+    const fetchSalary = async () => {
+        console.log("@@@@@@@@@@@@@", startDate, endDate, viewUserDetails?.id);
 
+        if (!startDate || !endDate || !viewUserDetails?.id) return;
 
+        try {
+            const response = await axiosClient.post("/api/payments/calculate", {
+                userId: viewUserDetails.id,
+                startDate,
+                endDate,
+            });
+            console.log(response);
+
+            setSalaryData(response.data); // store for rendering
+        } catch (error) {
+            console.error("Salary calculation error:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSalary();
+    }, [startDate, endDate, viewUserDetails])
+
+    
+    useEffect(() => {
+        if (user?.companyId) {
+          dispatch(fetchCompanysUsersThunk(user.companyId));
+        }
+      }, [user]);
 
     return (
         <>
@@ -1409,17 +1440,51 @@ const Users = () => {
                                                     }
                                                 </select>
                                             </div>
-                                            <div className="col-md-6 mb-3">
-                                                <label className="form-label">Reporting Person</label>
+                                            <div className="col-md-6 mb-3 position-relative">
+                                                <label className="form-label">Reporting Manager</label>
                                                 <input
                                                     type="text"
                                                     className="form-control"
-                                                    value={formDactaAddUser.reportingPerson}
-                                                    onChange={(e) =>
-                                                        setFormDataAddUser({ ...formDactaAddUser, reportingPerson: e.target.value })
-                                                    }
+                                                    value={searchText}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setSearchText(val);
+                                                        setShowDropdown(true);
+                                                    }}
+                                                    onBlur={() => {
+                                                        setTimeout(() => setShowDropdown(false), 500); // delay to allow selection
+                                                    }}
+                                                    onFocus={() => setShowDropdown(true)}
+                                                    placeholder="Search employee..."
                                                 />
+                                                {showDropdown && (
+                                                    <ul className="dropdown-menu show w-100" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                        {companyUserList
+                                                            .filter(emp =>
+                                                                `${emp.firstName} ${emp.lastName}`.toLowerCase().includes(searchText.toLowerCase())
+                                                            )
+                                                            .map(emp => (
+                                                                <li key={emp.id}>
+                                                                    <button
+                                                                        className="dropdown-item"
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setFormDataAddUser({ ...formDactaAddUser, reportingManagerId: emp.id.toString() });
+                                                                            setSearchText(`${emp.firstName} ${emp.lastName}`);
+                                                                            setShowDropdown(false);
+                                                                        }}
+                                                                    >
+                                                                        {emp.firstName} {emp.lastName}
+                                                                    </button>
+                                                                </li>
+                                                            ))}
+                                                        {companyUserList.length === 0 && (
+                                                            <li className="dropdown-item text-muted">No employees</li>
+                                                        )}
+                                                    </ul>
+                                                )}
                                             </div>
+
                                             <div className="col-md-6 mb-3">
                                                 <label className="form-label">Joining Date</label>
                                                 <input
@@ -2368,7 +2433,6 @@ const Users = () => {
 
                                 <TabPanel>
                                     <div className="container mt-1">
-
                                         <div className="d-flex align-items-center gap-3 mb-3">
                                             <input
                                                 type="date"
@@ -2377,7 +2441,6 @@ const Users = () => {
                                                 onChange={(e) => setStartDate(e.target.value)}
                                                 style={{ maxWidth: "200px" }}
                                             />
-
                                             <input
                                                 type="date"
                                                 className="form-control"
@@ -2385,103 +2448,81 @@ const Users = () => {
                                                 onChange={(e) => setEndDate(e.target.value)}
                                                 style={{ maxWidth: "200px" }}
                                             />
-
-                                            <button
-                                                className="btn btn-primary"
-                                                onClick={() =>
-                                                    exportAttendanceLogsToPDF(
-                                                        logs,
-                                                        getCompanyNameById(viewUserDetails?.companyId),
-                                                        geBranchNameById(viewUserDetails?.branchId),
-                                                        (viewUserDetails?.firstName + " " + viewUserDetails?.lastName) || "",
-                                                        startDate,
-                                                        endDate,
-                                                        attendanceSummary
-                                                    )
-                                                }
-                                            >
-                                                Download PDF
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-3">
-                                        <div
-                                            style={{
-                                                width: "100%",
-                                                maxWidth: "100%",
-                                                height: "300px",
-                                                overflow: "auto",
-                                            }}
-                                        >
-                                            <table className="table datanew table-bordered">
-                                                <thead className="table-header">
-                                                    <tr>
-                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Date</th>
-                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Day</th>
-                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Status</th>
-                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Working Hrs</th>
-                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Overtime Hrs</th>
-                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Check In</th>
-                                                        <th style={{ position: "sticky", top: 0, zIndex: 2 }}>Check Out</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {logs.map((log, index) => (
-                                                        <tr key={index}>
-                                                            <td>{formatToDDMonthNameYYYY(log.date)}</td>
-                                                            <td>{log.day}</td>
-                                                            <td>{log.status}</td>
-                                                            <td>{log.workingHours}</td>
-                                                            <td>{log.overtimeHours}</td>
-                                                            <td>{log.checkIn ? new Date(log.checkIn).toLocaleTimeString() : "-"}</td>
-                                                            <td>{log.checkOut ? new Date(log.checkOut).toLocaleTimeString() : "-"}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
                                         </div>
 
-                                        {/* ✅ Attendance Summary Below Table */}
-                                        {attendanceSummary && (
+                                        {salaryData && (
                                             <div className="mt-4">
-                                                <h5>Attendance Summary</h5>
-                                                <table className="table table-bordered w-auto">
+                                                <h5>Salary Details for: {salaryData.name}</h5>
+                                                <table className="table table-bordered w-auto mt-3">
                                                     <tbody>
                                                         <tr>
-                                                            <th>Total Days</th>
-                                                            <td>{attendanceSummary.totalDays}</td>
-                                                            <th>Working Days</th>
-                                                            <td>{attendanceSummary.workingDays}</td>
-                                                            <th>Present Days</th>
-                                                            <td>{attendanceSummary.presentDays}</td>
+                                                            <th>Basic Salary</th>
+                                                            <td>₹ {salaryData.basicSalary}</td>
+                                                            <th>Payment Mode</th>
+                                                            <td>{salaryData.paymentMode}</td>
                                                         </tr>
                                                         <tr>
-                                                            <th>Half Days</th>
-                                                            <td>{attendanceSummary.halfDayCount}</td>
-                                                            <th>Paid Leave</th>
-                                                            <td>{attendanceSummary.paidLeaveDays}</td>
-                                                            <th>Unpaid Leave</th>
-                                                            <td>{attendanceSummary.unpaidLeaveDays}</td>
+                                                            <th>Per Day Rate</th>
+                                                            <td>{salaryData.perDayRate}</td>
+                                                            <th>Hourly Rate</th>
+                                                            <td>{salaryData.hourlyRate}</td>
                                                         </tr>
                                                         <tr>
-                                                            <th>Holidays</th>
-                                                            <td>{attendanceSummary.holidays}</td>
-                                                            <th>Weekly Offs</th>
-                                                            <td>{attendanceSummary.weeklyOffs}</td>
-                                                            <th>Absent Days</th>
-                                                            <td>{attendanceSummary.absentDays}</td>
-                                                        </tr>
-                                                        <tr>
+                                                            <th>Eligible Paid Days</th>
+                                                            <td>{salaryData.eligiblePaidDays}</td>
                                                             <th>Total Hours Worked</th>
-                                                            <td>{attendanceSummary.totalHoursWorked}</td>
-                                                            <th>Overtime Hours</th>
-                                                            <td>{attendanceSummary.totalOvertimeWorked}</td>
-                                                            <td></td>
-                                                            <td></td>
+                                                            <td>{salaryData.totalHoursWorked}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Gross Pay</th>
+                                                            <td>₹ {salaryData.grossPay}</td>
+                                                            <th>Allowances</th>
+                                                            <td>₹ {salaryData.allowanceTotal}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Bonuses</th>
+                                                            <td>₹ {salaryData.bonusTotal}</td>
+                                                            <th>Deductions</th>
+                                                            <td>₹ {salaryData.deductionTotal}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Final Pay</th>
+                                                            <td colSpan={3}>
+                                                                <strong>₹ {salaryData.finalPay}</strong>
+                                                            </td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
+
+                                                {/* 🧾 Payroll Components Breakdown */}
+                                                <h6>Payroll Components</h6>
+                                                <table className="table table-striped table-bordered w-auto">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Name</th>
+                                                            <th>Type</th>
+                                                            <th>Amount Type</th>
+                                                            <th>Value</th>
+                                                            <th>Calculated Amount</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {salaryData.payrollComponentsBreakdown.map((comp, i) => (
+                                                            <tr key={i}>
+                                                                <td>{comp.name}</td>
+                                                                <td>{comp.type}</td>
+                                                                <td>{comp.amountType}</td>
+                                                                <td>{comp.value}</td>
+                                                                <td>₹ {comp.calculatedAmount}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+
+                                                {/* ✅ Download Button */}
+                                                <div className="mt-4">
+                                                    <SalarySlip salaryData={salaryData} />
+                                                </div>
                                             </div>
                                         )}
                                     </div>
