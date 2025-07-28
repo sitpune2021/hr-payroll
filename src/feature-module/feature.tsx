@@ -1,5 +1,5 @@
-import { useSelector } from "react-redux";
-import { Navigate, Outlet, useLocation } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router";
 import Header from "../core/common/header";
 import Sidebar from "../core/common/sidebar";
 // import ThemeSettings from "../core/common/theme-settings";
@@ -9,12 +9,17 @@ import TwoColumnSidebar from "../core/common/two-column";
 import StackedSidebar from "../core/common/stacked-sidebar";
 import DeleteModal from "../core/modals/deleteModal";
 import { publicRoutes } from "./router/router.link";
+import axiosClient from "../axiosConfig/axiosClient";
+import { AUTH_LOGOUT } from "../axiosConfig/apis";
+import { logout, setUser } from "../core/data/redux/authSlice";
 
 interface FeatureProps {
   allowedLabels: string[];
 } 
 
 const Feature: React.FC<FeatureProps>  = ({ allowedLabels }) => {
+  const navigate= useNavigate();
+  const dispatch= useDispatch();
   const [showLoader, setShowLoader] = useState(true);
   const headerCollapse = useSelector((state: any) => state.themeSetting.headerCollapse);
   const mobileSidebar = useSelector(
@@ -67,22 +72,29 @@ const Feature: React.FC<FeatureProps>  = ({ allowedLabels }) => {
   };
 
 
-    // 🧠 Route permission check
-    const currentRoute = publicRoutes.find((route) => route.path === location.pathname);
-    console.log('pathname', location.pathname);
-    
-    const currentLabel = currentRoute?.label;
-    console.log('current label',currentLabel);
-    
-  
-    const isAllowed = currentLabel && allowedLabels.includes(currentLabel);
-    console.log('isAllowed', isAllowed);
-  
-    if (!isAllowed) {
-      console.log(location.pathname,currentLabel);
-      
-      return <Navigate to="/not-allowed" replace />;
-    }  
+   useEffect(() => {
+    const enforcePermissions = async () => {
+      const currentRoute = publicRoutes.find(
+        (route) => route.path === location.pathname
+      );
+      const currentLabel = currentRoute?.label;
+
+      const isAllowed = currentLabel && allowedLabels.includes(currentLabel);
+
+      if (!isAllowed) {
+        console.log("Unauthorized access. Logging out...");
+        try {
+          await axiosClient.post(AUTH_LOGOUT, {}, { withCredentials: true });
+        } catch (error) {
+          console.error("Logout failed", error);
+        }
+       dispatch(logout());
+        navigate("/login", { replace: true });
+      }
+    };
+
+    enforcePermissions();
+  }, [location.pathname, allowedLabels, navigate]);  
   return (
     <>
       <style>

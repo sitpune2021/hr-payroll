@@ -174,10 +174,10 @@ const AttendanceAdmin = () => {
                 <div className="card flex-fill">
                   <div className="card-body d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center overflow-hidden">
-                      <span className="avatar avatar-lg bg-primary flex-shrink-0">
+                      <span className="avatar avatar-md bg-primary flex-shrink-0">
                         <i className="ti ti-building fs-16" />
                       </span>
-                      <div className="ms-2 overflow-hidden">
+                      <div className="ms-1 overflow-hidden">
                         <p className="fs-16 fw-medium mb-1 text-truncate">
                           Total
                         </p>
@@ -199,7 +199,7 @@ const AttendanceAdmin = () => {
                 <div className="card flex-fill">
                   <div className="card-body d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center overflow-hidden">
-                      <span className="avatar avatar-lg bg-success flex-shrink-0">
+                      <span className="avatar avatar-md bg-success flex-shrink-0">
                         <i className="ti ti-building fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
@@ -218,7 +218,7 @@ const AttendanceAdmin = () => {
                 <div className="card flex-fill">
                   <div className="card-body d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center overflow-hidden">
-                      <span className="avatar avatar-lg bg-danger flex-shrink-0">
+                      <span className="avatar avatar-md bg-danger flex-shrink-0">
                         <i className="ti ti-building fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
@@ -237,7 +237,7 @@ const AttendanceAdmin = () => {
                 <div className="card flex-fill">
                   <div className="card-body d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center overflow-hidden">
-                      <span className="avatar avatar-lg bg-purple flex-shrink-0">
+                      <span className="avatar avatar-md bg-purple flex-shrink-0">
                         <i className="ti ti-map-pin-check fs-16" />
                       </span>
                       <div className="ms-1 overflow-hidden">
@@ -255,7 +255,7 @@ const AttendanceAdmin = () => {
                 <div className="card flex-fill">
                   <div className="card-body d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center overflow-hidden">
-                      <span className="avatar avatar-lg bg-skyblue flex-shrink-0">
+                      <span className="avatar avatar-md bg-skyblue flex-shrink-0">
                         <i className="ti ti-map-pin-check fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">
@@ -273,7 +273,7 @@ const AttendanceAdmin = () => {
                 <div className="card flex-fill">
                   <div className="card-body d-flex align-items-center justify-content-between">
                     <div className="d-flex align-items-center overflow-hidden">
-                      <span className="avatar avatar-lg bg-pink flex-shrink-0">
+                      <span className="avatar avatar-md bg-pink flex-shrink-0">
                         <i className="ti ti-map-pin-check fs-16" />
                       </span>
                       <div className="ms-2 overflow-hidden">

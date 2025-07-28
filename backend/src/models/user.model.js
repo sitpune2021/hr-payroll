@@ -33,7 +33,7 @@ export default (sequelize) => {
       allowNull: false,
       validate: {
         isEmail: true,
-      }, 
+      },
     },
     gender: {
       type: DataTypes.STRING,
@@ -59,10 +59,6 @@ export default (sequelize) => {
     departmentId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    reportingPerson: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     joiningDate: {
       type: DataTypes.DATE,
@@ -138,7 +134,7 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-     profilePhoto: {
+    profilePhoto: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -158,6 +154,10 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    reportingManagerId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
 
   }, {
     tableName: 'User',
@@ -171,7 +171,8 @@ export default (sequelize) => {
     User.belongsTo(models.Department, { foreignKey: 'departmentId' });
     User.belongsTo(models.PayrollTemplate, { foreignKey: 'payrollTemplate' });
     User.belongsTo(models.LeaveTemplate, { foreignKey: 'leaveTemplateId' });
-
+    User.belongsTo(models.User, { as: 'manager', foreignKey: 'reportingManagerId' });
+    User.hasMany(models.User, { as: 'teamMembers', foreignKey: 'reportingManagerId' });
   };
 
 

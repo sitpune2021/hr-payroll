@@ -75,8 +75,6 @@ const loginController = async (req, res) => {
   }
 };
 
-
-
 const registerController = async (req, res) => {
 
   const { email, password, firstName, lastName, roleId, companyId, branchId,contact } = req.body;
@@ -140,5 +138,15 @@ const getUserDataController = async (req, res) => {
   }
 
 }
+const logoutController = (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: false,     // same as in your login
+    sameSite: 'Lax',
+  });
 
-export { loginController, registerController, getUserDataController };
+  res.status(200).json({ message: 'Logout successful' });
+};
+
+
+export { logoutController,loginController, registerController, getUserDataController };
