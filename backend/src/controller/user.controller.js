@@ -356,7 +356,7 @@ const getTeamByUserId = async (req, res) => {
 
     // 1. Fetch the user with reporting manager
     const user = await User.findByPk(userId, {
-      attributes: ['id', 'firstName', 'lastName', 'designation', 'email','contact','reportingManagerId']
+      attributes: ['id', 'firstName', 'lastName','profilePhoto', 'designation', 'email','contact','reportingManagerId']
     });
 
     if (!user) {
@@ -368,7 +368,7 @@ const getTeamByUserId = async (req, res) => {
     // 2. Include manager (if exists)
     if (user.reportingManagerId) {
       const manager = await User.findByPk(user.reportingManagerId, {
-        attributes: ['id', 'firstName', 'lastName', 'designation', 'email','contact']
+        attributes: ['id', 'firstName', 'lastName', 'profilePhoto','designation', 'email','contact']
       });
 
       if (manager) {
@@ -378,6 +378,7 @@ const getTeamByUserId = async (req, res) => {
           email: manager.email,
           contact: manager.contact,
           designation: manager.designation,
+          profilePhoto: manager.profilePhoto,
           type: 'manager'
         });
       }
@@ -387,7 +388,7 @@ const getTeamByUserId = async (req, res) => {
         where: {
           reportingManagerId: user.reportingManagerId
         },
-        attributes: ['id', 'firstName', 'lastName', 'designation', 'email','contact']
+        attributes: ['id', 'firstName', 'lastName','profilePhoto', 'designation', 'email','contact']
       });
 
       for (const peer of peers) {
@@ -397,6 +398,7 @@ const getTeamByUserId = async (req, res) => {
           email: peer.email,
           contact: peer.contact,
           designation: peer.designation,
+          profilePhoto: peer.profilePhoto,
           type: 'teamMember'
         });
       }
@@ -506,7 +508,60 @@ const getOrganizationTree = async (req, res) => {
   }
 };
 
+const getUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findOne({
+      where: { id: userId },
+      attributes: [
+        'id',
+        'firstName',
+        'lastName',
+        'email',
+        'contact',
+        'designation',
+        'birthDate',
+        'BloodGroup',
+        'profilePhoto',
+        'companyId'
+      ],
+      include: [
+        {
+          model: Company,
+          attributes: ['name'],
+        }
+      ]
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Format response
+    const fullName = `${user.firstName} ${user.lastName}`;
+    const formattedDOB = user.birthDate
+      ? new Date(user.birthDate).toISOString().split('T')[0].split('-').reverse().join(' : ')
+      : null;
+
+    res.json({
+      id: user.id,
+      fullName,
+      designation: user.designation,
+      companyName: user.Company?.name || 'N/A',
+      empCode: `Emp Code${user.id}`,
+      dob: formattedDOB,
+      bloodGroup: user.BloodGroup || 'N/A',
+      contact: user.contact,
+      email: user.email,
+      profilePhoto: user.profilePhoto || null
+    });
+
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
 
-
-export { getOrganizationTree,getTeamByUserId, addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel, fetchCompanysUsers }
+export {getUserProfile, getOrganizationTree,getTeamByUserId, addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel, fetchCompanysUsers }

@@ -1,7 +1,7 @@
 
 import { Router } from 'express'; 
 import multer from 'multer';
-import { getCompanyAttendanceByDate, getUserAttendanceLogsByStartEndDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUsersAttendancePerDay, markNewAttendance, uploadAttendanceExcel } from '../controller/attendance.controller.js';
+import { getCalenderAttendance, getCompanyAttendanceByDate, getUserAttendanceLogsByStartEndDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUsersAttendancePerDay, markNewAttendance, uploadAttendanceExcel } from '../controller/attendance.controller.js';
 import { verifyToken } from '../config/authMiddleware.js';
 const router =  Router(); 
 
@@ -20,6 +20,7 @@ router.route('/attendanceLogsByUserIDStartDtEndDt').get(getUserAttendanceLogsByS
 
 router.route('/UsersAttendanceDetailperday/:userId/:date').get(getUsersAttendancePerDay);
 
+router.route('/attendancecalender').get(getCalenderAttendance);
 
 
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from 'multer';
 import { checkPermission, verifyToken } from "../config/authMiddleware.js";
-import { addNewUser, fetchCompanysUsers, getOrganizationTree, getTeamByUserId, getUsersList, updateUserCOntrller, uploadUsersExcel } from "../controller/user.controller.js";
+import { addNewUser, fetchCompanysUsers, getOrganizationTree, getTeamByUserId, getUserProfile, getUsersList, updateUserCOntrller, uploadUsersExcel } from "../controller/user.controller.js";
 
 
 const router = Router();
@@ -25,6 +25,8 @@ router.route("/getcompanyusers/:companyId").get([verifyToken], fetchCompanysUser
 
 router.route("/team/:userId").get([verifyToken], getTeamByUserId);
 router.route("/orgtree/:userId").get([verifyToken], getOrganizationTree);
+
+router.route("/profile/:userId").get([verifyToken], getUserProfile);
 
 
 
