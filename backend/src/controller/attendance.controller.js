@@ -6,6 +6,7 @@ import models from "../models/index.js";
 import { processPunch } from '../utils/punchProcessor.js';
 import { getAttendanceSummary } from '../utils/GetAttendanceSummary.js';
 import { getAttendanceLogs } from '../utils/getAttendanceLogs.js';
+import { Op } from 'sequelize';
 
 const { Attendance, AttendanceSetting, User, EmployeeShiftSchedule } = models;
 
@@ -405,5 +406,70 @@ const getUsersAttendancePerDay = async (req, res) => {
 };
 
 
+const getCalenderAttendance = async (req, res) => {
+  try {
+    const { startDate, endDate, employeeId } = req.query;
 
-export { getUsersAttendancePerDay,markNewAttendance, uploadAttendanceExcel, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUserAttendanceLogsByStartEndDate };
+    // 1. Get all attendance records within date range
+    const attendances = await Attendance.findAll({
+      where: {
+        employeeId,
+        date: {
+          [Op.between]: [startDate, endDate],
+        },
+      },
+    });
+
+    // 2. Map date to status
+    const dateStatusMap = {};
+    attendances.forEach((att) => {
+      const date = att.date; // string in 'YYYY-MM-DD'
+      dateStatusMap[date] = att.status;
+    });
+
+    // 3. Init stats
+    let stats = {
+      presentDays: 0,
+      absentDays: 0,
+      leave: 0,
+      holidays: 0,
+      halfDays: 0,
+      remainingDays: 0, // optional or can be dropped
+    };
+
+    // 4. Generate all dates in range and build response
+    const dateArray = [];
+    let current = new Date(startDate);
+    const end = new Date(endDate);
+
+    while (current <= end) {
+      const dateStr = current.toISOString().split('T')[0];
+      const status = dateStatusMap[dateStr] || 'Absent'; // If no punch = Absent
+
+      // Assign status for frontend use
+      dateArray.push({ date: dateStr, status });
+
+      // Update stats
+      if (status === 'Present' || status === 'Unscheduled') stats.presentDays++;
+      else if (status === 'Leave') stats.leave++;
+      else if (status === 'Half-Day') stats.halfDays++;
+      else if (status === 'Absent') stats.absentDays++;
+
+      current.setDate(current.getDate() + 1);
+    }
+
+    res.json({
+      stats,
+      dateWiseStatus: dateArray,
+    });
+
+  } catch (error) {
+    console.error("Error fetching attendance summary:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+
+
+export {getCalenderAttendance, getUsersAttendancePerDay,markNewAttendance, uploadAttendanceExcel, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUserAttendanceLogsByStartEndDate };

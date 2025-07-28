@@ -403,7 +403,7 @@ const Users = () => {
         joiningDate: '',
         birthDate: '',
         attendanceMode: '',
-        shiftRotationalFixed: '',
+        shiftRotationalFixed: 'Fixed',
         workingShift: '',
         sendWhatsapp: '',
         geofencepoint: '',
@@ -1592,7 +1592,6 @@ const Users = () => {
                                                         setFormDataAddUser({ ...formDactaAddUser, shiftRotationalFixed: e.target.value })
                                                     }
                                                 >
-                                                    <option value="">Select</option>
                                                     <option value="Fixed">Fixed</option>
                                                     <option value="Rotational">Rotational</option>
                                                 </select>
