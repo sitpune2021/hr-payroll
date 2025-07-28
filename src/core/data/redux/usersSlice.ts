@@ -14,7 +14,6 @@ export interface User {
   companyId?: number | null;
   branchId?: number | null;
   departmentId: number;
-  reportingPerson?: string | null;
   joiningDate?: string | null;
   birthDate?: string | null;
   attendanceMode?: string | null;
@@ -36,6 +35,7 @@ export interface User {
   adhaarCard?: string | null;
   panCard?: string | null;
   educationalQualification?: string | null;
+  reportingManagerId:number | null;
   createdAt: string;
   updatedAt: string;
 }

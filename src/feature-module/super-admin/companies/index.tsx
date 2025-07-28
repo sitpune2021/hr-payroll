@@ -20,37 +20,32 @@ import { isValidContact, isValidEmail, isValidInteger, isValidName } from '../..
 
 const Companies = () => {
   const dispatch = useAppDispatch();
-
   const [sortOption, setSortOption] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
-
-
   const [dateRange, setDateRange] = useState({
     start: moment().subtract(6, 'days'),
     end: moment(),
   });
 
-
   const handleDateRangeChange = (start: moment.Moment, end: moment.Moment) => {
     setDateRange({ start, end });
   };
 
-
-
   const userAllowedLabels = useSelector((state: RootState) => state.feature.allowedFeatures);
   const filteredLabels = userAllowedLabels.map((feature: any) => feature.name);
   const { start, end } = useSelector((state: any) => state.dateRange);
-
   const companyList = useAppSelector((state) => state.companies.list);
   const [tableData, setTableData] = useState<CompanyTableItem[]>([]);
   const [viewCompanyData, setViewCompanyData] = useState<CompanyTableItem>()
   const [editCompanyData, setEditCompanyData] = useState<Company>()
   const [selectedImageEdit, setSelectedImageEdit] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 
   const getSortedFilteredData = () => {
     let data = [...companyList];
-
     if (start && end) {
       data = data.filter(company =>
         moment(company.createdAt).isBetween(start, end, 'day', '[]')
@@ -63,7 +58,7 @@ const Companies = () => {
       data = data.filter(company => company.isActive === false);
     }
 
-    if(sortOption==='All'){
+    if (sortOption === 'All') {
       return data;
     } else if (sortOption === 'Recently Added') {
       data.sort((a, b) => moment(b.createdAt).diff(moment(a.createdAt)));
@@ -219,459 +214,138 @@ const Companies = () => {
     if (file) {
       setAddCompanyImage(file);
       setFormErrors(prev => ({ ...prev, companyImage: "" }));
+
+      const imageUrl = URL.createObjectURL(file); // <-- Create preview URL
+      setPreviewImage(imageUrl);                 // <-- Save for display
     }
   };
 
 
 
-const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
+  const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const {
-    companyName,
-    companyEmail,
-    companyPhone,
-    subscriptionStartDate,
-    subscriptionEndDate,
-    allowedNoOfUsers,
-    firstName,
-    lastName,
-    password,
-  } = addCompanyFormData;
+    const {
+      companyName,
+      companyEmail,
+      companyPhone,
+      subscriptionStartDate,
+      subscriptionEndDate,
+      allowedNoOfUsers,
+      firstName,
+      lastName,
+      password,
+    } = addCompanyFormData;
 
-  const newErrors: any = {};
+    const newErrors: any = {};
 
-  // ✅ Use your utility functions here:
-  if (!companyName.trim()) {
-    newErrors.companyName = "Company Name is required";
-  } else if (!isValidName(companyName)) {
-    newErrors.companyName = "Company Name must contain letters only";
-  }
+    // ✅ Use your utility functions here:
+    if (!companyName.trim()) {
+      newErrors.companyName = "Company Name is required";
+    } else if (!isValidName(companyName)) {
+      newErrors.companyName = "Company Name must contain letters only";
+    }
 
-  if (!companyEmail.trim()) {
-    newErrors.companyEmail = "Email is required";
-  } else if (!isValidEmail(companyEmail)) {
-    newErrors.companyEmail = "Enter a valid email address";
-  }
+    if (!companyEmail.trim()) {
+      newErrors.companyEmail = "Email is required";
+    } else if (!isValidEmail(companyEmail)) {
+      newErrors.companyEmail = "Enter a valid email address";
+    }
 
-  if (!companyPhone.trim()) {
-    newErrors.companyPhone = "Phone Number is required";
-  } else if (!isValidContact(companyPhone)) {
-    newErrors.companyPhone = "Enter a valid 10-digit phone number starting with 6-9";
-  }
+    if (!companyPhone.trim()) {
+      newErrors.companyPhone = "Phone Number is required";
+    } else if (!isValidContact(companyPhone)) {
+      newErrors.companyPhone = "Enter a valid 10-digit phone number starting with 6-9";
+    }
 
-  if (!subscriptionStartDate.trim()) {
-    newErrors.subscriptionStartDate = "Subscription start date is required";
-  }
-  if (!subscriptionEndDate.trim()) {
-    newErrors.subscriptionEndDate = "Subscription end date is required";
-  }
+    if (!subscriptionStartDate.trim()) {
+      newErrors.subscriptionStartDate = "Subscription start date is required";
+    }
+    if (!subscriptionEndDate.trim()) {
+      newErrors.subscriptionEndDate = "Subscription end date is required";
+    }
 
-  if (!allowedNoOfUsers.trim()) {
-    newErrors.allowedNoOfUsers = "Number of users is required";
-  } else if (!isValidInteger(allowedNoOfUsers)) {
-    newErrors.allowedNoOfUsers = "Number of users must be an integer";
-  }
+    if (!allowedNoOfUsers.trim()) {
+      newErrors.allowedNoOfUsers = "Number of users is required";
+    } else if (!isValidInteger(allowedNoOfUsers)) {
+      newErrors.allowedNoOfUsers = "Number of users must be an integer";
+    }
 
-  if (!firstName.trim()) {
-    newErrors.firstName = "First Name is required";
-  } else if (!isValidName(firstName)) {
-    newErrors.firstName = "First Name must contain letters only";
-  }
+    if (!firstName.trim()) {
+      newErrors.firstName = "First Name is required";
+    } else if (!isValidName(firstName)) {
+      newErrors.firstName = "First Name must contain letters only";
+    }
 
-  if (!lastName.trim()) {
-    newErrors.lastName = "Last Name is required";
-  } else if (!isValidName(lastName)) {
-    newErrors.lastName = "Last Name must contain letters only";
-  }
+    if (!lastName.trim()) {
+      newErrors.lastName = "Last Name is required";
+    } else if (!isValidName(lastName)) {
+      newErrors.lastName = "Last Name must contain letters only";
+    }
 
-  if (!password.trim()) {
-    newErrors.password = "Password is required";
-  }
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    }
+    if(!confirmedPassword.trim()){
+      newErrors.conformPassword="Confirmed Password is required."
+    }
 
-  if (password !== confirmedPassword) {
-    newErrors.conformPassword = "Password does not match";
-  }
+    if (password !== confirmedPassword) {
+      newErrors.conformPassword = "Password does not match";
+    }
 
-  if (!addCompantImage) {
-    newErrors.companyImage = "Company image is required";
-  }
+    if (!addCompantImage) {
+      newErrors.companyImage = "Company image is required";
+    }
 
-  setFormErrors(newErrors);
-  if (Object.keys(newErrors).length > 0) return;
+    setFormErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      toast("Error", "Fill all Menndatory fields in all tabs", 'danger');
+      return;
+    }
 
-  // ✅ Prepare FormData
-  const payload = new FormData();
-  Object.entries(addCompanyFormData).forEach(([key, value]) => {
-    payload.append(key, value);
-  });
-
-  if (addCompantImage) {
-    payload.append("companyImage", addCompantImage);
-  }
-
-  try {
-    const response = await axiosClient.post(ADD_NEW_COMPANY, payload, {
-      headers: { "Content-Type": "multipart/form-data" },
+    // ✅ Prepare FormData
+    const payload = new FormData();
+    Object.entries(addCompanyFormData).forEach(([key, value]) => {
+      payload.append(key, value);
     });
 
-    if (response.status === 201) {
-      dispatch(fetchCompanies());
-      toast("Info", response.data.message, "success");
-      setAddCompanyFormData({
-        companyName: "",
-        companyAddress: "",
-        companyPhone: "",
-        companyEmail: "",
-        companyWebsite: "",
-        subscriptionStartDate: "",
-        subscriptionEndDate: "",
-        allowedNoOfUsers: "",
-        firstName: "",
-        lastName: "",
-        password: "",
+    if (addCompantImage) {
+      payload.append("companyImage", addCompantImage);
+    }
+
+    try {
+      const response = await axiosClient.post(ADD_NEW_COMPANY, payload, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      setAddCompanyImage(null);
-    }
-  } catch (error: any) {
-    toast(
-      "Error",
-      error.response?.data?.message || "Something went wrong",
-      "danger"
-    );
-  }
-};
 
+      if (response.status === 201) {
+        dispatch(fetchCompanies());
+        toast("Info", response.data.message, "success");
+        setAddCompanyFormData({
+          companyName: "",
+          companyAddress: "",
+          companyPhone: "",
+          companyEmail: "",
+          companyWebsite: "",
+          subscriptionStartDate: "",
+          subscriptionEndDate: "",
+          allowedNoOfUsers: "",
+          firstName: "",
+          lastName: "",
+          password: "",
+        });
+        setAddCompanyImage(null);
+      }
+    } catch (error: any) {
+      toast(
+        "Error",
+        error.response?.data?.message || "Something went wrong",
+        "danger"
+      );
+    }
+  };
 
-
-  const [totalChart] = React.useState<any>({
-    series: [{
-      name: "Messages",
-      data: [25, 66, 41, 12, 36, 9, 21]
-    }],
-    fill: {
-      type: 'gradient',
-      gradient: {
-        opacityFrom: 0, // Start with 0 opacity (transparent)
-        opacityTo: 0    // End with 0 opacity (transparent)
-      }
-    },
-    chart: {
-      foreColor: '#fff',
-      type: "area",
-      width: 50,
-      toolbar: {
-        show: !1
-      },
-      zoom: {
-        enabled: !1
-      },
-      dropShadow: {
-        enabled: 0,
-        top: 3,
-        left: 14,
-        blur: 4,
-        opacity: .12,
-        color: "#fff"
-      },
-      sparkline: {
-        enabled: !0
-      }
-    },
-    markers: {
-      size: 0,
-      colors: ["#F26522"],
-      strokeColors: "#fff",
-      strokeWidth: 2,
-      hover: {
-        size: 7
-      }
-    },
-    plotOptions: {
-      bar: {
-        horizontal: !1,
-        columnWidth: "35%",
-        endingShape: "rounded"
-      }
-    },
-    dataLabels: {
-      enabled: !1
-    },
-    stroke: {
-      show: !0,
-      width: 2.5,
-      curve: "smooth"
-    },
-    colors: ["#F26522"],
-    xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
-    },
-    tooltip: {
-      theme: "dark",
-      fixed: {
-        enabled: !1
-      },
-      x: {
-        show: !1
-      },
-      y: {
-        title: {
-          formatter: function (e: any) {
-            return ""
-          }
-        }
-      },
-      marker: {
-        show: !1
-      }
-    }
-  })
-  const [activeChart] = React.useState<any>({
-    series: [{
-      name: "Active Company",
-      data: [25, 40, 35, 20, 36, 9, 21]
-    }],
-    fill: {
-      type: 'gradient',
-      gradient: {
-        opacityFrom: 0, // Start with 0 opacity (transparent)
-        opacityTo: 0    // End with 0 opacity (transparent)
-      }
-    },
-    chart: {
-      foreColor: '#fff',
-      type: "area",
-      width: 50,
-      toolbar: {
-        show: !1
-      },
-      zoom: {
-        enabled: !1
-      },
-      dropShadow: {
-        enabled: 0,
-        top: 3,
-        left: 14,
-        blur: 4,
-        opacity: .12,
-        color: "#fff"
-      },
-      sparkline: {
-        enabled: !0
-      }
-    },
-    markers: {
-      size: 0,
-      colors: ["#F26522"],
-      strokeColors: "#fff",
-      strokeWidth: 2,
-      hover: {
-        size: 7
-      }
-    },
-    plotOptions: {
-      bar: {
-        horizontal: !1,
-        columnWidth: "35%",
-        endingShape: "rounded"
-      }
-    },
-    dataLabels: {
-      enabled: !1
-    },
-    stroke: {
-      show: !0,
-      width: 2.5,
-      curve: "smooth"
-    },
-    colors: ["#F26522"],
-    xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
-    },
-    tooltip: {
-      theme: "dark",
-      fixed: {
-        enabled: !1
-      },
-      x: {
-        show: !1
-      },
-      y: {
-        title: {
-          formatter: function (e: any) {
-            return ""
-          }
-        }
-      },
-      marker: {
-        show: !1
-      }
-    }
-  })
-  const [inactiveChart] = React.useState<any>({
-    series: [{
-      name: "Inactive Company",
-      data: [25, 10, 35, 5, 25, 28, 21]
-    }],
-    fill: {
-      type: 'gradient',
-      gradient: {
-        opacityFrom: 0, // Start with 0 opacity (transparent)
-        opacityTo: 0    // End with 0 opacity (transparent)
-      }
-    },
-    chart: {
-      foreColor: '#fff',
-      type: "area",
-      width: 50,
-      toolbar: {
-        show: !1
-      },
-      zoom: {
-        enabled: !1
-      },
-      dropShadow: {
-        enabled: 0,
-        top: 3,
-        left: 14,
-        blur: 4,
-        opacity: .12,
-        color: "#fff"
-      },
-      sparkline: {
-        enabled: !0
-      }
-    },
-    markers: {
-      size: 0,
-      colors: ["#F26522"],
-      strokeColors: "#fff",
-      strokeWidth: 2,
-      hover: {
-        size: 7
-      }
-    },
-    plotOptions: {
-      bar: {
-        horizontal: !1,
-        columnWidth: "35%",
-        endingShape: "rounded"
-      }
-    },
-    dataLabels: {
-      enabled: !1
-    },
-    stroke: {
-      show: !0,
-      width: 2.5,
-      curve: "smooth"
-    },
-    colors: ["#F26522"],
-    xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
-    },
-    tooltip: {
-      theme: "dark",
-      fixed: {
-        enabled: !1
-      },
-      x: {
-        show: !1
-      },
-      y: {
-        title: {
-          formatter: function (e: any) {
-            return ""
-          }
-        }
-      },
-      marker: {
-        show: !1
-      }
-    }
-  })
-  const [locationChart] = React.useState<any>({
-    series: [{
-      name: "Inactive Company",
-      data: [30, 40, 15, 23, 20, 23, 25]
-    }],
-    fill: {
-      type: 'gradient',
-      gradient: {
-        opacityFrom: 0, // Start with 0 opacity (transparent)
-        opacityTo: 0    // End with 0 opacity (transparent)
-      }
-    },
-    chart: {
-      foreColor: '#fff',
-      type: "area",
-      width: 50,
-      toolbar: {
-        show: !1
-      },
-      zoom: {
-        enabled: !1
-      },
-      dropShadow: {
-        enabled: 0,
-        top: 3,
-        left: 14,
-        blur: 4,
-        opacity: .12,
-        color: "#fff"
-      },
-      sparkline: {
-        enabled: !0
-      }
-    },
-    markers: {
-      size: 0,
-      colors: ["#F26522"],
-      strokeColors: "#fff",
-      strokeWidth: 2,
-      hover: {
-        size: 7
-      }
-    },
-    plotOptions: {
-      bar: {
-        horizontal: !1,
-        columnWidth: "35%",
-        endingShape: "rounded"
-      }
-    },
-    dataLabels: {
-      enabled: !1
-    },
-    stroke: {
-      show: !0,
-      width: 2.5,
-      curve: "smooth"
-    },
-    colors: ["#F26522"],
-    xaxis: {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
-    },
-    tooltip: {
-      theme: "dark",
-      fixed: {
-        enabled: !1
-      },
-      x: {
-        show: !1
-      },
-      y: {
-        title: {
-          formatter: function (e: any) {
-            return ""
-          }
-        }
-      },
-      marker: {
-        show: !1
-      }
-    }
-  })
 
   return (
     <>
@@ -766,12 +440,6 @@ const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                       <h4>{companyList.length}</h4>
                     </div>
                   </div>
-                  <ReactApexChart
-                    options={totalChart}
-                    series={totalChart.series}
-                    type="area"
-                    width={50}
-                  />
                 </div>
               </div>
             </div>
@@ -788,15 +456,9 @@ const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                       <p className="fs-12 fw-medium mb-1 text-truncate">
                         Active Companies
                       </p>
-                      <h4>920</h4>
+                      <h4>{(companyList.filter(comp => comp.isActive === true)).length}</h4>
                     </div>
                   </div>
-                  <ReactApexChart
-                    options={activeChart}
-                    series={activeChart.series}
-                    type="area"
-                    width={50}
-                  />
                 </div>
               </div>
             </div>
@@ -813,21 +475,17 @@ const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                       <p className="fs-12 fw-medium mb-1 text-truncate">
                         Inactive Companies
                       </p>
-                      <h4>30</h4>
+                      <h4>{(companyList.filter(comp => comp.isActive === false)).length}</h4>
                     </div>
                   </div>
-                  <ReactApexChart
-                    options={inactiveChart}
-                    series={inactiveChart.series}
-                    type="area"
-                    width={50}
-                  />
                 </div>
               </div>
             </div>
             {/* /Inactive Companies */}
             {/* Company Location */}
-            <div className="col-lg-3 col-md-6 d-flex">
+
+
+            {/* <div className="col-lg-3 col-md-6 d-flex">
               <div className="card flex-fill">
                 <div className="card-body d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-center overflow-hidden">
@@ -841,15 +499,11 @@ const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                       <h4>180</h4>
                     </div>
                   </div>
-                  <ReactApexChart
-                    options={locationChart}
-                    series={locationChart.series}
-                    type="area"
-                    width={50}
-                  />
                 </div>
               </div>
-            </div>
+            </div> */}
+
+
             {/* /Company Location */}
           </div>
           <div className="card">
@@ -911,7 +565,7 @@ const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                     Sort By : {sortOption}
                   </Link>
                   <ul className="dropdown-menu dropdown-menu-end p-3">
-                    {['All','Recently Added', 'Ascending', 'Descending', 'Last Month', 'Last 7 Days'].map((option) => (
+                    {['All', 'Recently Added', 'Ascending', 'Descending', 'Last Month', 'Last 7 Days'].map((option) => (
                       <li key={option}>
                         <Link
                           to="#"
@@ -1038,11 +692,13 @@ const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                         <div className="col-md-12">
                           <div className="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
                             <div className="d-flex align-items-center justify-content-center avatar avatar-xxl rounded-circle border border-dashed me-2 flex-shrink-0 text-dark frames">
-                              <ImageWithBasePath
-                                src="assets/img/profiles/avatar-30.jpg"
-                                alt="img"
+                              <img
+                                src={previewImage || "https://via.placeholder.com/100x100?text=No+Image"}
+                                alt="Logo"
                                 className="rounded-circle"
+                                style={{ width: 100, height: 100, objectFit: "cover" }}
                               />
+
                             </div>
                             <div className="profile-upload">
                               <div className="mb-2">
@@ -1213,32 +869,59 @@ const handleAddCompanySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                         </div>
 
                         <div className="col-md-6">
-                          <div className="mb-3">
-                            <label className="form-label">Password <span className="text-danger">*</span></label>
-                            <input
-                              type="password"
-                              name="password"
-                              value={addCompanyFormData.password}
-                              onChange={handleAddCompanyChange}
-                              className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
-                            />
-                            {formErrors.password && <div className="text-danger mt-1">{formErrors.password}</div>}
+                          <div className="mb-3 position-relative">
+                            <label className="form-label">
+                              Password <span className="text-danger">*</span>
+                            </label>
+                            <div className="input-group">
+                              <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                value={addCompanyFormData.password}
+                                onChange={handleAddCompanyChange}
+                                className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
+                              />
+                              <span
+                                className="input-group-text"
+                                onClick={() => setShowPassword(prev => !prev)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <i className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                              </span>
+                            </div>
+                            {formErrors.password && (
+                              <div className="text-danger mt-1">{formErrors.password}</div>
+                            )}
                           </div>
                         </div>
 
                         <div className="col-md-6">
-                          <div className="mb-3">
-                            <label className="form-label">Conform Password <span className="text-danger">*</span></label>
-                            <input
-                              type="password"
-                              name="password"
-                              value={confirmedPassword}
-                              onChange={(e) => setCOnformedPassword(e.target.value)}
-                              className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
-                            />
-                            {formErrors.conformPassword && <div className="text-danger mt-1">{formErrors.conformPassword}</div>}
+                          <div className="mb-3 position-relative">
+                            <label className="form-label">
+                              Confirm Password <span className="text-danger">*</span>
+                            </label>
+                            <div className="input-group">
+                              <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                name="confirmPassword"
+                                value={confirmedPassword}
+                                onChange={(e) => setCOnformedPassword(e.target.value)}
+                                className={`form-control ${formErrors.conformPassword ? 'is-invalid' : ''}`}
+                              />
+                              <span
+                                className="input-group-text"
+                                onClick={() => setShowConfirmPassword(prev => !prev)}
+                                style={{ cursor: "pointer" }}
+                              >
+                                <i className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"}`}></i>
+                              </span>
+                            </div>
+                            {formErrors.conformPassword && (
+                              <div className="text-danger mt-1">{formErrors.conformPassword}</div>
+                            )}
                           </div>
                         </div>
+
 
                       </div>
                     </TabPanel>

@@ -1,4 +1,5 @@
 export const AUTH_LOGIN  =  "/api/auth/login"
+export const AUTH_LOGOUT  =  "/api/auth/logout"
 export const FETCH_ALL_FEATURES  =  "/api/feature/getList"
 export const FETCH_ROLE_FEATURES  =  "/api/feature/getfeaturetorole"
 export const FETCH_USER_DETAILS  =  "/api/auth/getUser"

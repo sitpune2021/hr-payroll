@@ -11,10 +11,16 @@ import {
 } from "../../data/redux/sidebarSlice";
 import { all_routes } from "../../../feature-module/router/all_routes";
 import { HorizontalSidebarData } from '../../data/json/horizontalSidebar'
+import { toast } from '../../../utils/toastUtil';
+import axiosClient from '../../../axiosConfig/axiosClient';
+import { AUTH_LOGOUT } from '../../../axiosConfig/apis';
+import { logout } from '../../data/redux/authSlice';
+import { RootState } from '../../data/redux/store';
 const Header = () => {
   const routes = all_routes;
   const dispatch = useDispatch();
   const dataLayout = useSelector((state: any) => state.themeSetting.dataLayout);
+    const user = useSelector((state: RootState) => state.auth.user);
   const Location = useLocation();
 
   const [subOpen, setSubopen] = useState<any>("");
@@ -76,7 +82,17 @@ const Header = () => {
     }
   };
 
-  
+  const handleLogoutUser = async () => {
+  try {
+    await axiosClient.post(AUTH_LOGOUT, {}, { withCredentials: true }); 
+	dispatch(logout());
+    window.location.href = "/login"; // ✅ fix casing
+  } catch (error) {
+    toast("Error", "Error while logging out user");
+    console.error(error);
+  }
+};
+
 
   return (
     <>
@@ -117,65 +133,7 @@ const Header = () => {
 									<kbd>CTRL + / </kbd>
 								</span>
 							</div>
-							<div className="dropdown crm-dropdown">
-								<Link to="#" className="btn btn-menubar me-1" data-bs-toggle="dropdown">
-									<i className="ti ti-layout-grid"></i>
-								</Link>
-								<div className="dropdown-menu dropdown-lg dropdown-menu-start">
-									<div className="card mb-0 border-0 shadow-none">
-										<div className="card-header">
-											<h4>CRM</h4>
-										</div>
-										<div className="card-body pb-1">		
-											<div className="row">
-												<div className="col-sm-6">							
-													<Link to={routes.contactList} className="d-flex align-items-center justify-content-between p-2 crm-link mb-3">
-														<span className="d-flex align-items-center me-3">
-															<i className="ti ti-user-shield text-default me-2"></i>Contacts
-														</span>
-														<i className="ti ti-arrow-right"></i>
-													</Link>							
-													<Link to={routes.dealsGrid} className="d-flex align-items-center justify-content-between p-2 crm-link mb-3">
-														<span className="d-flex align-items-center me-3">
-															<i className="ti ti-heart-handshake text-default me-2"></i>Deals
-														</span>
-														<i className="ti ti-arrow-right"></i>
-													</Link>								
-													<Link to={routes.pipeline} className="d-flex align-items-center justify-content-between p-2 crm-link mb-3">
-														<span className="d-flex align-items-center me-3">
-															<i className="ti ti-timeline-event-text text-default me-2"></i>Pipeline
-														</span>
-														<i className="ti ti-arrow-right"></i>
-													</Link>		
-												</div>
-												<div className="col-sm-6">							
-													<Link to={routes.companiesGrid} className="d-flex align-items-center justify-content-between p-2 crm-link mb-3">
-														<span className="d-flex align-items-center me-3">
-															<i className="ti ti-building text-default me-2"></i>Companies
-														</span>
-														<i className="ti ti-arrow-right"></i>
-													</Link>								
-													<Link to={routes.leadsGrid} className="d-flex align-items-center justify-content-between p-2 crm-link mb-3">
-														<span className="d-flex align-items-center me-3">
-															<i className="ti ti-user-check text-default me-2"></i>Leads
-														</span>
-														<i className="ti ti-arrow-right"></i>
-													</Link>								
-													<Link to={routes.activity} className="d-flex align-items-center justify-content-between p-2 crm-link mb-3">
-														<span className="d-flex align-items-center me-3">
-															<i className="ti ti-activity text-default me-2"></i>Activities
-														</span>
-														<i className="ti ti-arrow-right"></i>
-													</Link>		
-												</div>
-											</div>		
-										</div>
-									</div>
-								</div>
-							</div>
-							<Link to={routes.profilesettings} className="btn btn-menubar">
-								<i className="ti ti-settings-cog"></i>
-							</Link>	
+								
 						</div>
 
 						<div className="sidebar sidebar-horizontal" id="horizontal-single">
@@ -248,55 +206,7 @@ const Header = () => {
 									<i className="ti ti-maximize"></i>
 								</Link>
 							</div>
-							<div className="dropdown me-1">
-								<Link to="#" className="btn btn-menubar" data-bs-toggle="dropdown">
-									<i className="ti ti-layout-grid-remove"></i>
-								</Link>
-								<div className="dropdown-menu dropdown-menu-end">
-									<div className="card mb-0 border-0 shadow-none">
-										<div className="card-header">
-											<h4>Applications</h4>
-										</div>
-										<div className="card-body">											
-											<Link to={routes.calendar} className="d-block pb-2">
-												<span className="avatar avatar-md bg-transparent-dark me-2"><i className="ti ti-calendar text-gray-9"></i></span>Calendar
-											</Link>										
-											<Link to={routes.todo} className="d-block py-2">
-												<span className="avatar avatar-md bg-transparent-dark me-2"><i className="ti ti-subtask text-gray-9"></i></span>To Do
-											</Link>										
-											<Link to={routes.notes} className="d-block py-2">
-												<span className="avatar avatar-md bg-transparent-dark me-2"><i className="ti ti-notes text-gray-9"></i></span>Notes
-											</Link>										
-											<Link to={routes.fileManager} className="d-block py-2">
-												<span className="avatar avatar-md bg-transparent-dark me-2"><i className="ti ti-folder text-gray-9"></i></span>File Manager
-											</Link>								
-											<Link to={routes.kanbanView} className="d-block py-2">
-												<span className="avatar avatar-md bg-transparent-dark me-2"><i className="ti ti-layout-kanban text-gray-9"></i></span>Kanban
-											</Link>								
-											<Link to={routes.invoice} className="d-block py-2 pb-0">
-												<span className="avatar avatar-md bg-transparent-dark me-2"><i className="ti ti-file-invoice text-gray-9"></i></span>Invoices
-											</Link>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div className="me-1">
-								<Link to={routes.chat} className="btn btn-menubar position-relative">
-									<i className="ti ti-brand-hipchat"></i>
-									<span className="badge bg-info rounded-pill d-flex align-items-center justify-content-center header-badge">5</span>
-								</Link>
-							</div>
-							<div className="me-1">
-								<Link to={routes.email} className="btn btn-menubar">
-									<i className="ti ti-mail"></i>
-								</Link>
-							</div>
 							<div className="me-1 notification_item">
-								<Link to="#" className="btn btn-menubar position-relative me-1" id="notification_popup"
-									data-bs-toggle="dropdown">
-									<i className="ti ti-bell"></i>
-									<span className="notification-status-dot"></span>
-								</Link>
 								<div className="dropdown-menu dropdown-menu-end notification-dropdown p-4">
 									<div
 										className="d-flex align-items-center justify-content-between border-bottom p-0 pb-3 mb-3">
@@ -415,8 +325,8 @@ const Header = () => {
 													<ImageWithBasePath src="assets/img/profiles/avatar-12.jpg" alt="img"/>
 												</span>
 												<div>
-													<h5 className="mb-0">Omkar Pagade</h5>
-													<p className="fs-12 fw-medium mb-0">warren@example.com</p>
+													<h5 className="mb-0">{user?.firstName}{" "}{user?.lastName}</h5>
+													<p className="fs-12 fw-medium mb-0">{user?.email}</p>
 												</div>
 											</div>
 										</div>
@@ -438,7 +348,9 @@ const Header = () => {
 											</Link>
 										</div>
 										<div className="card-footer">
-											<Link className="dropdown-item d-inline-flex align-items-center p-0 py-2" to={routes.login}><i className="ti ti-login me-2"></i>Logout</Link>
+											<button className='btn btn-primary' 
+											onClick={handleLogoutUser}
+											>Logout</button>
 										</div>
 									</div>
 								</div>

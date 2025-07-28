@@ -66,23 +66,6 @@ const SidebarDataTest = [
     showAsTab: true,
     separateRoute: false,
     submenuItems: [
-      // {
-      //   label: 'Dashboard',
-      //   link: 'index',
-      //   submenu: true,
-      //   showSubRoute: false,
-      //   icon: 'smart-home',
-      //   base: 'dashboard',
-      //   materialicons: 'start',
-      //   dot: true,
-      //   submenuItems: [
-      //     { label: "Admin Dashboard", link: '' },
-      //     { label: "Employee Dashboard", link: '' },
-      //     { label: "Deals Dashboard", link: '' },
-      //     { label: "Leads Dashboard", link: '' },
-
-      //   ],
-      // },
       {
         label: 'Applications',
         link: 'apps',
