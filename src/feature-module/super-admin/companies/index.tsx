@@ -42,6 +42,7 @@ const Companies = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [headerMessage, setHeaderMessage] = useState<string | null>(null);
 
 
   const getSortedFilteredData = () => {
@@ -121,6 +122,8 @@ const Companies = () => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedImageEdit(file);
+      const imageUrl = URL.createObjectURL(file); // <-- Create preview URL
+      setPreviewImage(imageUrl);
     }
   };
 
@@ -151,6 +154,7 @@ const Companies = () => {
       });
       if (response.status === 200) {
         dispatch(fetchCompanies())
+        setPreviewImage(null)
         toast('Info', response.data.message, 'success');
       }
     } catch (error: any) {
@@ -286,8 +290,8 @@ const Companies = () => {
     if (!password.trim()) {
       newErrors.password = "Password is required";
     }
-    if(!confirmedPassword.trim()){
-      newErrors.conformPassword="Confirmed Password is required."
+    if (!confirmedPassword.trim()) {
+      newErrors.conformPassword = "Confirmed Password is required."
     }
 
     if (password !== confirmedPassword) {
@@ -298,10 +302,20 @@ const Companies = () => {
       newErrors.companyImage = "Company image is required";
     }
 
+
+
     setFormErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
-      toast("Error", "Fill all Menndatory fields in all tabs", 'danger');
+      toast("Error", "Please fill out all required fields", 'danger');
       return;
+    }
+
+    if (!firstName.trim() || !lastName.trim() || !password.trim() || !confirmedPassword.trim()) {
+      setHeaderMessage("Please fill out the Admin Info form.");
+      toast("Error", "Admin Info is incomplete", "danger");
+      return;
+    } else {
+      setHeaderMessage(null);
     }
 
     // ✅ Prepare FormData
@@ -321,7 +335,10 @@ const Companies = () => {
 
       if (response.status === 201) {
         dispatch(fetchCompanies());
+        setPreviewImage(null)
         toast("Info", response.data.message, "success");
+        const closeBtn = document.querySelector('[data-bs-dismiss="modal"]') as HTMLElement;
+        closeBtn?.click();
         setAddCompanyFormData({
           companyName: "",
           companyAddress: "",
@@ -336,6 +353,7 @@ const Companies = () => {
           password: "",
         });
         setAddCompanyImage(null);
+
       }
     } catch (error: any) {
       toast(
@@ -715,12 +733,17 @@ const Companies = () => {
                                     className="form-control image-sign"
                                   />
                                 </div>
-                                <Link
-                                  to="#"
+                                <button
                                   className="btn btn-light btn-sm"
+                                  type='button'
+                                  onClick={() => {
+                                    setPreviewImage(null);
+                                    setAddCompanyImage(null);
+                                  }
+                                  }
                                 >
                                   Cancel
-                                </Link>
+                                </button>
                               </div>
                               {formErrors.companyImage && <div className="text-danger mt-1">{formErrors.companyImage}</div>}
                             </div>
@@ -974,7 +997,7 @@ const Companies = () => {
                     <div className="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
                       <div className="d-flex align-items-center justify-content-center avatar avatar-xxl rounded-circle border border-dashed me-2 flex-shrink-0 text-dark frames">
                         <img
-                          src={`${baseURL}/api/image/img/${editCompanyData?.companyImage}`}
+                          src={previewImage || `${baseURL}/api/image/img/${editCompanyData?.companyImage}`}
                           className="img-fluid"
                           alt="img"
                         />
@@ -995,12 +1018,17 @@ const Companies = () => {
                               multiple
                             />
                           </div>
-                          <Link
-                            to="#"
-                            className="btn btn-light btn-sm"
-                          >
-                            Cancel
-                          </Link>
+                          <button
+                                  className="btn btn-light btn-sm"
+                                  type='button'
+                                  onClick={() => {
+                                    setPreviewImage(null);
+                                    setSelectedImageEdit(null);
+                                  }
+                                  }
+                                >
+                                  Cancel
+                                </button>
                         </div>
                       </div>
                     </div>

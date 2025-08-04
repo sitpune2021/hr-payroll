@@ -47,3 +47,24 @@ export const listHolidayGroups = async (req, res) => {
   }
 };
 
+export const deleteHolidayGroup = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const group = await models.HolidayGroup.findByPk(id);
+    if (!group) return res.status(404).json({ message: 'Holiday group not found' });
+
+    // Delete associated holidays
+    await models.Holiday.destroy({ where: { holidayGroupId: id } });
+
+    await group.destroy();
+
+    return res.status(200).json({ message: 'Holiday group and related holidays deleted successfully' });
+
+  } catch (err) {
+    console.error('Error deleting holiday group:', err);
+    return res.status(500).json({ message: 'Error deleting holiday group', error: err.message });
+  }
+};
+
+

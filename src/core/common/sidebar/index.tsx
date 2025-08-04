@@ -13,11 +13,25 @@ import usePreviousRoute from "./usePreviousRoute";
 import { SidebarDataTest } from "../../data/json/sidebarMenu";
 import { RootState } from "../../data/redux/store";
 import filterSidebarByLabel from "../../../utils/filterSidebarByLabel";
+import { useAppSelector } from "../../data/redux/hooks";
+import { Company } from "../../data/redux/companySlice";
+import { baseURL } from "../../../axiosConfig/axiosClient";
+
+
 
 const Sidebar = () => {
   const Location = useLocation();
   const user = useSelector((state: RootState) => state.auth.user);
   const [sidebarData, setSidebarData] = useState<any[]>([]);
+  const companyList = useAppSelector((state) => state.companies.list);
+
+  const [currComp, setCurrComp] = useState<Company>();
+
+  useEffect(() => {
+    const c = companyList.find(comp => comp.id === user?.companyId)
+    if (c) setCurrComp(c);
+  }, [user, companyList])
+
 
   useEffect(() => {
     if (user?.role) {
@@ -28,7 +42,7 @@ const Sidebar = () => {
 
 
   const allowedFeatures = useSelector((state: RootState) => state.feature.allowedFeatures);
-  
+
   const allowedLabels = allowedFeatures.map((f: any) => f.name);
 
 
@@ -140,16 +154,24 @@ const Sidebar = () => {
         onMouseLeave={onMouseLeave}
       >
         <div className="sidebar-logo">
-          <Link to="index" className="logo logo-normal">
-            <img style={{height:'80px'}} src="assets/img/namedLogo.jpg" alt="Logo" />
+          {/* <Link to="index" className="logo logo-normal">
+            <img style={{ height: '80px' }} src="assets/img/namedLogo.jpg" alt="Logo" />
+          </Link> */}
+          { }
+          <Link to="routes.index" className="logo logo-normal">
+            <img
+              src={
+                currComp?.companyImage
+                  ? `${baseURL}/api/image/img/${currComp.companyImage}`
+                  :
+                   "/assets/img/namedLogo.jpg" // <-- static fallback logo
+              }
+              className="img-fluid"
+              style={{ height: '80px' }}
+              alt="img"
+            />
           </Link>
-          <Link to="routes.index" className="logo-small">
-            <ImageWithBasePath src="assets/img/logo-small.svg" alt="Logo" />
-          </Link>
-          <Link to="routes.index" className="dark-logo">
-            <ImageWithBasePath src="assets/img/logo-white.svg" alt="Logo" />
-          </Link>
-          <h3 className="company-name">Company Name</h3>
+          <h3 className="company-name">{currComp ? currComp.name : ""}</h3>
         </div>
         <div className="modern-profile p-3 pb-0">
           <div className="text-center rounded bg-light p-3 mb-4 user-profile">
@@ -241,7 +263,7 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-        <Scrollbars style={{backgroundColor:'rgba(14, 152, 249,.1)'}}>
+        <Scrollbars style={{ backgroundColor: 'rgba(14, 152, 249,.1)' }}>
           <div className="sidebar-inner slimscroll">
             <div id="sidebar-menu" className="sidebar-menu">
               <ul>
@@ -252,7 +274,7 @@ const Sidebar = () => {
                     </li>
                     <li>
                       <ul>
-                        {mainLabel?.submenuItems?.map((title: any, i:any) => {
+                        {mainLabel?.submenuItems?.map((title: any, i: any) => {
                           let link_array: any = [];
                           if ("submenuItems" in title) {
                             title.submenuItems?.forEach((link: any) => {
@@ -312,11 +334,11 @@ const Sidebar = () => {
                                       <Link
                                         to={item?.submenu ? "#" : item?.link}
                                         className={`${item?.submenuItems
-                                            ?.map((link: any) => link?.link)
-                                            .includes(Location.pathname) ||
-                                            item?.link === Location.pathname
-                                            ? "active"
-                                            : ""
+                                          ?.map((link: any) => link?.link)
+                                          .includes(Location.pathname) ||
+                                          item?.link === Location.pathname
+                                          ? "active"
+                                          : ""
                                           } ${subsidebar === item?.label ? "subdrop" : ""
                                           }`}
                                         onClick={() => {
@@ -340,8 +362,8 @@ const Sidebar = () => {
                                               <Link
                                                 to={items?.submenu ? "#" : items?.link}
                                                 className={`${subsidebar === items?.label
-                                                    ? "submenu-two subdrop"
-                                                    : "submenu-two"
+                                                  ? "submenu-two subdrop"
+                                                  : "submenu-two"
                                                   } ${items?.submenuItems
                                                     ?.map((link: any) => link.link)
                                                     .includes(Location.pathname) ||

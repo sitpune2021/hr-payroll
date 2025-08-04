@@ -32,6 +32,8 @@ const Branches = () => {
     const [allPayrollTemp, setAllPayrollTemp] = useState<Template[]>([])
     const [viewBranchData, setViewBranchData] = useState<Branch>()
     const [editBranchData, setEditBranchData] = useState<Branch>()
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+
 
     const [addBranchLogo, setAddBranchLogo] = useState<File | null>(null);
     const [addBranchBankDetails, setAddBranchBankDetails] = useState<File | null>(null);
@@ -51,7 +53,7 @@ const Branches = () => {
             if (!prev) return prev;
             return {
                 ...prev,
-                [name]: name === 'isActive' ? value === 'true' : value
+                [name]: name === 'status' ? value === 'true' : value
             };
         });
     };
@@ -143,7 +145,7 @@ const Branches = () => {
             } else {
                 setAllBranches(getSortedFilteredData);
             }
-        } else if(!user?.companyId){
+        } else if (!user?.companyId) {
             setAllBranches(branchList)
         }
 
@@ -174,11 +176,15 @@ const Branches = () => {
         bankDetails: ""
     });
 
+
     const handleAddBranchLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setAddBranchLogo(file);
             setFormErrors(prev => ({ ...prev, branchLogo: "" }));
+
+            const imageUrl = URL.createObjectURL(file); // <-- Create preview URL
+            setPreviewImage(imageUrl);                 // <-- Save for display
         }
     };
 
@@ -241,6 +247,8 @@ const Branches = () => {
 
             if (response.status === 201) {
                 dispatch(fetchBranches());
+                const closeBtn = document.querySelector('[data-bs-dismiss="modal"]') as HTMLElement;
+                closeBtn?.click();
                 toast('Info', response.data.message, 'success');
             }
             console.log(formData);
@@ -254,339 +262,7 @@ const Branches = () => {
     }
 
 
-    const getModalContainer = () => {
-        const modalElement = document.getElementById('modal-datepicker');
-        return modalElement ? modalElement : document.body; // Fallback to document.body if modalElement is null
-    };
 
-    const [totalChart] = React.useState<any>({
-        series: [{
-            name: "Messages",
-            data: [25, 66, 41, 12, 36, 9, 21]
-        }],
-        fill: {
-            type: 'gradient',
-            gradient: {
-                opacityFrom: 0, // Start with 0 opacity (transparent)
-                opacityTo: 0    // End with 0 opacity (transparent)
-            }
-        },
-        chart: {
-            foreColor: '#fff',
-            type: "area",
-            width: 50,
-            toolbar: {
-                show: !1
-            },
-            zoom: {
-                enabled: !1
-            },
-            dropShadow: {
-                enabled: 0,
-                top: 3,
-                left: 14,
-                blur: 4,
-                opacity: .12,
-                color: "#fff"
-            },
-            sparkline: {
-                enabled: !0
-            }
-        },
-        markers: {
-            size: 0,
-            colors: ["#F26522"],
-            strokeColors: "#fff",
-            strokeWidth: 2,
-            hover: {
-                size: 7
-            }
-        },
-        plotOptions: {
-            bar: {
-                horizontal: !1,
-                columnWidth: "35%",
-                endingShape: "rounded"
-            }
-        },
-        dataLabels: {
-            enabled: !1
-        },
-        stroke: {
-            show: !0,
-            width: 2.5,
-            curve: "smooth"
-        },
-        colors: ["#F26522"],
-        xaxis: {
-            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
-        },
-        tooltip: {
-            theme: "dark",
-            fixed: {
-                enabled: !1
-            },
-            x: {
-                show: !1
-            },
-            y: {
-                title: {
-                    formatter: function (e: any) {
-                        return ""
-                    }
-                }
-            },
-            marker: {
-                show: !1
-            }
-        }
-    })
-    const [activeChart] = React.useState<any>({
-        series: [{
-            name: "Active Company",
-            data: [25, 40, 35, 20, 36, 9, 21]
-        }],
-        fill: {
-            type: 'gradient',
-            gradient: {
-                opacityFrom: 0, // Start with 0 opacity (transparent)
-                opacityTo: 0    // End with 0 opacity (transparent)
-            }
-        },
-        chart: {
-            foreColor: '#fff',
-            type: "area",
-            width: 50,
-            toolbar: {
-                show: !1
-            },
-            zoom: {
-                enabled: !1
-            },
-            dropShadow: {
-                enabled: 0,
-                top: 3,
-                left: 14,
-                blur: 4,
-                opacity: .12,
-                color: "#fff"
-            },
-            sparkline: {
-                enabled: !0
-            }
-        },
-        markers: {
-            size: 0,
-            colors: ["#F26522"],
-            strokeColors: "#fff",
-            strokeWidth: 2,
-            hover: {
-                size: 7
-            }
-        },
-        plotOptions: {
-            bar: {
-                horizontal: !1,
-                columnWidth: "35%",
-                endingShape: "rounded"
-            }
-        },
-        dataLabels: {
-            enabled: !1
-        },
-        stroke: {
-            show: !0,
-            width: 2.5,
-            curve: "smooth"
-        },
-        colors: ["#F26522"],
-        xaxis: {
-            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
-        },
-        tooltip: {
-            theme: "dark",
-            fixed: {
-                enabled: !1
-            },
-            x: {
-                show: !1
-            },
-            y: {
-                title: {
-                    formatter: function (e: any) {
-                        return ""
-                    }
-                }
-            },
-            marker: {
-                show: !1
-            }
-        }
-    })
-    const [inactiveChart] = React.useState<any>({
-        series: [{
-            name: "Inactive Company",
-            data: [25, 10, 35, 5, 25, 28, 21]
-        }],
-        fill: {
-            type: 'gradient',
-            gradient: {
-                opacityFrom: 0, // Start with 0 opacity (transparent)
-                opacityTo: 0    // End with 0 opacity (transparent)
-            }
-        },
-        chart: {
-            foreColor: '#fff',
-            type: "area",
-            width: 50,
-            toolbar: {
-                show: !1
-            },
-            zoom: {
-                enabled: !1
-            },
-            dropShadow: {
-                enabled: 0,
-                top: 3,
-                left: 14,
-                blur: 4,
-                opacity: .12,
-                color: "#fff"
-            },
-            sparkline: {
-                enabled: !0
-            }
-        },
-        markers: {
-            size: 0,
-            colors: ["#F26522"],
-            strokeColors: "#fff",
-            strokeWidth: 2,
-            hover: {
-                size: 7
-            }
-        },
-        plotOptions: {
-            bar: {
-                horizontal: !1,
-                columnWidth: "35%",
-                endingShape: "rounded"
-            }
-        },
-        dataLabels: {
-            enabled: !1
-        },
-        stroke: {
-            show: !0,
-            width: 2.5,
-            curve: "smooth"
-        },
-        colors: ["#F26522"],
-        xaxis: {
-            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
-        },
-        tooltip: {
-            theme: "dark",
-            fixed: {
-                enabled: !1
-            },
-            x: {
-                show: !1
-            },
-            y: {
-                title: {
-                    formatter: function (e: any) {
-                        return ""
-                    }
-                }
-            },
-            marker: {
-                show: !1
-            }
-        }
-    })
-    const [locationChart] = React.useState<any>({
-        series: [{
-            name: "Inactive Company",
-            data: [30, 40, 15, 23, 20, 23, 25]
-        }],
-        fill: {
-            type: 'gradient',
-            gradient: {
-                opacityFrom: 0, // Start with 0 opacity (transparent)
-                opacityTo: 0    // End with 0 opacity (transparent)
-            }
-        },
-        chart: {
-            foreColor: '#fff',
-            type: "area",
-            width: 50,
-            toolbar: {
-                show: !1
-            },
-            zoom: {
-                enabled: !1
-            },
-            dropShadow: {
-                enabled: 0,
-                top: 3,
-                left: 14,
-                blur: 4,
-                opacity: .12,
-                color: "#fff"
-            },
-            sparkline: {
-                enabled: !0
-            }
-        },
-        markers: {
-            size: 0,
-            colors: ["#F26522"],
-            strokeColors: "#fff",
-            strokeWidth: 2,
-            hover: {
-                size: 7
-            }
-        },
-        plotOptions: {
-            bar: {
-                horizontal: !1,
-                columnWidth: "35%",
-                endingShape: "rounded"
-            }
-        },
-        dataLabels: {
-            enabled: !1
-        },
-        stroke: {
-            show: !0,
-            width: 2.5,
-            curve: "smooth"
-        },
-        colors: ["#F26522"],
-        xaxis: {
-            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"]
-        },
-        tooltip: {
-            theme: "dark",
-            fixed: {
-                enabled: !1
-            },
-            x: {
-                show: !1
-            },
-            y: {
-                title: {
-                    formatter: function (e: any) {
-                        return ""
-                    }
-                }
-            },
-            marker: {
-                show: !1
-            }
-        }
-    })
 
     return (
         <>
@@ -680,41 +356,6 @@ const Branches = () => {
                                         className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
                                         data-bs-toggle="dropdown"
                                     >
-                                        Select Plan
-                                    </Link>
-                                    <ul className="dropdown-menu  dropdown-menu-end p-3">
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Advanced
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Basic
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                Enterprise
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div className="dropdown me-3">
-                                    <Link
-                                        to="#"
-                                        className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                                        data-bs-toggle="dropdown"
-                                    >
                                         Select Status
                                     </Link>
                                     <ul className="dropdown-menu  dropdown-menu-end p-3">
@@ -790,6 +431,13 @@ const Branches = () => {
                                             <tr key={index}>
                                                 <td>
                                                     <div className="d-flex align-items-center file-name-icon">
+                                                        <Link to="#" className="avatar avatar-md border rounded-circle">
+                                                            <img
+                                                                src={`${baseURL}/api/image/img/${branch.branchLogoFileName}`}
+                                                                className="img-fluid"
+                                                                alt="img"
+                                                            />
+                                                        </Link>
                                                         <div className="ms-2">
                                                             <h6 className="fw-medium mb-0">
                                                                 <Link to="#">{branch.name}</Link>
@@ -810,9 +458,9 @@ const Branches = () => {
                                                         <Link to="#" onClick={() => setEditBranchData(branch)} className="me-2" data-bs-toggle="modal" data-bs-target="#edit_branch">
                                                             <i className="ti ti-edit" />
                                                         </Link>
-                                                        <Link to="#" data-bs-toggle="modal" data-bs-target="#delete_modal">
+                                                        {/* <Link to="#" data-bs-toggle="modal" data-bs-target="#delete_modal">
                                                             <i className="ti ti-trash" />
-                                                        </Link>
+                                                        </Link> */}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -863,10 +511,11 @@ const Branches = () => {
                                     <div className="col-md-12">
                                         <div className="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
                                             <div className="d-flex align-items-center justify-content-center avatar avatar-xxl rounded-circle border border-dashed me-2 flex-shrink-0 text-dark frames">
-                                                <ImageWithBasePath
-                                                    src="assets/img/profiles/avatar-30.jpg"
-                                                    alt="img"
+                                                <img
+                                                    src={previewImage || "https://via.placeholder.com/100x100?text=No+Image"}
+                                                    alt="Logo"
                                                     className="rounded-circle"
+                                                    style={{ width: 100, height: 100, objectFit: "cover" }}
                                                 />
                                             </div>
                                             <div className="profile-upload">
@@ -884,12 +533,17 @@ const Branches = () => {
                                                             className="form-control image-sign"
                                                         />
                                                     </div>
-                                                    <Link
-                                                        to="#"
+                                                    <button
                                                         className="btn btn-light btn-sm"
+                                                        type='button'
+                                                        onClick={() => {
+                                                            setPreviewImage(null);
+                                                            setAddBranchLogo(null);
+                                                        }
+                                                        }
                                                     >
                                                         Cancel
-                                                    </Link>
+                                                    </button>
                                                 </div>
                                                 {formErrors.branchLogo && <div className="text-danger mt-1">{formErrors.branchLogo}</div>}
                                             </div>
@@ -990,7 +644,7 @@ const Branches = () => {
                                     <div className="col-md-6">
                                         <div className="mb-3">
                                             <label className="form-label">
-                                                Bank Details <span className="text-danger"> *</span>
+                                                Bank Details
                                             </label>
                                             <input
                                                 type="file"
@@ -1097,7 +751,23 @@ const Branches = () => {
                                             />
                                         </div>
                                     </div>
+                                    <div className="col-md-6">
+                                        <div className="mb-3">
+                                            <label className="form-label">
+                                                Status <span className="text-danger"> *</span>
+                                            </label>
+                                            <select
+                                                className='form-control'
+                                                name='status'
+                                                value={editBranchData?.status === true ? "true" : "false"}
+                                                onChange={handleEditInputChange}
+                                            >
+                                                <option value='true'>Active</option>
+                                                <option value="false">Inactive</option>
+                                            </select>
 
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className="modal-footer">
@@ -1153,10 +823,19 @@ const Branches = () => {
                                             <p>{viewBranchData?.email}</p>
                                         </div>
                                     </div>
-                                    <span className="badge badge-success">
-                                        <i className="ti ti-point-filled" />
-                                        Active
-                                    </span>
+                                    {
+                                        viewBranchData?.status === true ?
+                                            <span className="badge badge-success">
+                                                <i className="ti ti-point-filled" />
+                                                Active
+                                            </span>
+                                            :
+                                            <span className="badge badge-danger">
+                                                <i className="ti ti-point-filled" />
+                                                Inactive
+                                            </span>
+                                    }
+
                                 </div>
                             </div>
                             <div className="p-3">

@@ -530,46 +530,12 @@ const SuperAdminDashboard = () => {
       </div>
     </div>
     {/* /Breadcrumb */}
-    {/* Welcome Wrap */}
-    <div className="welcome-wrap mb-4">
-      <div className=" d-flex align-items-center justify-content-between flex-wrap">
-        <div className="mb-3">
-          <h2 className="mb-1 text-white">Welcome Back, Adrian</h2>
-          <p className="text-light">14 New Companies Subscribed Today !!!</p>
-        </div>
-        <div className="d-flex align-items-center flex-wrap mb-1">
-          <Link to={routes.superAdminCompanies} className="btn btn-dark btn-md me-2 mb-2">
-            Companies
-          </Link>
-          <Link to={routes.superAdminPackages} className="btn btn-light btn-md mb-2">
-            All Packages
-          </Link>
-        </div>
-      </div>
-      <div className="welcome-bg">
-        <ImageWithBasePath
-          src="assets/img/bg/welcome-bg-02.svg"
-          alt="img"
-          className="welcome-bg-01"
-        />
-        <ImageWithBasePath
-          src="assets/img/bg/welcome-bg-03.svg"
-          alt="img"
-          className="welcome-bg-02"
-        />
-        <ImageWithBasePath
-          src="assets/img/bg/welcome-bg-01.svg"
-          alt="img"
-          className="welcome-bg-03"
-        />
-      </div>
-    </div>
-    {/* /Welcome Wrap */}
+
     <div className="row">
       {/* Total Companies */}
       <div className="col-xl-3 col-sm-6 d-flex">
         <div className="card flex-fill">
-          <div className="card-body">
+          <div className="card-body"> 
             <div className="d-flex align-items-center justify-content-between">
               <span className="avatar avatar-md bg-dark mb-3">
                 <i className="ti ti-building fs-16" />

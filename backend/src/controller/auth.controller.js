@@ -3,17 +3,21 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import { JWT_SECRET, NODE_ENV } from '../envvariablesdata.js';
+import logger from '../config/logger.js';
 
 const { User, Role } = models;
 
 
 const loginController = async (req, res) => {
   const { emailOrContact, password } = req.body;
+  logger.info(`login request--${emailOrContact,password}`)
 
   console.log(emailOrContact, password, "@@@@@@@@@@@@");
 
 
   try {
+    console.log("1111111111111");
+    
     const user = await User.findOne({
       where: {
         [Op.or]: [
@@ -23,6 +27,8 @@ const loginController = async (req, res) => {
       },
     });
     if (!user) {
+      console.log("222222222222");
+      
       return res.status(404).json({ message: 'User not found' });
     }
 

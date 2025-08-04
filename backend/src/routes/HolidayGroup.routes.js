@@ -1,11 +1,13 @@
 import { Router } from "express";
 import { checkRole, verifyToken } from '../config/authMiddleware.js';
-import { createHolidayGroup, listHolidayGroups } from "../controller/holidayGroup.Controller.js";
+import { createHolidayGroup, deleteHolidayGroup, listHolidayGroups } from "../controller/holidayGroup.Controller.js";
 
 
 const router =  Router();
 
 router.route("/addnewholidaygroup").post(verifyToken, createHolidayGroup );
 router.route("/listall").get(verifyToken, listHolidayGroups );
+
+router.delete('/holiday-groups/:id', deleteHolidayGroup);
 
 export default router;

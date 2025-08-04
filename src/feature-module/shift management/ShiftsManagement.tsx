@@ -284,9 +284,9 @@ function ShiftsManagement() {
                                                             >
                                                                 <i className="ti ti-edit" />
                                                             </Link>
-                                                            <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
+                                                            {/* <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
                                                                 <i className="ti ti-trash" />
-                                                            </Link>
+                                                            </Link> */}
                                                         </div>
                                                     </td>
                                                 </tr>

@@ -22,23 +22,29 @@ import leaveTemplateRoute from './routes/LeaveTemplate.routes.js';
 import weeklyOffComponentsRoute from './routes/weeklyOffComponents.routes.js';
 import paymentsRoute from './routes/Payments.routes.js';
 import leaveRecordRoute from './routes/LeaveRecord.route.js';
+import mobileAppRoute from './routes/mobileAppReq.router.js'
 import { PORT } from './envvariablesdata.js'
+import logger from './config/logger.js';
+import loggingMiddleware from './config/loggingMiddleware.js';
 
 
 dotenv.config();
 
 const app = express();
 
+logger.info("server.js entry")
+
 app.use(cors({
   // origin: "http://localhost:3000",
-  origin: "http://103.165.118.71:3020",
+  origin: "http://103.165.118.71:3020", 
   credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser())
+// app.use(loggingMiddleware);  
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); 
 app.use('/api/company', companyRoutes);
 app.use('/api/branch', branchRoutes);
 app.use('/api/settings', settingRoutes);
@@ -63,6 +69,9 @@ app.use('/api/weeklyoffcomponents', weeklyOffComponentsRoute);
 app.use('/api/payments', paymentsRoute);
 
 app.use('/api/leaveRecord',leaveRecordRoute);
+
+
+app.use('/api/mobileapp/admin',mobileAppRoute);
 
 
 
