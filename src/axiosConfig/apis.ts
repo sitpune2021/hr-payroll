@@ -41,6 +41,9 @@ export const ADD_HOLIDAY_GROUP_NEW =  "/api/holidaygroup/addnewholidaygroup"
 export const FETCH_HOLIDAY_GROUP_NEW =  "/api/holidaygroup/listall"
 export const FETCH_HOLIDAY_BY_GROUPiD =  "/api/holiday/getbygroupid/"
 export const ADD_NEW_HOLIDAY =  "/api/holiday/addnewholiday"
+export const DELETE_HOLIDAY =   "/api/holiday//holidays/"
+
+
 
 export const ADD_NEW_LEAVE_TEMPLATE =  "/api/leaveTemplate/addnewleavetemplate"
 export const EDIT_LEAVE_TEMPLATE_WITH_COMPONENTS =  "/api/leaveTemplate/edittemplatewithcomponent/"

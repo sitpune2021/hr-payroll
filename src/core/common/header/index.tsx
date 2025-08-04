@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -16,6 +16,8 @@ import axiosClient from '../../../axiosConfig/axiosClient';
 import { AUTH_LOGOUT } from '../../../axiosConfig/apis';
 import { logout } from '../../data/redux/authSlice';
 import { RootState } from '../../data/redux/store';
+import { useAppSelector } from '../../data/redux/hooks';
+import { Company } from '../../data/redux/companySlice';
 const Header = () => {
   const routes = all_routes;
   const dispatch = useDispatch();
@@ -25,6 +27,7 @@ const Header = () => {
 
   const [subOpen, setSubopen] = useState<any>("");
   const [subsidebar, setSubsidebar] = useState("");
+
 
   const toggleSidebar = (title: any) => {
 	localStorage.setItem("menuOpened", title);
@@ -39,7 +42,7 @@ const Header = () => {
 	if (subitem === subsidebar) {
 	  setSubsidebar("");
 	} else {
-	  setSubsidebar(subitem);
+	  setSubsidebar(subitem); 
 	}
   };
   const mobileSidebar = useSelector(

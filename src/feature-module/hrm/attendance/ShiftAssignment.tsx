@@ -174,7 +174,7 @@ const ShiftAssignment: React.FC = () => {
 
                   <button
                     data-bs-toggle="modal"
-                    data-bs-target="#add_shift"
+                    data-bs-target="#viewShiftRecord"
                     className="btn btn-sm btn-success mx-1"
                   >
                     View
@@ -189,7 +189,7 @@ const ShiftAssignment: React.FC = () => {
 
       {/* assign shift */}
       <form >
-        <div className="modal fade" id="add_shift">
+        <div className="modal fade" id="viewShiftRecord">
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content">
               <div className="modal-header">

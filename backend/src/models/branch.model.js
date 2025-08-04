@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { type } from 'os';
 import { DataTypes } from 'sequelize';
 
 export default (sequelize) => {
@@ -41,6 +42,10 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    status:{
+      type:DataTypes.BOOLEAN,
+      defaultValue:true
+    }
   },{
     tableName: 'Branch',
     timestamps: true

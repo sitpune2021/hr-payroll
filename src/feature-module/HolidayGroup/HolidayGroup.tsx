@@ -11,6 +11,7 @@ import { fetchHolidayGroups, HolidayGroup } from '../../core/data/redux/holidayG
 import {
   ADD_HOLIDAY_GROUP_NEW,
   ADD_NEW_HOLIDAY,
+  DELETE_HOLIDAY,
   FETCH_HOLIDAY_BY_GROUPiD,
 } from '../../axiosConfig/apis';
 
@@ -28,19 +29,19 @@ function HolidayGroups() {
   const [holidays, setHolidays] = useState<{ [groupId: number]: any[] }>({});
   const [expandedGroups, setExpandedGroups] = useState<{ [groupId: number]: boolean }>({});
   const [loadingGroups, setLoadingGroups] = useState<{ [groupId: number]: boolean }>({});
-  const [allHolidaGrps,setAllHolidayGrps] = useState<HolidayGroup[]>([]);
+  const [allHolidaGrps, setAllHolidayGrps] = useState<HolidayGroup[]>([]);
 
   const companyList = useAppSelector((state) => state.companies.list);
   const user = useSelector((state: RootState) => state.auth.user);
   const holidayGroupList = useAppSelector((state) => state.holidayGroup.data);
-  useEffect(()=>{
-      if(user && user.companyId){
-        const usersHolidayGroups= holidayGroupList.filter(holiday=>holiday.companyId===user.companyId);
-        setAllHolidayGrps(usersHolidayGroups);
-      }else{
-        setAllHolidayGrps(holidayGroupList);
-      }
-  },[user,holidayGroupList])
+  useEffect(() => {
+    if (user && user.companyId) {
+      const usersHolidayGroups = holidayGroupList.filter(holiday => holiday.companyId === user.companyId);
+      setAllHolidayGrps(usersHolidayGroups);
+    } else {
+      setAllHolidayGrps(holidayGroupList);
+    }
+  }, [user, holidayGroupList])
 
   useEffect(() => {
     if (companyList.length > 0) {
@@ -105,10 +106,13 @@ function HolidayGroups() {
 
   const handleDeleteHoliday = async (holidayId: number, groupId: number) => {
     try {
-      await axiosClient.delete(`/holidays/${holidayId}`);
-      toast('success', 'Deleted successfully');
-      const res = await axiosClient.get(`${FETCH_HOLIDAY_BY_GROUPiD}${groupId}`);
-      setHolidays((prev) => ({ ...prev, [groupId]: res.data }));
+      const response = await axiosClient.delete(`${DELETE_HOLIDAY}${holidayId}`);
+      if (response.status === 200) {
+        toast('success', 'Deleted successfully');
+        const res = await axiosClient.get(`${FETCH_HOLIDAY_BY_GROUPiD}${groupId}`);
+        setHolidays((prev) => ({ ...prev, [groupId]: res.data }));
+      }
+
     } catch (err) {
       toast('error', 'Could not delete holiday');
     }

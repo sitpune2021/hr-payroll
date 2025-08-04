@@ -15,6 +15,15 @@ type PasswordField = "password" | "confirmPassword";
 
 const Department = () => {
 
+  interface Department1 {
+    id: number;
+    name: string;
+    description: string;
+    companyId: number;
+    isActive: boolean;
+  }
+
+  const [allDept, setAllDept] = useState<Department1[]>([])
   const [addDeptData, setAddDeptData] = useState({
     "name": "",
     "description": "",
@@ -24,6 +33,7 @@ const Department = () => {
   const companyList = useAppSelector((state) => state.companies.list);
   const departmentList = useSelector((state: RootState) => state.departments.data)
   const user = useSelector((state: RootState) => state.auth.user);
+
 
 
   useEffect(() => {
@@ -38,6 +48,10 @@ const Department = () => {
       } else {
         setAllCompany(activeCompany);
       }
+    }
+
+    if (user?.companyId) {
+      setAllDept(departmentList.filter(dept => dept.companyId === user?.companyId));
     }
   }, [user, companyList]);
 
@@ -135,86 +149,6 @@ const Department = () => {
           <div className="card">
             <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
               <h5>Department List</h5>
-              <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-                <div className="dropdown me-3">
-                  <Link
-                    to="#"
-                    className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                    data-bs-toggle="dropdown"
-                  >
-                    Status
-                  </Link>
-                  <ul className="dropdown-menu  dropdown-menu-end p-3">
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Active
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Inactive
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="dropdown">
-                  <Link
-                    to="#"
-                    className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                    data-bs-toggle="dropdown"
-                  >
-                    Sort By : Last 7 Days
-                  </Link>
-                  <ul className="dropdown-menu  dropdown-menu-end p-3">
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Recently Added
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Ascending
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Desending
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Last Month
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                      >
-                        Last 7 Days
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
             </div>
             <div className="card-body p-0">
               {/* <Table dataSource={data} columns={columns} Selection={true} /> */}
@@ -232,7 +166,7 @@ const Department = () => {
                   </thead>
                   <tbody>
                     {
-                      departmentList.map((department, index) => (
+                      allDept.map((department, index) => (
                         <tr key={department.id}>
                           <td>{index + 1}</td>
                           <td>{department.name}</td>

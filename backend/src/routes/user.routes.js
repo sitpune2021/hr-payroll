@@ -18,7 +18,15 @@ router.route("/addUser").post([verifyToken,
   ])
 ], addNewUser);
 router.route("/getlist").get([verifyToken], getUsersList);
-router.route("/editUser/:userId").put([verifyToken, checkPermission('EditUser')], updateUserCOntrller);
+router.route("/editUser/:userId").put([verifyToken,
+  upload.fields([
+    { name: 'profilePhotoEdit', maxCount: 1 },
+    { name: 'bankDetailsEdit', maxCount: 1 },
+    { name: 'adhaarCardEdit', maxCount: 1 },
+    { name: 'panCardEdit', maxCount: 1 },
+    { name: 'educationalQulifEdit', maxCount: 1 }
+  ])
+], updateUserCOntrller);
 router.route('/uploaduserexcel').post([verifyToken, checkPermission('AddUser'), upload.single('file')], uploadUsersExcel);
 
 router.route("/getcompanyusers/:companyId").get([verifyToken], fetchCompanysUsers);
