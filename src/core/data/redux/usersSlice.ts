@@ -32,6 +32,7 @@ export interface User {
   alternatePhone?: string | null;
   PFAccountDetails?: string | null;
   bankDetails?: string | null;
+  profilePhoto?: string | null;
   adhaarCard?: string | null;
   panCard?: string | null;
   educationalQualification?: string | null;

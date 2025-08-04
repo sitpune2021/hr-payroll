@@ -4,9 +4,9 @@ import { where, Op, Sequelize } from 'sequelize';
 import * as XLSX from 'xlsx'
 import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js';
 import { log } from 'console';
-import { saveImageFile } from '../utils/imageUtils.js';
+import { deleteImageFile, saveImageFile } from '../utils/imageUtils.js';
 
-const { Permission, Role, User,Branch, Company, Department, UserLeaveQuota } = models;
+const { Permission, Role, User, Branch, Company, Department, UserLeaveQuota } = models;
 
 const addNewUser = async (req, res) => {
   const transaction = await sequelize.transaction();
@@ -197,7 +197,7 @@ const getUsersList = async (req, res) => {
         'joiningDate', 'birthDate', 'attendanceMode',
         'shiftRotationalFixed', 'workingShift', 'sendAttTOWhatsapp',
         'geofencepoint', 'leaveTemplateId', 'paymentMode',
-        'paymentDate', 'basicSalary',
+        'paymentDate', 'basicSalary', 'profilePhoto',
         'payrollTemplate', 'temporaryAddress', 'PermenantAddress',
         'BloodGroup', 'alternatePhone', 'PFAccountDetails',
         'bankDetails', 'adhaarCard', 'panCard', "reportingManagerId",
@@ -223,39 +223,87 @@ const getUsersList = async (req, res) => {
 
 
 const updateUserCOntrller = async (req, res) => {
+  const transaction = await sequelize.transaction();
+
   try {
     const id = req.params.userId;
-    const { firstName, lastName, email, contact, birthDate, maritalStatus, companyId, branchId, roleId, departmentId } = req.body;
-    console.log(departmentId, "AAAAAAAAAAAAAAAAAAAAA");
+    const updatedFields = req.body;
 
-    const user = await User.findOne({
-      where: {
-        id
-      }
-    });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const files = req.files || {};
+    console.log('--- FILES RECEIVED ---');
+    console.log(req.files); // Log all files
+    console.log('--- BODY RECEIVED ---');
+    console.log(req.body);  // Log form fields
+
+
+    // Parse fields safely
+    const parseOrNull = (val) => {
+      if (val === undefined || val === null || val === '') return null;
+      const parsed = parseInt(val);
+      return isNaN(parsed) ? null : parsed;
+    };
+
+    const parseFloatOrNull = (val) =>
+      val === '' || isNaN(parseFloat(val)) ? null : parseFloat(val);
+
+    // Fix field types
+    updatedFields.reportingManagerId = parseOrNull(updatedFields.reportingManagerId);
+    updatedFields.roleId = parseOrNull(updatedFields.roleId);
+    updatedFields.branchId = parseOrNull(updatedFields.branchId);
+    updatedFields.departmentId = parseOrNull(updatedFields.departmentId);
+    updatedFields.workingShift = parseOrNull(updatedFields.workingShift);
+    updatedFields.leaveTemplateId = parseOrNull(updatedFields.leaveTemplate);
+    updatedFields.payrollTemplate = parseOrNull(updatedFields.payrollTemplate);
+    updatedFields.basicSalary = parseFloatOrNull(updatedFields.basicSalary);
+    updatedFields.joiningDate = updatedFields.joiningDate ? new Date(updatedFields.joiningDate) : null;
+    updatedFields.birthDate = updatedFields.birthDate ? new Date(updatedFields.birthDate) : null;
+    updatedFields.paymentDate = updatedFields.paymentDate ? new Date(updatedFields.paymentDate) : null;
+    updatedFields.sendAttTOWhatsapp = updatedFields.sendWhatsapp === 'yes' || updatedFields.sendWhatsapp === true;
+
+    // Fetch existing user
+    const user = await User.findByPk(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Handle file uploads and delete old files if replaced
+
+    if (files.profilePhotoEdit?.[0]) {
+      deleteImageFile(user.profilePhoto);
+      const name = await saveImageFile(files.profilePhotoEdit[0]);
+      updatedFields.profilePhoto = name;
     }
-    const cleanBranchId = branchId === '' ? null : branchId;
-    const cleanCompanyId = companyId === '' ? null : companyId;
-    user.firstName = firstName;
-    user.lastName = lastName;
-    user.email = email;
-    user.contact = contact;
-    user.birthDate = birthDate;
-    user.maritalStatus = maritalStatus;
-    user.companyId = cleanCompanyId;
-    user.branchId = cleanBranchId;
-    user.roleId = roleId;
-    user.departmentId = departmentId;
-    await user.save();
-    return res.status(200).json({ message: "User updated successfully" });
+    if (files.adhaarCardEdit?.[0]) {
+      deleteImageFile(user.adhaarCard);
+      updatedFields.adhaarCard = await saveImageFile(files.adhaarCardEdit[0]);
+    }
+    if (files.panCardEdit?.[0]) {
+      deleteImageFile(user.panCard);
+      updatedFields.panCard = await saveImageFile(files.panCardEdit[0]);
+    }
+    if (files.bankDetailsEdit?.[0]) {
+      deleteImageFile(user.bankDetails);
+      updatedFields.bankDetails = await saveImageFile(files.bankDetailsEdit[0]);
+    }
+    if (files.educationalQulifEdit?.[0]) {
+      deleteImageFile(user.educationalQualification);
+      updatedFields.educationalQualification = await saveImageFile(files.educationalQulifEdit[0]);
+    }
 
+    // Remove frontend-only fields
+    delete updatedFields.sendWhatsapp;
+    delete updatedFields.leaveTemplate;
+
+    // Update user
+    await user.update(updatedFields, { transaction });
+
+    await transaction.commit();
+    return res.status(200).json({ message: "User updated successfully", user });
 
   } catch (error) {
+    await transaction.rollback();
+    console.error("Error updating user:", error);
     return res.status(500).json({ message: "Error updating user", error: error.message });
   }
-}
+};
 const uploadUsersExcel = async (req, res) => {
   try {
     const file = req.file;
@@ -356,7 +404,7 @@ const getTeamByUserId = async (req, res) => {
 
     // 1. Fetch the user with reporting manager
     const user = await User.findByPk(userId, {
-      attributes: ['id', 'firstName', 'lastName','profilePhoto', 'designation', 'email','contact','reportingManagerId']
+      attributes: ['id', 'firstName', 'lastName', 'profilePhoto', 'designation', 'email', 'contact', 'reportingManagerId']
     });
 
     if (!user) {
@@ -368,7 +416,7 @@ const getTeamByUserId = async (req, res) => {
     // 2. Include manager (if exists)
     if (user.reportingManagerId) {
       const manager = await User.findByPk(user.reportingManagerId, {
-        attributes: ['id', 'firstName', 'lastName', 'profilePhoto','designation', 'email','contact']
+        attributes: ['id', 'firstName', 'lastName', 'profilePhoto', 'designation', 'email', 'contact']
       });
 
       if (manager) {
@@ -388,7 +436,7 @@ const getTeamByUserId = async (req, res) => {
         where: {
           reportingManagerId: user.reportingManagerId
         },
-        attributes: ['id', 'firstName', 'lastName','profilePhoto', 'designation', 'email','contact']
+        attributes: ['id', 'firstName', 'lastName', 'profilePhoto', 'designation', 'email', 'contact']
       });
 
       for (const peer of peers) {
@@ -564,4 +612,4 @@ const getUserProfile = async (req, res) => {
 };
 
 
-export {getUserProfile, getOrganizationTree,getTeamByUserId, addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel, fetchCompanysUsers }
+export { getUserProfile, getOrganizationTree, getTeamByUserId, addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel, fetchCompanysUsers }

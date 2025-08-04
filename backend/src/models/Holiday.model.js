@@ -5,7 +5,7 @@ export default (sequelize) => {
   const Holiday = sequelize.define('Holiday', {
     id: {
       type: DataTypes.INTEGER,
-      autoIncrement: true,
+      autoIncrement: true, 
       primaryKey: true,
     },
     holidayGroupId: {

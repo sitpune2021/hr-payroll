@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '../../../core/data/redux/hooks';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../core/data/redux/store';
 import { toast } from '../../../utils/toastUtil';
-import axiosClient from '../../../axiosConfig/axiosClient';
+import axiosClient, { baseURL } from '../../../axiosConfig/axiosClient';
 import { ADD_NEW_USER, EDIT_USER, FETCH_ATTENDANCE_LOGS_USER, FETCH_ATTENDANCE_SUMMARY_USER, FETCH_USER_LEAVE_STATS, UPLOAD_USERS_EXCEL } from '../../../axiosConfig/apis';
 import { Company } from '../../../core/data/redux/companySlice';
 import { Branch } from '../../../core/data/redux/branchesSlice';
@@ -44,12 +44,20 @@ const Users = () => {
     const [allShifts, setAllSHifts] = useState<Shift[]>([])
     const [filteredRoles, setFilteredRoles] = useState<Role[]>([])
     const [bankDetails, setBankDetails] = useState<File | null>(null);
+    const [bankDetailsEdit, setBankDetailsEdit] = useState<File | null>(null);
     const [adhaarCard, setAdhaarCard] = useState<File | null>(null);
+    const [adhaarCardEdit, setAdhaarCardEdit] = useState<File | null>(null);
     const [panCard, setPanCard] = useState<File | null>(null);
+    const [panCardEdit, setPanCardEdit] = useState<File | null>(null);
     const [educationalQulif, setEducationalQulif] = useState<File | null>(null);
+    const [educationalQulifEdit, setEducationalQulifEdit] = useState<File | null>(null);
     const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+    const [profilePhotoEdit, setProfilePhotoEdit] = useState<File | null>(null);
     const [searchText, setSearchText] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
+
+
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     // This assumes you have allEmployees fetched somewhere
     // If not, fetch and setAllEmployees from your API
@@ -243,8 +251,34 @@ const Users = () => {
     const handleEditUserSubmit = async (e: any) => {
         e.preventDefault();
         const userData = editUserData;
+        if (!userData) {
+            toast('Error', 'User data is missing', 'danger');
+            return;
+        }
+        const payload = new FormData();
+        Object.entries(userData).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+                payload.append(key, value as string | Blob);
+            }
+        });
+
+        if (profilePhotoEdit) {
+            payload.append("profilePhotoEdit", profilePhotoEdit);
+            console.log(profilePhotoEdit);
+            
+            console.log("profile photo appended @!@!@!@@!@!@!!!!!!!!!!@@@@@@@@@@@@@@@@@@@!!!!!!!!!!!!!!!!!!!!!!@@@@@@@@");
+        }
+        if (bankDetailsEdit) payload.append("bankDetailsEdit", bankDetailsEdit);
+        if (adhaarCardEdit) payload.append("adhaarCardEdit", adhaarCardEdit);
+        if (panCardEdit) payload.append("panCardEdit", panCardEdit);
+        if (educationalQulifEdit) payload.append("educationalQulifEdit", educationalQulifEdit);
+
         try {
-            const response = await axiosClient.put(`${EDIT_USER}${editUserData?.id}`, userData);
+            const response = await axiosClient.put(`${EDIT_USER}${editUserData?.id}`, payload, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            });
             if (response.status === 200) {
                 toast('Info', response.data.message, 'success');
             }
@@ -297,7 +331,7 @@ const Users = () => {
     const payrollTemplates = useSelector((state: RootState) => state.payrollTemplate.templates);
     const shiftsList = useSelector((state: RootState) => state.shifts.shifts);
     const leaveTemplateList = useAppSelector((state) => state.leaveTemplate.templates);
-      const companyUserList = useSelector((state: RootState) => state.companysEmployees.list);
+    const companyUserList = useSelector((state: RootState) => state.companysEmployees.list);
 
     useEffect(() => {
         if (payrollTemplates.length > 0) {
@@ -417,7 +451,7 @@ const Users = () => {
         bloodGroup: '',
         alternateMobileNO: '',
         pfNumber: '',
-        reportingManagerId:''
+        reportingManagerId: ''
     });
 
     const [formErrors, setFormErrors] = useState({
@@ -525,6 +559,8 @@ const Users = () => {
         if (!departmentId.trim()) newErrors.departmentId = "Department Selection is required";
 
         setFormErrors(newErrors);
+        console.log(newErrors);
+        
         if (Object.keys(newErrors).length > 0) return;
 
         const payload = new FormData();
@@ -772,12 +808,24 @@ const Users = () => {
         fetchSalary();
     }, [startDate, endDate, viewUserDetails])
 
-    
+
     useEffect(() => {
         if (user?.companyId) {
-          dispatch(fetchCompanysUsersThunk(user.companyId));
+            dispatch(fetchCompanysUsersThunk(user.companyId));
         }
-      }, [user]);
+    }, [user]);
+
+    useEffect(() => {
+        if (editUserData?.reportingManagerId) {
+            const selectedManager = companyUserList.find(
+                (emp) => emp.id === editUserData.reportingManagerId
+            );
+            if (selectedManager) {
+                setSearchText(`${selectedManager.firstName} ${selectedManager.lastName}`);
+            }
+        }
+    }, [editUserData, companyUserList]);
+
 
     return (
         <>
@@ -1262,10 +1310,10 @@ const Users = () => {
                                             <div className="col-md-12">
                                                 <div className="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
                                                     <div className="d-flex align-items-center justify-content-center avatar avatar-xxl rounded-circle border border-dashed me-2 flex-shrink-0 text-dark frames">
-                                                        <ImageWithBasePath
-                                                            src="assets/img/profiles/avatar-30.jpg"
+                                                        <img
+                                                            src={previewImage || ""}
+                                                            className="img-fluid"
                                                             alt="img"
-                                                            className="rounded-circle"
                                                         />
                                                     </div>
                                                     <div className="profile-upload">
@@ -1281,17 +1329,25 @@ const Users = () => {
                                                                     name='companyImage'
                                                                     onChange={(e) => {
                                                                         const file = e.target.files?.[0];
-                                                                        if (file) setProfilePhoto(file);
+                                                                        if (file) {
+                                                                            setProfilePhoto(file);
+                                                                            const imageUrl = URL.createObjectURL(file); // <-- Create preview URL
+                                                                            setPreviewImage(imageUrl);
+                                                                        }
+
                                                                     }}
                                                                     className="form-control image-sign"
                                                                 />
                                                             </div>
-                                                            <Link
-                                                                to="#"
+                                                            <button
                                                                 className="btn btn-light btn-sm"
+                                                                onClick={() => {
+                                                                    setProfilePhoto(null);
+                                                                    setPreviewImage(null);
+                                                                }}
                                                             >
                                                                 Cancel
-                                                            </Link>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1934,235 +1990,665 @@ const Users = () => {
                             </button>
                         </div>
                         <form onSubmit={(e) => handleEditUserSubmit(e)}>
-                            <div className="modal-body pb-0">
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">First Name</label>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => handleEditDataChange(e)}
-                                                name='firstName'
-                                                value={editUserData?.firstName}
-                                                className="form-control"
-                                                defaultValue="Anthony "
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Last Name</label>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => handleEditDataChange(e)}
-                                                name='lastName'
-                                                value={editUserData?.lastName}
-                                                className="form-control"
-                                                defaultValue=" Lewis"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Email</label>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => handleEditDataChange(e)}
-                                                name='email'
-                                                value={editUserData?.email}
-                                                className="form-control"
-                                                defaultValue="anthony@example.com"
-                                            />
-                                        </div>
-                                    </div>
+                            <div className="modal-body pb-0" style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                                <Tabs style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                    <TabList>
+                                        <Tab>Personal Info</Tab>
+                                        <Tab>Attendance Info</Tab>
+                                        <Tab>Salary Info</Tab>
+                                        <Tab>Other Info</Tab>
+                                    </TabList>
 
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Phone</label>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => handleEditDataChange(e)}
-                                                name='contact'
-                                                value={editUserData?.contact}
-                                                className="form-control"
-                                                defaultValue={988765544}
-                                            />
-                                        </div>
-                                    </div>
-                                    {/* <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Merital Status</label>
-                                            <select
-                                                value={editUserData?.maritalStatus ?? ""}
-                                                className="form-control"
-                                                onChange={(e) => handleEditDataChange(e)}
-                                                name='maritalStatus'
-                                            >
-                                                <option value=''>Select Marital Status</option>
-                                                <option value="single">Single</option>
-                                                <option value="married">Married</option>
-                                                <option value="Unmarried">Unmarried</option>
-
-                                            </select>
-                                        </div>
-                                    </div> */}
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Role</label>
-                                            <select
-                                                className='form-control'
-                                                value={editUserData?.roleId}
-                                                name='roleId'
-                                                onChange={(e) => handleEditDataChange(e)}
-                                            >
-                                                {
-                                                    filteredRoles.map(role => (
-                                                        <option key={role.id} value={role.id}>{role.name}</option>
-                                                    ))
-                                                }
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Birth Date</label>
-                                            <input
-                                                type="date"
-                                                onChange={(e) => handleEditDataChange(e)}
-                                                name="birthDate"
-                                                value={editUserData?.birthDate?.split("T")[0] || ""}
-                                                className="form-control"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Company</label>
-                                            <select
-                                                className="form-control"
-                                                value={editUserData?.companyId ?? ""}
-                                                name="companyId"
-                                                onChange={(e) => handleEditDataChange(e)}
-                                            >
-                                                <option value="">Select Company</option>
-                                                {allcompany.map(company => (
-                                                    <option key={company.id} value={company.id}>
-                                                        {company.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Branch</label>
-                                            <select
-                                                className="form-control"
-                                                value={editUserData?.branchId ?? ""}
-                                                name="branchId"
-                                                onChange={(e) => handleEditDataChange(e)}
-                                            >
-                                                <option value="">Select Branch</option>
-                                                {filteredBranches.map(branch => (
-                                                    <option key={branch.id} value={branch.id}>
-                                                        {branch.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Department</label>
-                                            <select
-                                                className='form-control'
-                                                name='departmentId'
-                                                value={editUserData?.departmentId}
-                                                onChange={(e) => handleEditDataChange(e)}
-                                            >
-                                                <option value="">---Select ---</option>
-                                                {
-                                                    filteredDepartments.map(dept => (
-                                                        <option key={dept.id} value={dept.id}>{dept.name}</option>
-                                                    ))
-                                                }
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Password</label>
-                                            <div className="pass-group">
-                                                <input
-                                                    type={
-                                                        passwordVisibility.password
-                                                            ? "text"
-                                                            : "password"
-                                                    }
-                                                    onChange={(e) => handleEditDataChange(e)}
-                                                    name='password'
-                                                    className="pass-input form-control"
-                                                />
-                                                <span
-                                                    className={`ti toggle-passwords ${passwordVisibility.password
-                                                        ? "ti-eye"
-                                                        : "ti-eye-off"
-                                                        }`}
-                                                    onClick={() =>
-                                                        togglePasswordVisibility("password")
-                                                    }
-                                                ></span>
+                                    {/* --- Tab 1 --- */}
+                                    <TabPanel>
+                                        <div className="row" style={{ minHeight: '300px' }}>
+                                            <div className="col-md-12">
+                                                <div className="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
+                                                    <div className="d-flex align-items-center justify-content-center avatar avatar-xxl rounded-circle border border-dashed me-2 flex-shrink-0 text-dark frames">
+                                                        <img
+                                                            src={previewImage || `${baseURL}/api/image/img/${editUserData?.profilePhoto}`}
+                                                            className="img-fluid"
+                                                            alt="img"
+                                                        />
+                                                    </div>
+                                                    <div className="profile-upload">
+                                                        <div className="mb-2">
+                                                            <h6 className="mb-1">Select Image</h6>
+                                                            <p className="fs-12">Image should be below 4 mb</p>
+                                                        </div>
+                                                        <div className="profile-uploader d-flex align-items-center">
+                                                            <div className={`drag-upload-btn btn btn-sm btn-primary me-2`}>
+                                                                Upload
+                                                                <input
+                                                                    type="file"
+                                                                    name='companyImage'
+                                                                    onChange={(e) => {
+                                                                        const file = e.target.files?.[0];
+                                                                        if (file) {
+                                                                            setProfilePhotoEdit(file);
+                                                                            const imageUrl = URL.createObjectURL(file); // <-- Create preview URL
+                                                                            setPreviewImage(imageUrl);
+                                                                        }
+                                                                    }}
+                                                                    className="form-control image-sign"
+                                                                />
+                                                            </div>
+                                                            <button
+                                                                className="btn btn-light btn-sm"
+                                                                onClick={() => {
+                                                                    setProfilePhotoEdit(null);
+                                                                    setPreviewImage(null);
+                                                                }}
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">Confirm Password</label>
-                                            <div className="pass-group">
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">First Name</label>
                                                 <input
-                                                    type={
-                                                        passwordVisibility.confirmPassword
-                                                            ? "text"
-                                                            : "password"
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={editUserData?.firstName}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, firstName: e.target.value })
                                                     }
-                                                    className="pass-inputs form-control"
-                                                    onChange={(e) => handleEditDataChange(e)}
-                                                    name='confirmPassword'
                                                 />
-                                                <span
-                                                    className={`ti toggle-passwords ${passwordVisibility.confirmPassword
-                                                        ? "ti-eye"
-                                                        : "ti-eye-off"
-                                                        }`}
-                                                    onClick={() =>
-                                                        togglePasswordVisibility("confirmPassword")
-                                                    }
-                                                ></span>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <div className="mb-3">
-                                            <label className="form-label">
-                                                Select Payroll Template <span className="text-danger"> *</span>
-                                            </label>
-                                            <select
-                                                name='templateId'
-                                                value={editUserData?.payrollTemplate ?? ''}
-                                                className='form-control'
-                                                onChange={(e) => handleEditDataChange(e)}
-                                            >
-                                                <option value="">--Select Template--</option>
-                                                {
-                                                    allPayrollTemp.map(template => (
-                                                        <option value={template.id} key={template.id}>{template.templateName}</option>
-                                                    ))
-                                                }
-                                            </select>
-                                        </div>
-                                    </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Last Name</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={editUserData?.lastName}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, lastName: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Phone</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={editUserData?.contact}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, contact: e.target.value })
+                                                    }
+                                                />
+                                            </div>
 
-                                </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Email</label>
+                                                <input
+                                                    type="email"
+                                                    className="form-control"
+                                                    value={editUserData?.email}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, email: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Gender</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.gender === "Male" ? "Male" : editUserData?.gender === "Female" ? "Female" : "Other"}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, gender: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Designation</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={editUserData?.designation}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, designation: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Role</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.roleId}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, roleId: parseInt(e.target.value) })
+                                                    }
+                                                >
+                                                    <option value="">Select Role</option>
+                                                    {filteredRoles.map((role) => (
+                                                        <option key={role.id} value={role.id}>
+                                                            {role.name}-{getCompanyNameById(role.companyId)}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Company</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.companyId ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, companyId: parseInt(e.target.value) })
+                                                    }
+                                                >
+                                                    <option value="">Select Company</option>
+                                                    {allcompany.map((company) => (
+                                                        <option key={company.id} value={company.id}>
+                                                            {company.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Branch</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.branchId ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, branchId: parseInt(e.target.value) })
+                                                    }
+                                                    disabled={!editUserData?.companyId}
+                                                >
+                                                    <option value="">Select branch</option>
+                                                    {filteredBranches.map((branch) => (
+                                                        <option key={branch.id} value={branch.id}>
+                                                            {branch.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Department</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.departmentId}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, departmentId: parseInt(e.target.value) })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    {
+                                                        filteredDepartments.map(dept => (
+                                                            <option value={dept.id} key={dept.id}>{dept.name}</option>
+                                                        ))
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div className="col-md-6 mb-3 position-relative">
+                                                <label className="form-label">Reporting Manager</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={searchText}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setSearchText(val);
+                                                        setShowDropdown(true);
+                                                    }}
+                                                    onBlur={() => {
+                                                        setTimeout(() => setShowDropdown(false), 500);
+                                                    }}
+                                                    onFocus={() => setShowDropdown(true)}
+                                                    placeholder="Search employee..."
+                                                />
+
+                                                {showDropdown && (
+                                                    <ul className="dropdown-menu show w-100" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                        {companyUserList
+                                                            .filter(emp =>
+                                                                `${emp.firstName} ${emp.lastName}`.toLowerCase().includes(searchText.toLowerCase())
+                                                            )
+                                                            .map(emp => (
+                                                                <li key={emp.id}>
+                                                                    <button
+                                                                        className="dropdown-item"
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setEditUserData(prev => ({
+                                                                                ...prev,
+                                                                                reportingManagerId: emp.id,
+                                                                            }));
+                                                                            setSearchText(`${emp.firstName} ${emp.lastName}`);
+                                                                            setShowDropdown(false);
+                                                                        }}
+                                                                    >
+                                                                        {emp.firstName} {emp.lastName}
+                                                                    </button>
+                                                                </li>
+                                                            ))}
+                                                        {companyUserList.length === 0 && (
+                                                            <li className="dropdown-item text-muted">No employees</li>
+                                                        )}
+                                                    </ul>
+                                                )}
+                                            </div>
+
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Joining Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={editUserData?.joiningDate ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, joiningDate: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Birth Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={editUserData?.birthDate ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, birthDate: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+
+                                            {/* <div className="col-md-6 mb-3">
+                                                <label className="form-label">Marital Status</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.maritalStatus}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, maritalStatus: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="single">Single</option>
+                                                    <option value="married">Married</option>
+                                                    <option value="unmarried">Unmarried</option>
+                                                </select>
+                                            </div> */}
+
+
+
+                                            {/* <div className="col-md-6 mb-3">
+                                                <label className="form-label">Password</label>
+                                                <div className="pass-group">
+                                                    <input
+                                                        type={passwordVisibility.password ? "text" : "password"}
+                                                        className="form-control"
+                                                        value={formDactaAddUser.password}
+                                                        onChange={(e) =>
+                                                            setFormDataAddUser({ ...formDactaAddUser, password: e.target.value })
+                                                        }
+                                                    />
+                                                    <span
+                                                        className={`ti toggle-passwords ${passwordVisibility.password ? "ti-eye" : "ti-eye-off"}`}
+                                                        onClick={() => togglePasswordVisibility("password")}
+                                                    ></span>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Confirm Password</label>
+                                                <div className="pass-group">
+                                                    <input
+                                                        type={passwordVisibility.confirmPassword ? "text" : "password"}
+                                                        className="form-control"
+                                                        value={formDactaAddUser.confirmPassword}
+                                                        onChange={(e) =>
+                                                            setFormDataAddUser({ ...formDactaAddUser, confirmPassword: e.target.value })
+                                                        }
+                                                    />
+                                                    <span
+                                                        className={`ti toggle-passwords ${passwordVisibility.confirmPassword ? "ti-eye" : "ti-eye-off"}`}
+                                                        onClick={() => togglePasswordVisibility("confirmPassword")}
+                                                    ></span>
+                                                </div>
+                                            </div> */}
+                                        </div>
+                                    </TabPanel>
+
+                                    {/* --- Tab 2 --- */}
+                                    <TabPanel>
+                                        <div className="row" style={{ minHeight: '300px' }}>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Atterdance mode</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.attendanceMode ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, attendanceMode: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="Month">Manual</option>
+                                                    <option value="Day">Biometric</option>
+                                                    <option value="Hour">Geofence point</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Shift (Rotational/fixed)</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.shiftRotationalFixed}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, shiftRotationalFixed: e.target.value as 'Fixed' | 'Rotational' })
+                                                    }
+                                                >
+                                                    <option value="Fixed">Fixed</option>
+                                                    <option value="Rotational">Rotational</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Working Shift</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.workingShift ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, workingShift: parseInt(e.target.value) })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    {
+                                                        allShifts.map(shift => (
+                                                            <option value={shift.id} key={shift.id}>{shift.shiftName}</option>
+                                                        ))
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Send Attendance to WhatsApp</label>
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        value="yes"
+                                                        checked={editUserData?.sendAttTOWhatsapp === true}
+                                                        onChange={(e) =>
+                                                            setEditUserData({ ...editUserData, sendAttTOWhatsapp: true })
+                                                        }
+                                                    />
+                                                    <label className="form-check-label" htmlFor="sendWhatsappYes">
+                                                        Yes
+                                                    </label>
+                                                </div>
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        value="no"
+                                                        checked={editUserData?.sendAttTOWhatsapp === false}
+                                                        onChange={(e) =>
+                                                            setEditUserData({ ...editUserData, sendAttTOWhatsapp: false })
+                                                        }
+                                                    />
+                                                    <label className="form-check-label" htmlFor="sendWhatsappNo">
+                                                        No
+                                                    </label>
+                                                </div>
+                                            </div>
+
+
+
+                                            {/* <div className="col-md-6 mb-3">
+                                                <label className="form-label">Face Scan/Biometric Device</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={formDactaAddUser.biometricDevice}
+                                                    onChange={(e) =>
+                                                        setFormDataAddUser({ ...formDactaAddUser, biometricDevice: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="Device 1">Device 1</option>
+                                                    <option value="Device 2">Device 2</option>
+                                                    <option value="Device 3">Device 3</option>
+
+                                                </select>
+                                            </div> */}
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Geofence point</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.geofencepoint ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, geofencepoint: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="Location 1">Location 1</option>
+                                                    <option value="Location 2">Location 2</option>
+                                                    <option value="Location 3">Location 3</option>
+
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Leave Template</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.leaveTemplate ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, leaveTemplate: parseInt(e.target.value) })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    {
+                                                        allLeaveTemplates.map(leaveTemp => (
+                                                            <option value={leaveTemp.id}>{leaveTemp.name}</option>
+                                                        ))
+                                                    }
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </TabPanel>
+
+
+                                    {/* --- Tab 3 --- */}
+                                    <TabPanel>
+                                        <div className="row" style={{ minHeight: '300px' }}>
+
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Payment mode</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.paymentMode ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, paymentMode: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="Month">Month</option>
+                                                    <option value="Day">Day</option>
+                                                    <option value="Hour">Hour</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Payment Date</label>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={editUserData?.paymentDate ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, paymentDate: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Earning (Gross)</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={editUserData?.basicSalary ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, basicSalary: parseInt(e.target.value) })
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Payroll Template</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.payrollTemplate ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, payrollTemplate: parseInt(e.target.value) })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    {
+                                                        allPayrollTemp.map(template => (
+                                                            <option value={template.id} key={template.id}>{template.templateName}</option>
+                                                        ))
+                                                    }
+                                                </select>
+                                            </div>
+
+                                        </div>
+                                    </TabPanel>
+
+                                    {/* --- Tab 4 --- */}
+                                    <TabPanel>
+                                        <div className="row" style={{ minHeight: '300px' }}>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Temperary Address</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={editUserData?.temporaryAddress ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, temporaryAddress: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Permenant Address</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={editUserData?.PermenantAddress ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, PermenantAddress: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Blood Group</label>
+                                                <select
+                                                    className="form-control"
+                                                    value={editUserData?.BloodGroup ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, BloodGroup: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Select</option>
+                                                    <option value="A+">A+</option>
+                                                    <option value="A-">A−</option>
+                                                    <option value="B+">B+</option>
+                                                    <option value="B-">B−</option>
+                                                    <option value="AB+">AB+</option>
+                                                    <option value="AB-">AB−</option>
+                                                    <option value="O+">O+</option>
+                                                    <option value="O-">O−</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">ALternate Mobile Number</label>
+                                                <input
+                                                    type="number"
+                                                    className="form-control"
+                                                    value={editUserData?.alternatePhone ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, alternatePhone: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">PF Number</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={editUserData?.PFAccountDetails ?? ""}
+                                                    onChange={(e) =>
+                                                        setEditUserData({ ...editUserData, PFAccountDetails: e.target.value })
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Bank Dtails</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) setBankDetailsEdit(file);
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Adhaar Card</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) setAdhaarCardEdit(file);
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">PAN Card</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) setPanCardEdit(file);
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Educational Qualification</label>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) setEducationalQulifEdit(file);
+                                                    }}
+                                                />
+                                            </div>
+
+                                        </div>
+                                    </TabPanel>
+                                </Tabs>
                             </div>
                             <div className="modal-footer">
                                 <button
