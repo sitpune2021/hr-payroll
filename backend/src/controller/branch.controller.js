@@ -12,6 +12,9 @@ const addNewBranch = async (req, res) => {
 
     const branchLogoFile = req.files['branchLogo']?.[0];
     const bankDetailsFile = req.files['bankDetails']?.[0];
+       if (!branchLogoFile) {
+      return res.status(400).json({ message: 'Branch logo is required' });
+    }
 
     let branchLogoFileName = null;
     let bankDetailsFileName = null;
