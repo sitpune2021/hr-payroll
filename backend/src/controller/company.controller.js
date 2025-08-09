@@ -181,5 +181,18 @@ const updatecompany = async (req, res) => {
   }
 };
 
+const companyProfile = async (req,res) =>{
+  try {
+    const { companyId } = req.params;
 
-export { addnewcompany, updatecompany, fetchListOfCompanies }
+    const company = await Company.findByPk(companyId);
+    if (!company) return res.status(404).json({ message: 'Company not found' });
+  res.status(200).json(company)
+    
+  } catch (error) {
+    res.status(500).json({message:"internal server error"})
+  }
+}
+
+
+export { addnewcompany, updatecompany, fetchListOfCompanies,companyProfile }
