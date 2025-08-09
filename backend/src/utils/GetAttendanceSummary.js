@@ -41,7 +41,8 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
                     },
                 },
             });
-            holidayDates = holidays.map(h => h.holidayDate.toISOString().split('T')[0]);
+            holidayDates = holidays.map(h => new Date(h.holidayDate).toISOString().split('T')[0]);
+
             console.log('Holidays:', holidayDates);
         } else {
             console.log(`Leave Template ID ${user.leaveTemplateId} not found → ignoring leave template.`);
