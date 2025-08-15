@@ -29,6 +29,7 @@ import companysEmployeeReducer from './companysUsersSlice';
 import companyDateAttendanceReducer from './companyDateAttendanceSlice'
 import holidayGroupReducer from './holidayGroupSlice'
 import leaveTemplateReducer from './leaveTemplateSlice'
+import birthDayAnniversaryReducer from './birthdayAnniversarySlice'
 
 
 
@@ -52,6 +53,7 @@ const rootReducer = combineReducers({
   companyDateAttendance: companyDateAttendanceReducer,
   holidayGroup: holidayGroupReducer,
   leaveTemplate: leaveTemplateReducer,
+  birthDayAnniversary: birthDayAnniversaryReducer,
 });
 
 // 👇 Persist config: Choose what to persist

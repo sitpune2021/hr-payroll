@@ -5,7 +5,6 @@ import Sidebar from "../core/common/sidebar";
 // import ThemeSettings from "../core/common/theme-settings";
 import { useEffect, useState } from "react";
 import HorizontalSidebar from "../core/common/horizontal-sidebar";
-import TwoColumnSidebar from "../core/common/two-column";
 import StackedSidebar from "../core/common/stacked-sidebar";
 import DeleteModal from "../core/modals/deleteModal";
 import { publicRoutes } from "./router/router.link";
@@ -132,7 +131,7 @@ const Feature: React.FC<FeatureProps>  = ({ allowedLabels }) => {
                 <Header />
                 <Sidebar />
                 <HorizontalSidebar />
-                <TwoColumnSidebar />
+                {/* <TwoColumnSidebar /> */}
                 <StackedSidebar />
                 <Outlet />
                 <DeleteModal />
@@ -147,7 +146,7 @@ const Feature: React.FC<FeatureProps>  = ({ allowedLabels }) => {
                 <Header />
                 <Sidebar />
                 <HorizontalSidebar />
-                <TwoColumnSidebar />
+                {/* <TwoColumnSidebar /> */}
                 <StackedSidebar />
                 <Outlet />
                 <DeleteModal />

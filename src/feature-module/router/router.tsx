@@ -34,7 +34,7 @@ const ALLRoutes: React.FC = () => {
           ))}
         </Route>
 
-        <Route path="*" element={<Navigate to="/not-allowed" />} />
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </>
   );

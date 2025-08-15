@@ -127,15 +127,15 @@ const Header = () => {
 							<Link id="toggle_btn" to="#" onClick={handleToggleMiniSidebar} className="btn btn-menubar me-1">
 								<i className="ti ti-arrow-bar-to-left"></i>
 							</Link>
-							<div className="input-group input-group-flat d-inline-flex me-1">
+							{/* <div className="input-group input-group-flat d-inline-flex me-1">
 								<span className="input-icon-addon">
 									<i className="ti ti-search"></i>
 								</span>
-								<input type="text" className="form-control" placeholder="Search in HRMS" />
+								<input type="text" className="form-control" placeholder="HRMS" />
 								<span className="input-group-text">
 									<kbd>CTRL + / </kbd>
 								</span>
-							</div>
+							</div> */}
 								
 						</div>
 

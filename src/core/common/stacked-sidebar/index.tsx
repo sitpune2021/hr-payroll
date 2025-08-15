@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { TowColData } from '../../data/json/twoColData'
+// import { TowColData } from '../../data/json/twoColData'
 import ImageWithBasePath from '../imageWithBasePath';
 import { all_routes } from '../../../feature-module/router/all_routes';
 
@@ -9,19 +9,19 @@ const StackedSidebar = () => {
     const Location = useLocation();
     const [showSubMenusTab, SetShowSubMenusTab] = useState(false);
     const [subOpen, setSubopen] = useState<any>("");
-    const showTabs = (res:any) => {
-        TowColData.forEach((menus:any)=>{
-            menus.menu.forEach((mainMenus:any) => {
-                if (res.menuValue === mainMenus.menuValue) {
-                    mainMenus.showMyTab = true;
-                  } else {
-                    mainMenus.showMyTab = false;
-                  }
-            })
-        }
+    // const showTabs = (res:any) => {
+    //     TowColData.forEach((menus:any)=>{
+    //         menus.menu.forEach((mainMenus:any) => {
+    //             if (res.menuValue === mainMenus.menuValue) {
+    //                 mainMenus.showMyTab = true;
+    //               } else {
+    //                 mainMenus.showMyTab = false;
+    //               }
+    //         })
+    //     }
 
-        )
-    }
+    //     )
+    // }
     const toggleSidebar = (title: any) => {
         localStorage.setItem("menuOpened", title);
         if (title === subOpen) {
@@ -87,7 +87,7 @@ const StackedSidebar = () => {
                         <p className="fs-10">System Admin</p>
                     </div>
                     <div className="stack-menu">
-                        <div className="nav flex-column align-items-center nav-pills" role="tablist"
+                        {/* <div className="nav flex-column align-items-center nav-pills" role="tablist"
                             aria-orientation="vertical">
                             <div className="row g-2">
                             {TowColData.map((mainMenu, index) => (
@@ -112,9 +112,9 @@ const StackedSidebar = () => {
                             ))}
                                
                             </div>
-                        </div>
+                        </div> */}
                         <div className="tab-content">
-                            <div className={`tab-pane ${showSubMenusTab ? 'd-block':'d-none'}`} id="menu-dashboard">
+                            {/* <div className={`tab-pane ${showSubMenusTab ? 'd-block':'d-none'}`} id="menu-dashboard">
                                 <ul className="stack-submenu">
                                 {TowColData.map((mainMenu, index) => (
                                     <React.Fragment key={`main-${index}`}>
@@ -208,7 +208,7 @@ const StackedSidebar = () => {
                                     
                                     
                                 </ul>
-                            </div>
+                            </div> */}
                             
                         </div>
                     </div>

@@ -5,29 +5,42 @@ import { saveImageFile } from "../utils/imageUtils.js";
 const { Branch, Company } = models;
 
 
+
 const addNewBranch = async (req, res) => {
   const { name, address, phone, companyId, email, nameOfSalarySlip } = req.body;
 
   try {
-
     const branchLogoFile = req.files['branchLogo']?.[0];
     const bankDetailsFile = req.files['bankDetails']?.[0];
-       if (!branchLogoFile) {
+
+    if (!branchLogoFile) {
       return res.status(400).json({ message: 'Branch logo is required' });
     }
 
-    let branchLogoFileName = null;
-    let bankDetailsFileName = null;
-
-
-    if (branchLogoFile) {
-      branchLogoFileName = await saveImageFile(branchLogoFile);
+    // 🔍 Check by name
+    const nameExists = await Branch.findOne({ where: { name } });
+    if (nameExists) {
+      return res.status(409).json({ message: 'A branch with this name already exists' });
     }
+
+    // 🔍 Check by phone
+    const phoneExists = await Branch.findOne({ where: { phone } });
+    if (phoneExists) {
+      return res.status(409).json({ message: 'A branch with this phone number already exists' });
+    }
+
+    // 🔍 Check by email
+    const emailExists = await Branch.findOne({ where: { email } });
+    if (emailExists) {
+      return res.status(409).json({ message: 'A branch with this email already exists' });
+    }
+
+    let branchLogoFileName = await saveImageFile(branchLogoFile);
+    let bankDetailsFileName = null;
 
     if (bankDetailsFile) {
       bankDetailsFileName = await saveImageFile(bankDetailsFile);
     }
-
 
     const newBranch = await Branch.create({
       name,
@@ -40,16 +53,17 @@ const addNewBranch = async (req, res) => {
       branchLogoFileName
     });
 
-
     res.status(201).json({
       message: 'Branch created successfully',
       branch: newBranch
     });
+
   } catch (error) {
     console.error('Error creating branch:', error);
     res.status(500).json({ message: 'Something went wrong', error: error.message });
   }
-}
+};
+
 
 const fetchListBranches = async (req, res) => {
   try {

@@ -612,4 +612,80 @@ const getUserProfile = async (req, res) => {
 };
 
 
-export { getUserProfile, getOrganizationTree, getTeamByUserId, addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel, fetchCompanysUsers }
+
+const getBirthdaysAndAnniversaries = async (req, res) => {
+  try {
+    const { companyId, branchId, startDate, endDate } = req.query;
+
+    if (!companyId) {
+      return res.status(400).json({ error: "companyId is required" });
+    }
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: "startDate and endDate are required" });
+    }
+
+    // Local timezone safe parsing (yyyy-mm-dd → Date)
+    const [sy, sm, sd] = startDate.split("-").map(Number);
+    const [ey, em, ed] = endDate.split("-").map(Number);
+    const start = new Date(sy, sm - 1, sd);
+    const end = new Date(ey, em - 1, ed);
+
+    const whereClause = { companyId };
+    if (branchId) whereClause.branchId = branchId;
+
+    const employees = await User.findAll({
+      where: whereClause,
+      attributes: [
+        "id", "firstName", "lastName",
+        "birthDate", "joiningDate",
+        "designation", "companyId", "branchId",
+      ],
+    });
+
+    const birthdays = [];
+    const anniversaries = [];
+
+    employees.forEach((emp) => {
+      // --- Birthday ---
+      if (emp.birthDate) {
+        const [_, birthMonth, birthDay] = emp.birthDate
+          .toISOString()
+          .split("T")[0]
+          .split("-")
+          .map(Number);
+
+        const currentYearBirthday = new Date(start.getFullYear(), birthMonth - 1, birthDay);
+        if (currentYearBirthday >= start && currentYearBirthday <= end) {
+          birthdays.push(emp);
+        }
+      }
+
+      // --- Anniversary ---
+      if (emp.joiningDate) {
+        const [_, joinMonth, joinDay] = emp.joiningDate
+          .toISOString()
+          .split("T")[0]
+          .split("-")
+          .map(Number);
+
+        const currentYearAnniversary = new Date(start.getFullYear(), joinMonth - 1, joinDay);
+        if (currentYearAnniversary >= start && currentYearAnniversary <= end) {
+          anniversaries.push(emp);
+        }
+      }
+    });
+
+    return res.json({ birthdays, anniversaries });
+
+  } catch (error) {
+    console.error("Error fetching birthdays/anniversaries:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
+export default getBirthdaysAndAnniversaries;
+
+
+
+export { getBirthdaysAndAnniversaries, getUserProfile, getOrganizationTree, getTeamByUserId, addNewUser, getUsersList, updateUserCOntrller, uploadUsersExcel, fetchCompanysUsers }
