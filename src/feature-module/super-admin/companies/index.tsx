@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import moment from 'moment';
 import { all_routes } from '../../router/all_routes'
 import PredefinedDateRanges from '../../../core/common/datePicker'
@@ -17,9 +17,12 @@ import { RootState } from '../../../core/data/redux/store'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Password from 'antd/es/input/Password';
 import { isValidContact, isValidEmail, isValidInteger, isValidName } from '../../../utils/Validators';
+import autoTable from 'jspdf-autotable';
+import jsPDF from 'jspdf';
 
 const Companies = () => {
   const dispatch = useAppDispatch();
+  const nevigate = useNavigate();
   const [sortOption, setSortOption] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [dateRange, setDateRange] = useState({
@@ -364,6 +367,34 @@ const Companies = () => {
     }
   };
 
+  const exportCompnysInPDF = () => {
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(16);
+    doc.text("Company List", 14, 20);
+
+    // Convert companies into table data
+    const tableData = companyList.map((c, index) => [
+      index + 1,
+      c.name,
+      c.website,
+      c.email,
+      c.phone,
+      c.isActive ? "Active" : "Inactive",
+    ]);
+
+    // Add table
+    autoTable(doc, {
+      startY: 30,
+      head: [["#", "Name", "Website", "Email", "Phone", "Status"]],
+      body: tableData,
+    });
+
+    // Save
+    doc.save("companies.pdf");
+  };
+
 
   return (
     <>
@@ -389,7 +420,16 @@ const Companies = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-             
+              <div className="mb-2 mx-2">
+                  <button
+                  onClick={exportCompnysInPDF}
+                    className="btn btn-primary d-flex align-items-center"
+                  >
+                    <i className="ti ti-download me-2" />
+                    Export Pdf
+                  </button>
+                </div>
+
               {
                 filteredLabels.includes('AddCompany') &&
                 <div className="mb-2">
@@ -505,44 +545,18 @@ const Companies = () => {
                     </span>
                   </div>
                 </div>
-                <div className="dropdown me-3">
-                  <Link
-                    to="#"
-                    className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                    data-bs-toggle="dropdown"
+                <div className="me-3">
+                  <select
+                    className="form-select"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
                   >
-                    Select Status
-                  </Link>
-                  <ul className="dropdown-menu  dropdown-menu-end p-3">
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                        onClick={() => setStatusFilter('All')}
-                      >
-                        All
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                        onClick={() => setStatusFilter('Active')}
-                      >
-                        Active
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
-                        className="dropdown-item rounded-1"
-                        onClick={() => setStatusFilter('Inactive')}
-                      >
-                        Inactive
-                      </Link>
-                    </li>
-                  </ul>
+                    <option value="All">All</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
                 </div>
+
                 <div className="dropdown">
                   <Link
                     to="#"
@@ -988,16 +1002,16 @@ const Companies = () => {
                             />
                           </div>
                           <button
-                                  className="btn btn-light btn-sm"
-                                  type='button'
-                                  onClick={() => {
-                                    setPreviewImage(null);
-                                    setSelectedImageEdit(null);
-                                  }
-                                  }
-                                >
-                                  Cancel
-                                </button>
+                            className="btn btn-light btn-sm"
+                            type='button'
+                            onClick={() => {
+                              setPreviewImage(null);
+                              setSelectedImageEdit(null);
+                            }
+                            }
+                          >
+                            Cancel
+                          </button>
                         </div>
                       </div>
                     </div>

@@ -333,7 +333,7 @@ const Users = () => {
     const shiftsList = useSelector((state: RootState) => state.shifts.shifts);
     const leaveTemplateList = useAppSelector((state) => state.leaveTemplate.templates);
     const companyUserList = useSelector((state: RootState) => state.companysEmployees.list);
-    
+
 
     useEffect(() => {
         if (payrollTemplates.length > 0) {
@@ -853,7 +853,7 @@ const Users = () => {
                             </nav> */}
                         </div>
                         <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-                          
+
                             <div className="d-flex flex-row gap-2">
                                 <label
                                     className="btn d-flex align-items-center mb-0"
@@ -963,7 +963,7 @@ const Users = () => {
                                         <i className='fas fa-search' style={{ padding: '0 0 0 12px' }}></i>
                                         <input style={{ minWidth: "320px", border: 'none', fontSize: '16px' }} type="text" value={employeeSearch} className="form-control me-2" placeholder="Search Employees..." onChange={(e) => setEmployeeSearch(e.target.value)} />
                                         {employeeSearch && <i className='fas fa-times' style={{ padding: '0 20px 0 0', cursor: 'pointer' }} onClick={() => setEmployeeSearch("")}></i>}
-                                        
+
                                     </div>
                                 </div>
 
@@ -1252,7 +1252,11 @@ const Users = () => {
                 <div className="modal-dialog modal-dialog-centered modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h4 className="modal-title">Add User</h4>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h4 className="modal-title">Add User</h4>
+                                <h5 style={{color:'red'}} className="modal-title mx-2">NOTE: All fields in <strong>Personal Info</strong> tab are mendatory</h5>
+                            </div>
+
                             <button
                                 type="button"
                                 className="btn-close custom-btn-close"

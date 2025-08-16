@@ -489,7 +489,7 @@ const Branches = () => {
                                             </div>
                                             <div className="profile-upload">
                                                 <div className="mb-2">
-                                                    <h6 className="mb-1">Select Image</h6>
+                                                    <h6 className="mb-1">Select Image<span className="text-danger"> *</span></h6>
                                                     <p className="fs-12">Image should be below 4 mb</p>
                                                 </div>
                                                 <div className="profile-uploader d-flex align-items-center">
@@ -599,7 +599,7 @@ const Branches = () => {
 
                                     <div className="col-md-6">
                                         <div className="mb-3">
-                                            <label className="form-label">Email Address</label>
+                                            <label className="form-label">Email Address<span className="text-danger"> *</span></label>
                                             <input
                                                 type="email"
                                                 name='email'
