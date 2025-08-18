@@ -1,4 +1,5 @@
 import { calculatePay } from "../utils/CalculatePays.js";
+import logger from '../config/logger.js';
 
 import models from '../models/index.js';
 
@@ -6,6 +7,7 @@ const { User, PayrollComponent, PayrollTemplate } = models;
 
 const calculatePaymentController = async (req, res) => {
   try {
+    logger.info(`${req.user.id}--calculate payment  controller called`)
     const { userId, startDate, endDate } = req.body;
 
     if (!userId || !startDate || !endDate) {
@@ -13,15 +15,17 @@ const calculatePaymentController = async (req, res) => {
     }
 
     const payrollData = await calculatePay(userId, startDate, endDate);
+    logger.info(`${req.user.id}--calculate payment  controller responded successfully`)
     res.json(payrollData);
   } catch (error) {
-    console.error('Error calculating pay:', error);
+    logger.error(`${req.user.id}--calculate payment  controller failed with error ${error.message}`)
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
 
 const calculatePaymentForGroup = async (req, res) => {
   try {
+    logger.info(`${req.user.id}--calculate payment for group controller called`)
     const { companyId, branchId, startDate, endDate } = req.body;
 
     if (!companyId || !startDate || !endDate) {
@@ -63,6 +67,7 @@ const calculatePaymentForGroup = async (req, res) => {
       { totalAllowance: 0, totalDeduction: 0, totalPay: 0 }
     );
 
+    logger.info(`${req.user.id}--calculate payment for group successfully responded`)
     // Step 5: Response
     res.json({
       totals: {
@@ -80,7 +85,7 @@ const calculatePaymentForGroup = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error calculating group pay:', error);
+    logger.error(`${req.user.id}--Error calculating payment for group: ${error.message}`);
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };

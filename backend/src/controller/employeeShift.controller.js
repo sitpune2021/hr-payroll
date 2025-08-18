@@ -1,10 +1,12 @@
 import moment from 'moment';
 import models from "../models/index.js";
+import logger from '../config/logger.js';
 
 const { Attendance, AttendanceSetting, EmployeeShiftSchedule } = models;
 
 export const assignShiftToEmployee = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- assign shift to employee controller called`)
     const { userId, fromDate, toDate, attendanceSettingId } = req.body;
 
     console.log('[Request Body]', { userId, fromDate, toDate, attendanceSettingId });
@@ -33,10 +35,10 @@ export const assignShiftToEmployee = async (req, res) => {
 
       assignments.push(newShift);
     }
-
+    logger.info(`${req.user.id}-- shift assigned to employee successfully`)
     res.status(201).json({ success: true, assigned: assignments.length });
   } catch (error) {
-    console.error('[Error in assignShiftToEmployee]', error);
+    logger.error(`${req.user.id}-- error assigning shift to employee`, error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

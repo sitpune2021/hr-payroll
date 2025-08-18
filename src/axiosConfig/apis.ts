@@ -68,6 +68,9 @@ export const UPLOAD_ATTENDANCE_EXCEL  =  "/api/attendance/upload-attendance"
 
 export const FETCH_BIRTHDAY_ANNIVERSARY= '/api/user/birthdays-anniversaries'
 
+export const COMPANY_LEAVES = '/api/leaveRecord/fetchCompanyLeaverecord'
+
+export const UPDATE_LEAVE_STATUS = '/api/leaveRecord/updateLeaveStatus'
 
 
  

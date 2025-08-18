@@ -3,12 +3,13 @@ import models, { sequelize } from '../models/index.js';
 import { where, Op, Sequelize } from 'sequelize';
 import * as XLSX from 'xlsx'
 import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js';
-import { log } from 'console';
 import { deleteImageFile, saveImageFile } from '../utils/imageUtils.js';
+import logger from '../config/logger.js'
 
 const { Permission, Role, User, Branch, Company, Department, UserLeaveQuota } = models;
 
 const addNewUser = async (req, res) => {
+  logger.info(`${req.user.id}-- add new user controller entry`)
   const transaction = await sequelize.transaction();
   try {
     let {
@@ -136,10 +137,12 @@ const addNewUser = async (req, res) => {
     }, { transaction });
 
     await transaction.commit();
+    logger.info(`${req.user.id}-- user added successfully`)
     return res.status(201).json({ message: "User added successfully", user: newUser });
 
   } catch (error) {
     await transaction.rollback();
+    logger.error(`${req.user.id}-- error while adding user ${error}`)
     console.error("Error adding user:", error);
     return res.status(500).json({ message: "Error adding new user", error: error.message });
   }
@@ -150,6 +153,7 @@ const addNewUser = async (req, res) => {
 
 const getUsersList = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- get users list controller entry`)
     let {
       companyId,
       branchId,
@@ -204,7 +208,7 @@ const getUsersList = async (req, res) => {
         'educationalQualification', 'createdAt', 'updatedAt'
       ],
     });
-
+    logger.info(`${req.user.id}-- users list fetched successfully`)
     return res.status(200).json({
       users,
       total,
@@ -213,7 +217,7 @@ const getUsersList = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('getUsersList error:', error);
+    logger.error(`${req.user.id}--${error}-error while fetching users list`)
     return res.status(500).json({
       message: 'Error getting users list',
       error: error.message,
@@ -224,6 +228,7 @@ const getUsersList = async (req, res) => {
 
 const updateUserCOntrller = async (req, res) => {
   const transaction = await sequelize.transaction();
+  logger.info(`${req.user.id}-- update user controller entry`)
 
   try {
     const id = req.params.userId;
@@ -296,16 +301,18 @@ const updateUserCOntrller = async (req, res) => {
     await user.update(updatedFields, { transaction });
 
     await transaction.commit();
+    logger.info(`${req.user.id}-- user updated successfully`)
     return res.status(200).json({ message: "User updated successfully", user });
 
   } catch (error) {
     await transaction.rollback();
-    console.error("Error updating user:", error);
+    logger.error(`${req.user.id}--${error}--error while updating user`)
     return res.status(500).json({ message: "Error updating user", error: error.message });
   }
 };
 const uploadUsersExcel = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- adding users by excel controller called`)
     const file = req.file;
     const loggedInUser = req.user;
 
@@ -349,11 +356,11 @@ const uploadUsersExcel = async (req, res) => {
 
     // ✅ Save users (assumes validUsers already have necessary info)
     await User.bulkCreate(validUsers);
-
+    logger.info(`${req.user.id}-- users by excel added successfully`)
     return res.status(200).json({ message: 'All users uploaded successfully' });
 
   } catch (error) {
-    console.error(error);
+    logger.error(`${req.user.id}-- error adding users by excel ${error.message}`)
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };
@@ -362,6 +369,8 @@ const uploadUsersExcel = async (req, res) => {
 
 const fetchCompanysUsers = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- fetch company users controller called`)
+
     const companyId = req.params.companyId;
     console.log('[Fetch Company Users] companyId:', companyId);
 
@@ -386,11 +395,11 @@ const fetchCompanysUsers = async (req, res) => {
     });
 
     console.log(`[Users Fetched] Count: ${compUserList.length}`);
-
+    logger.info(`${req.user.id}-- company users fetched successfully`)
     return res.status(200).json(compUserList);
 
   } catch (error) {
-    console.error('[Error in fetchCompanysUsers]', error);
+    logger.error(`${req.user.id}--${error}--error while fetching company users`)
     return res.status(500).send({
       message: "Internal server error",
       error: error.message,
@@ -400,6 +409,7 @@ const fetchCompanysUsers = async (req, res) => {
 
 const getTeamByUserId = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- get team by user id controller called`)
     const { userId } = req.params;
 
     // 1. Fetch the user with reporting manager
@@ -461,17 +471,19 @@ const getTeamByUserId = async (req, res) => {
         type: 'teamMember'
       });
     }
+    logger.info(`${req.user.id}-- team fetched successfully`)
 
     return res.json({ team });
 
   } catch (error) {
-    console.error("Error fetching team:", error);
+    logger.error(`${req.user.id}-${error}--error while fetching team`)
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
 const getOrganizationTree = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- company orgnization tree fetch controller entry`)
     const { userId } = req.params;
 
     // Step 1: Get current user to extract companyId and branchId
@@ -545,19 +557,21 @@ const getOrganizationTree = async (req, res) => {
     const branchManagerMap = buildManagerMap(usersInBranch);
     const branchTree = buildTree(branchManagerMap, branchUserMap);
 
+    logger.info(`${req.user.id}-- orgnization tree fetched successfully`)
     return res.json({
       companyTree,
       branchTree
     });
 
   } catch (error) {
-    console.error("Error building organization tree:", error);
+    logger.error(`${req.user.id}--${error}--error while fetching organization tree`)
     return res.status(500).json({ message: "Internal server error" });
   }
 };
 
 const getUserProfile = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- get user profile controller entry`)
     const { userId } = req.params;
 
     const user = await User.findOne({
@@ -591,7 +605,7 @@ const getUserProfile = async (req, res) => {
     const formattedDOB = user.birthDate
       ? new Date(user.birthDate).toISOString().split('T')[0].split('-').reverse().join(' : ')
       : null;
-
+      logger.info(`${req.user.id}-- user profile fetched successfully`)
     res.json({
       id: user.id,
       fullName,
@@ -606,7 +620,7 @@ const getUserProfile = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching user profile:', error);
+    logger.error(`${req.user.id}--${error}-error whille fetching user profile`)
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
@@ -615,6 +629,7 @@ const getUserProfile = async (req, res) => {
 
 const getBirthdaysAndAnniversaries = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- get birthdays and anniversaries controller entry`)
     const { companyId, branchId, startDate, endDate } = req.query;
 
     if (!companyId) {
@@ -674,17 +689,16 @@ const getBirthdaysAndAnniversaries = async (req, res) => {
         }
       }
     });
+    logger.info(`${req.user.id}-- birthday and anniversaries fetched successfully`)
 
     return res.json({ birthdays, anniversaries });
 
   } catch (error) {
-    console.error("Error fetching birthdays/anniversaries:", error);
+    logger.error(`${req.user.id}--${error}--error while fetching birthday and anniversaries`)
     return res.status(500).json({ error: "Internal server error" });
   }
 };
 
-
-export default getBirthdaysAndAnniversaries;
 
 
 

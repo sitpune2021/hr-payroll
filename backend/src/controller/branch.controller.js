@@ -1,12 +1,14 @@
 import { where } from "sequelize";
 import models, { sequelize } from "../models/index.js";
 import { saveImageFile } from "../utils/imageUtils.js";
+import logger from '../config/logger.js';
 
 const { Branch, Company } = models;
 
 
 
 const addNewBranch = async (req, res) => {
+  logger.info(`${req.user.id}-- adding new branch`);
   const { name, address, phone, companyId, email, nameOfSalarySlip } = req.body;
 
   try {
@@ -52,14 +54,14 @@ const addNewBranch = async (req, res) => {
       bankDetailsFileName,
       branchLogoFileName
     });
-
+    logger.info(`${req.user.id}-- added new branch`);
     res.status(201).json({
       message: 'Branch created successfully',
       branch: newBranch
     });
 
   } catch (error) {
-    console.error('Error creating branch:', error);
+    logger.error(`${`${req.user.id}--${error}`}`);
     res.status(500).json({ message: 'Something went wrong', error: error.message });
   }
 };
@@ -68,6 +70,7 @@ const addNewBranch = async (req, res) => {
 const fetchListBranches = async (req, res) => {
   try {
     const user = req.user;
+    logger.info(`${req.user.id}-- fetching branch list controller entry`);
     if (user.companyId) {
       const branches = await Branch.findAll({
         where: {
@@ -75,26 +78,30 @@ const fetchListBranches = async (req, res) => {
         }
       }
       );
+      logger.info(`${req.user.id}-- branch list fetched successfully for company user`);
       return res.status(200).json(branches)
     }else{
       const branches = await Branch.findAll();
+      logger.info(`${req.user.id}-- getched branch list for super admin`);
       return res.status(200).json(branches)
     }
 
   } catch (error) {
-    console.error('Error fetching branches:', error);
+    logger.erro(`${req.user.id}--${error}--error while fetching list of branches`);
     return res.status(500).json({ message: "Error" })
   }
 }
 
 const updateBranch = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- updating existing branch`);
     const id = req.params.branchId;
     const { name, address, phone, email,status } = req.body;
     const branch = await Branch.update({ name, address, phone, email,status }, { where: { id } });
+    logger.info(`${req.user.id}-- branch updated successfully`);
     return res.status(200).json({ message: "Branch updated successfully", branch: branch })
   } catch (error) {
-    console.error('Error updating branch:', error);
+    logger.error(`${req.user.id}-- ${error}--error while updating branch`);
     return res.status(500).json({ message: "Error" })
   }
 }

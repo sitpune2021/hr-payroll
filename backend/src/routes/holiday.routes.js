@@ -9,6 +9,6 @@ router.route("/addnewholiday").post(verifyToken, addHoliday );
 router.route("/getbygroupid/:groupId").get(verifyToken, getHolidaysByGroup );
 
 
-router.delete('/holidays/:id', deleteHoliday);
+router.route('/holidays/:id').delete([verifyToken],deleteHoliday);
 
 export default router;

@@ -114,36 +114,38 @@ export const SidebarDataTest = (userRole: string) => [
             link: routes.permissionpage,
             base: 'roles-permissions',
           },
-        ],
-      },
-      {
-        label: 'Leaves',
-        customSubmenuTwo: true,
-        submenu: true,
-        showSubRoute: false,
-        link: routes.leaveadmin,
-        base: 'leaves',
-        submenuItems: [
           {
-            label: 'Leaves (Admin)',
+            label: 'Leaves',
             link: routes.leaveadmin,
             submenu: false,
             showSubRoute: false,
           },
-          {
-            label: 'Leaves (Employee)',
-            link: routes.leaveemployee,
-            submenu: false,
-            showSubRoute: false,
-          },
-          {
-            label: 'Leave Settings',
-            link: routes.leavesettings,
-            submenu: false,
-            showSubRoute: false,
-          },
         ],
       },
+
+
+      // {
+      //   label: 'Leaves',
+      //   customSubmenuTwo: true,
+      //   submenu: true,
+      //   showSubRoute: false,
+      //   link: routes.leaveadmin,
+      //   base: 'leaves',
+      //   submenuItems: [
+      //     {
+      //       label: 'Leaves (Employee)',
+      //       link: routes.leaveemployee,
+      //       submenu: false,
+      //       showSubRoute: false,
+      //     },
+      //     {
+      //       label: 'Leave Settings',
+      //       link: routes.leavesettings,
+      //       submenu: false,
+      //       showSubRoute: false,
+      //     },
+      //   ],
+      // },
     ]
   },
 

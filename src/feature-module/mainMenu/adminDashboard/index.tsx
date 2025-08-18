@@ -23,6 +23,7 @@ import { FETCH_BIRTHDAY_ANNIVERSARY } from "../../../axiosConfig/apis";
 import dayjs from "dayjs";
 import { setEvents } from "../../../core/data/redux/birthdayAnniversarySlice";
 import { useAppSelector } from "../../../core/data/redux/hooks";
+import { fetchLeaves } from "../../../core/data/redux/leavesSlice";
 
 const AdminDashboard = () => {
   // types.ts
@@ -69,6 +70,24 @@ const AdminDashboard = () => {
   const companyUserList = useSelector((state: RootState) => state.companysEmployees.list);
   const userSaved = useSelector((state: RootState) => state.auth.user);
   const { birthdays, anniversaries } = useAppSelector((state) => state.birthDayAnniversary);
+  const { leaves } = useAppSelector((state) => state.companyLeaves);
+
+
+  const [fromDate, setFromDate] = useState(() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 2); // 2 months ago
+    return date.toISOString().split("T")[0]; // yyyy-mm-dd
+  });
+
+  const [toDate, setToDate] = useState(() => {
+    return new Date().toISOString().split("T")[0]; // today
+  });
+  useEffect(() => {
+    if (user && user.companyId) {
+      dispatch(fetchLeaves({ companyId: user.companyId, fromDate, toDate }));
+    }
+  }, [user, fromDate, toDate, dispatch]);
+
 
 
   const getCompletedYears = (dateString: string | null | undefined): number => {
@@ -462,7 +481,8 @@ const AdminDashboard = () => {
       label: "Pending Leave Request",
       icon: "ti-login",
       color: "#090a09", // teal
-      value: 8,
+      value: leaves.filter((l) => l.status === 'Applied').length,
+      route:'/leaves'
     },
     {
       label: "Pending Payment Request",
@@ -761,7 +781,7 @@ const AdminDashboard = () => {
                           </span>
                         </div>
                         <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
-                          {item.label === 'Today Birthday & Work Anniversary' ? todayAnniversaries.length+todayBirthdays.length : item.value}
+                          {item.label === 'Today Birthday & Work Anniversary' ? todayAnniversaries.length + todayBirthdays.length : item.value}
                         </span>
                       </div>
                     </li>

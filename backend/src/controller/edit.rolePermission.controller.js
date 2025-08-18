@@ -1,17 +1,12 @@
 import models from '../models/index.js';
+import logger from '../config/logger.js';
 
 const { Role, Permission, RolePermission } = models
 
 const updatePermissionsForRole = async (req, res) => {
-
   const { roleId, permissionId } = req.params;
-
-  console.log(roleId,permissionId);
-  
-
-
+  logger.info(`${req.user.id}-- update permission for role--roleId:${roleId}--permissionId:${permissionId}`)
   try {
-
     // Validate Role
     const role = await Role.findByPk(roleId);
     if (!role) {
@@ -36,24 +31,28 @@ const updatePermissionsForRole = async (req, res) => {
     } else {
       // Permission not assigned, add it (toggle ON)
       await RolePermission.create({ roleId, permissionId });
+      logger.info(`${req.user.id}-- update permission for role--roleId:${roleId}--permissionId:${permissionId}--success`)
       return res.status(200).json({ message: 'Permission enabled for role.' });
     }
   } catch (error) {
-    console.error("Toggle permission error:", error);
+    logger.error(`${req.user.id}-- update permission for role--roleId:${roleId}--permissionId:${permissionId}--error:${error.message}`)
     return res.status(500).json({ message: 'Internal server error.' });
   }
 };
 
 const fetchRolesPermissionsLinking = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- fetch roles permissions linking controller called`)
     const rolesPermissions = await RolePermission.findAll({
-      attributes: ['roleId', 'permissionId'], 
-      raw: true 
+      attributes: ['roleId', 'permissionId'],
+      raw: true
     });
 
-      return res.status(200).json(rolesPermissions);
+    logger.info(`${req.user.id}-- fetch roles permissions linking controller responded--successfully`)
+    return res.status(200).json(rolesPermissions);
   } catch (error) {
-      return res.status(500).json({ message: error.message });
+    logger.error(`${req.user.id}-- fetch roles permissions linking controller responded--error:${error.message}`)
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -61,4 +60,4 @@ const fetchRolesPermissionsLinking = async (req, res) => {
 
 
 
-export { updatePermissionsForRole,fetchRolesPermissionsLinking }
+export { updatePermissionsForRole, fetchRolesPermissionsLinking }
