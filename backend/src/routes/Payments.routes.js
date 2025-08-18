@@ -1,10 +1,11 @@
 import express, { Router } from 'express';
 import { calculatePaymentController, calculatePaymentForGroup } from '../controller/PaymentCalculation.controller.js';
+import { verifyToken } from '../config/authMiddleware.js';
 
 const router = Router();
 
-router.post('/calculate', calculatePaymentController);
+router.route('/calculate').post([verifyToken],calculatePaymentController);
 
-router.post('/totalPayForCompanyINDates', calculatePaymentForGroup);
+router.route('/totalPayForCompanyINDates').post([verifyToken], calculatePaymentForGroup);
 
 export default router;

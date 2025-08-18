@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 // types.d.ts or top of SalarySlip.tsx
 import "jspdf";
+import axios from "axios";
+import { baseURL } from "../axiosConfig/axiosClient";
 
 declare module "jspdf" {
   interface jsPDF {
@@ -21,8 +23,23 @@ interface PayrollComponent {
   value: number;
   calculatedAmount: number;
 }
+export interface CompanyInfo {
+  name: string;
+  address: string;
+  phone: string;
+  companyImage: string;
+  email: string;
+}
 
- export interface SalaryData {
+export interface BranchInfo {
+  name: string;
+  address: string;
+  contact: string;
+  email: string;
+  nameOfSalarySlip: string;
+  branchLogoFileName: string;
+}
+export interface SalaryData {
   userId: number;
   name: string;
   startDate: string;
@@ -44,6 +61,8 @@ interface PayrollComponent {
   paidLeaveDays: number;
   unpaidLeaveDays: number;
   absentDays: number;
+  company: CompanyInfo | null;
+  branch: BranchInfo | null;
 }
 
 // Component Props
@@ -52,6 +71,36 @@ interface Props {
 }
 
 const SalarySlip: React.FC<Props> = ({ salaryData }) => {
+  const [logoBase64, setLogoBase64] = useState<string | null>(null);
+
+  const fetchLogo = async (imgName:String) => {
+      try {
+        const response = await axios.get(
+          `${baseURL}/api/image/img/${imgName}`,
+          { responseType: "blob" } // important
+        );
+
+        // Convert Blob → Base64
+        const reader = new FileReader();
+        reader.readAsDataURL(response.data);
+        reader.onloadend = () => {
+          setLogoBase64(reader.result as string);
+        };
+      } catch (err) {
+        console.warn("No logo found, continuing without logo");
+        console.error("Error fetching logo:", err);
+      }
+    
+  };
+
+  useEffect(()=>{
+    if(salaryData.company && salaryData.company.companyImage){
+      console.log("use effect loafing indfg");
+      
+          fetchLogo(salaryData.company.companyImage)
+    }
+  },[])
+
   const generateSalarySlip = () => {
     const doc = new jsPDF();
 
@@ -76,12 +125,28 @@ const SalarySlip: React.FC<Props> = ({ salaryData }) => {
       totalHoursWorked,
     } = salaryData;
 
-    // Header
+ 
+    const pdfWidth = doc.internal.pageSize.getWidth(); // ✅ define width
+    const pdfHeight = doc.internal.pageSize.getHeight(); // (optional agar chahiye)
+
+    // ✅ Add logo only if available
+    if (logoBase64) {
+    const imgSize = 30; // image ka size
+    const x = pdfWidth - imgSize - 15; // thoda left shift (margin 15)
+    const y = 10;
+
+    doc.addImage(logoBase64, "JPEG", x, y, imgSize, imgSize); // image lagana
+  }
+
+    // if (logoBase64) {
+    //   doc.addImage(logoBase64, "JPEG", pdfWidth - 40, 10, 30, 30);
+    // }
     doc.setFontSize(14);
-    doc.text("VEGAYAN SYSTEMS PVT.LTD.", 15, 15);
+    doc.text(`${salaryData.company?.name}`, 15, 15);
     doc.setFontSize(10);
-    doc.text("A-1111-1116, Kailas Business Park, Hiranandani Link Road", 15, 22);
-    doc.text("Park Site, Vikhroli (West), Mumbai-400079", 15, 27);
+    doc.text(`Branch name:${salaryData.branch?.name}`, 15, 22);
+    doc.text(`Branch Address:${salaryData.branch?.address}`, 15, 27);
+    doc.text(`${salaryData.branch?.email} ${salaryData.branch?.contact}`, 15, 32);
 
     doc.setFontSize(12);
     doc.text(`Salary Slip for: ${startDate} to ${endDate}`, 15, 38);
@@ -149,7 +214,9 @@ const SalarySlip: React.FC<Props> = ({ salaryData }) => {
   };
 
   return (
-    <button onClick={generateSalarySlip} className="btn btn-success">
+    <button
+    //  disabled={logoBase64===null}
+      onClick={generateSalarySlip} className="btn btn-success">
       Calculate Salary & Download PDF
     </button>
   );

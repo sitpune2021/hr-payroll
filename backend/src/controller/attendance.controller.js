@@ -7,16 +7,17 @@ import { processPunch } from '../utils/punchProcessor.js';
 import { getAttendanceSummary } from '../utils/GetAttendanceSummary.js';
 import { getAttendanceLogs } from '../utils/getAttendanceLogs.js';
 import { Op } from 'sequelize';
+import logger from '../config/logger.js';
 
 const { Attendance, AttendanceSetting, User, EmployeeShiftSchedule } = models;
 
 const markNewAttendance = async (req, res) => {
   try {
     const { employeeId, punchDatetime } = req.body;
-    console.log('[Request] employeeId:', employeeId, 'punchDatetime:', punchDatetime);
+    logger.info(`[markNewAttendance] Request received`);
 
     if (!employeeId || !punchDatetime) {
-      console.log('[Validation Failed] Missing employeeId or punchDatetime');
+      logger.info('[Validation Failed] Missing employeeId or punchDatetime');
       return res.status(400).json({ message: 'Employee ID and punch time are required.' });
     }
 
@@ -104,7 +105,7 @@ const markNewAttendance = async (req, res) => {
         isLate,
         status: initialStatus,
       });
-      console.log('[Attendance Created] id:', attendance.id);
+      logger.info(`Attenddance created`);
     } else {
       // Already has attendance – update punch-out
       const actualIn = moment(`${date} ${attendance.checkIn}`);
@@ -165,9 +166,8 @@ const markNewAttendance = async (req, res) => {
         }
       }
 
-
       await attendance.save();
-      console.log('[Attendance Updated] id:', attendance.id, 'status:', attendance.status);
+      logger.info(`Attenddance updated`)
     }
 
     return res.status(200).json({
@@ -180,6 +180,7 @@ const markNewAttendance = async (req, res) => {
     });
 
   } catch (error) {
+    logger.error(`${error}--error while marking attendance`)
     console.error('Error in markNewAttendance:', error);
     return res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
@@ -191,6 +192,7 @@ const markNewAttendance = async (req, res) => {
 
 const uploadAttendanceExcel = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- upload excel file controller entry`)
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
@@ -304,8 +306,10 @@ const uploadAttendanceExcel = async (req, res) => {
       await Attendance.upsert({ ...data });
     }
 
+    logger.info(`${req.user.id}-- upload excel file atteendance processed successfully`)
     res.status(200).json({ message: 'Attendance uploaded successfully', saved: validData.length });
   } catch (error) {
+    logger.error(`${req.user.id}--${error} upload excel file controller error`)
     console.error('Upload error:', error);
     res.status(500).json({ message: 'Server error while uploading attendance' });
   }
@@ -314,6 +318,7 @@ const uploadAttendanceExcel = async (req, res) => {
 
 const getCompanyAttendanceByDate = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- get company attendance by date`)
     const { companyId, date } = req.params;
 
     if (!companyId || !date) {
@@ -338,27 +343,30 @@ const getCompanyAttendanceByDate = async (req, res) => {
     console.log(companyId, date);
     console.log(attendanceList);
 
-
-
+    logger.info(`${req.user.id}-- attendance list fetched successfully`)
     res.status(200).json(attendanceList);
   } catch (error) {
-    console.error('Error fetching attendance:', error);
+    logger.error(`${req.user.id}--${error} get company attendance by date error`)
     res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 const getUserAttendanceSummaryOFUserByStartEndDateAndUserID = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- get user attendance summary by start date and end date and user id`)
     const { userId, startDate, endDate } = req.query;
     const summary = await getAttendanceSummary(userId, startDate, endDate);
+    logger.info(`${req.user.id}-- attendance summary fetched successfully`)
     res.json(summary);
   } catch (err) {
+    logger.error(`${req.user.id}--${err} get user attendance summary by start date and end date and id`)
     res.status(500).json({ error: err.message });
   }
 };
 
 const getUserAttendanceLogsByStartEndDate = async (req, res) => {
   try {
+    logger.info(`${req.user.id}--user attendance log by start date and end date`)
     const { userId, startDate, endDate } = req.query;
 
     if (!startDate || !endDate) {
@@ -367,11 +375,13 @@ const getUserAttendanceLogsByStartEndDate = async (req, res) => {
 
     const logs = await getAttendanceLogs(userId, startDate, endDate);
 
+    logger.info(`${req.user.id}-- user attendance log fetched successfully`)
     return res.status(200).json({
       success: true,
       data: logs,
     });
   } catch (err) {
+    logger.error(`${req.user.id}--${err} user attendance log by start date and end date error`)
     res.status(500).json({ error: err.message });
   }
 };
@@ -379,6 +389,7 @@ const getUserAttendanceLogsByStartEndDate = async (req, res) => {
 
 const getUsersAttendancePerDay = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- get user attendance per day`)
     const { userId, date } = req.params;
 
     const attendanceList = await Attendance.findAll({
@@ -394,10 +405,10 @@ const getUsersAttendancePerDay = async (req, res) => {
         exclude: ['createdAt', 'updatedAt'],
       },
     });
-
+    logger.info(`${req.user.id}-- user attendance per day fetched successfully`)
     return res.status(200).json(attendanceList);
   } catch (error) {
-    console.error('Error fetching attendance:', error);
+    logger.error(`${req.user.id}--${error} get user attendance per day error`)
     return res.status(500).json({
       message: 'Failed to fetch attendance data',
       error: error.message,
@@ -408,6 +419,7 @@ const getUsersAttendancePerDay = async (req, res) => {
 
 const getCalenderAttendance = async (req, res) => {
   try {
+    logger.info(`${req.user.id}--calender attendance controller entry`)
     const { startDate, endDate, employeeId } = req.query;
 
     // 1. Get all attendance records within date range
@@ -457,14 +469,14 @@ const getCalenderAttendance = async (req, res) => {
 
       current.setDate(current.getDate() + 1);
     }
-
+    logger.info(`${req.user.id}-- calender attendance controller responded successfully`)
     res.json({
       stats,
       dateWiseStatus: dateArray,
     });
 
   } catch (error) {
-    console.error("Error fetching attendance summary:", error);
+    logger.error(`${req.user.id}--${error}-- error in calender attendance controller`)
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -472,4 +484,4 @@ const getCalenderAttendance = async (req, res) => {
 
 
 
-export {getCalenderAttendance, getUsersAttendancePerDay,markNewAttendance, uploadAttendanceExcel, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUserAttendanceLogsByStartEndDate };
+export { getCalenderAttendance, getUsersAttendancePerDay, markNewAttendance, uploadAttendanceExcel, getCompanyAttendanceByDate, getUserAttendanceSummaryOFUserByStartEndDateAndUserID, getUserAttendanceLogsByStartEndDate };

@@ -1,10 +1,12 @@
 import { Op } from "sequelize";
 import models from "../models/index.js";
-
+import logger from "../config/logger.js";
+ 
 const { Role } = models;
 
 const addNewRole = async (req, res) => {
   try {
+        logger.info(`${req.user.id}--add new role controller called`)
     const { name, companyId } = req.body;
 
     // Basic validation
@@ -36,14 +38,14 @@ const addNewRole = async (req, res) => {
     }
 
     const createdRole = await Role.create({ name: normalizedName, companyId });
-
+        logger.info(`${req.user.id}--new role created`)
     return res.status(201).json({
       message: "Role created successfully",
       createdRole
     });
 
   } catch (error) {
-    console.error("Error creating role:", error);
+    logger.error(`${req.user.id}--error in add new role controller--${error.message}`)
     return res.status(500).json({
       message: "Internal server error",
       error: error.message
@@ -55,6 +57,7 @@ const addNewRole = async (req, res) => {
 
 const getRolesList = async (req, res) => {
   try {
+        logger.info(`${req.user.id}--fetch roll list controller called`)
     const rolesList = await Role.findAll({
       attributes: ['id', 'name', 'companyId'],
       where: {
@@ -63,10 +66,10 @@ const getRolesList = async (req, res) => {
         }
       }
     });
-
+        logger.info(`${req.user.id}--role list fetched successfully`)
     res.status(200).json(rolesList);
   } catch (error) {
-    console.error("Error fetching roles:", error);
+    logger.error(`${req.user.id}--error in get roles list controller--${error.message}`)
     return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };

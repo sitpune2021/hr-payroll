@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { Link, useNavigate } from "react-router-dom";
 import ImageWithBasePath from "../../../core/common/imageWithBasePath";
@@ -18,8 +18,31 @@ import { AppDispatch, RootState } from "../../../core/data/redux/store";
 import getAttendanceSummaryAdminDashStat, { SummaryItem } from "../../../utils/AttendanceStatAdminDash";
 import { fetchCompanyDateAttendance } from "../../../core/data/redux/companyDateAttendanceSlice";
 import { fetchCompanysUsersThunk } from "../../../core/data/redux/companysUsersSlice";
+import axiosClient from "../../../axiosConfig/axiosClient";
+import { FETCH_BIRTHDAY_ANNIVERSARY } from "../../../axiosConfig/apis";
+import dayjs from "dayjs";
+import { setEvents } from "../../../core/data/redux/birthdayAnniversarySlice";
+import { useAppSelector } from "../../../core/data/redux/hooks";
+import { fetchLeaves } from "../../../core/data/redux/leavesSlice";
 
 const AdminDashboard = () => {
+  // types.ts
+  interface EmployeeEvent {
+    id: number;
+    firstName: string;
+    lastName: string;
+    birthDate: string | null;
+    joiningDate: string | null;
+    designation: string;
+    companyId: number;
+    branchId: number | null;
+  }
+
+  interface BirthdayAnniversaryState {
+    birthdays: EmployeeEvent[];
+    anniversaries: EmployeeEvent[];
+  }
+
 
   const dispatch = useDispatch<AppDispatch>();
   const nevigate = useNavigate();
@@ -31,16 +54,142 @@ const AdminDashboard = () => {
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
 
   const [statSummary, setStatSumary] = useState<SummaryItem[]>([]);
+  const [birthdayAnniversary, setBirthdayAnniversary] = useState<BirthdayAnniversaryState>();
 
   const [allBranches, setAllBranches] = useState<Branch[]>([])
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useState(dayjs().format("YYYY-MM-DD"));
+
+  const [endDate, setEndDate] = useState(
+    dayjs().add(1, "month").format("YYYY-MM-DD")
+  );
 
   const user = useSelector((state: RootState) => state.auth.user);
   const branchList: Branch[] = useSelector((state: RootState) => state.branches.branches);
   const attendanceList = useSelector((state: RootState) => state.companyDateAttendance.data);
   const companyUserList = useSelector((state: RootState) => state.companysEmployees.list);
   const userSaved = useSelector((state: RootState) => state.auth.user);
+  const { birthdays, anniversaries } = useAppSelector((state) => state.birthDayAnniversary);
+  const { leaves } = useAppSelector((state) => state.companyLeaves);
 
+
+  const [fromDate, setFromDate] = useState(() => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - 2); // 2 months ago
+    return date.toISOString().split("T")[0]; // yyyy-mm-dd
+  });
+
+  const [toDate, setToDate] = useState(() => {
+    return new Date().toISOString().split("T")[0]; // today
+  });
+  useEffect(() => {
+    if (user && user.companyId) {
+      dispatch(fetchLeaves({ companyId: user.companyId, fromDate, toDate }));
+    }
+  }, [user, fromDate, toDate, dispatch]);
+
+
+
+  const getCompletedYears = (dateString: string | null | undefined): number => {
+    if (!dateString) return 0;
+
+    const inputDatePart = dateString.split("T")[0];
+    const [inputYear, inputMonth, inputDay] = inputDatePart.split("-").map(Number);
+
+    const today = new Date();
+    let years = today.getFullYear() - inputYear;
+
+    const hasHadAnniversaryThisYear =
+      today.getMonth() + 1 > inputMonth ||
+      (today.getMonth() + 1 === inputMonth && today.getDate() >= inputDay);
+
+    if (!hasHadAnniversaryThisYear) {
+      years -= 1;
+    }
+
+    return Math.max(0, years);
+  };
+
+  interface EventDisplay {
+    id: number;
+    name: string;
+    date: string;
+    type: "birthday" | "anniversary";
+    years?: number;
+    designation: string;
+    avatar?: string;
+  }
+  const isToday = (dateString: string | null | undefined): boolean => {
+    if (!dateString) return false;
+
+    const [year, month, day] = dateString.split("T")[0].split("-").map(Number);
+    // console.log(month,day,"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+
+    const today = new Date();
+    console.log(month, "@@", today.getMonth() + 1);
+    console.log(day, "@@", today.getDate());
+
+
+    return (
+      month === today.getMonth() + 1 &&
+      day === today.getDate()
+    );
+  };
+  const todayBirthdays: EventDisplay[] = useMemo(() => {
+    return birthdays
+      .filter((b) => isToday(b.birthDate))
+      .map((b) => ({
+        id: b.id,
+        name: `${b.firstName} ${b.lastName}`,
+        date: b.birthDate!,
+        type: "birthday" as const,
+        designation: b.designation,
+      }));
+  }, [birthdays]);
+
+  const todayAnniversaries: EventDisplay[] = useMemo(() => {
+    return anniversaries
+      .filter((a) => isToday(a.joiningDate))
+      .map((a) => ({
+        id: a.id,
+        name: `${a.firstName} ${a.lastName}`,
+        date: a.joiningDate!,
+        type: "anniversary" as const,
+        years: getCompletedYears(a.joiningDate),
+        designation: a.designation,
+      }));
+  }, [anniversaries]);
+
+
+  useEffect(() => {
+
+
+    try {
+      if (userSaved) {
+        const fetchBirthdayAnniversary = async () => {
+          const response = await axiosClient.get(FETCH_BIRTHDAY_ANNIVERSARY, {
+            params: {
+              companyId: userSaved.companyId,
+              branchId: userSaved.branchId,
+              startDate: startDate,
+              endDate: endDate
+            }
+          });
+          if (response.status === 200) {
+            console.log(response.data);
+
+            dispatch(setEvents(response.data));
+          }
+          console.log("Birth ANniversary", response);
+
+        }
+        fetchBirthdayAnniversary();
+
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [userSaved])
 
   useEffect(() => {
     if (selectedBranch) {
@@ -84,9 +233,9 @@ const AdminDashboard = () => {
 
   const [date, setDate] = useState(new Date());
 
-  const formatDate = (date:any) => {
-  return date.toISOString().split("T")[0];
-};
+  const formatDate = (date: any) => {
+    return date.toISOString().split("T")[0];
+  };
 
 
 
@@ -320,6 +469,7 @@ const AdminDashboard = () => {
       icon: "ti-cake",
       color: "#e83e8c", // pinkish
       value: 0,
+      route: '/birthdayworkanniversary'
     },
     {
       label: "Announcement",
@@ -331,7 +481,8 @@ const AdminDashboard = () => {
       label: "Pending Leave Request",
       icon: "ti-login",
       color: "#090a09", // teal
-      value: 8,
+      value: leaves.filter((l) => l.status === 'Applied').length,
+      route:'/leaves'
     },
     {
       label: "Pending Payment Request",
@@ -612,9 +763,11 @@ const AdminDashboard = () => {
                     <li
                       key={index}
                       className="py-3"
+                      onClick={() => nevigate(item?.route || '/index')}
                       style={{
                         borderBottom: "1px solid #eee",
                         margin: "0 -1rem", // cancels out the .p-3 padding
+                        cursor: "pointer"
                       }}
                     >
                       <div className="px-3 d-flex flex-row justify-content-between align-items-center">
@@ -628,7 +781,7 @@ const AdminDashboard = () => {
                           </span>
                         </div>
                         <span style={{ color: "#333", fontSize: "16px", fontWeight: 500 }}>
-                          {item.value}
+                          {item.label === 'Today Birthday & Work Anniversary' ? todayAnniversaries.length + todayBirthdays.length : item.value}
                         </span>
                       </div>
                     </li>

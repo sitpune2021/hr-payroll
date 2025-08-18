@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import * as XLSX from 'xlsx';
 import { all_routes } from '../../router/all_routes'
 import { Link } from 'react-router-dom'
@@ -265,7 +265,7 @@ const Users = () => {
         if (profilePhotoEdit) {
             payload.append("profilePhotoEdit", profilePhotoEdit);
             console.log(profilePhotoEdit);
-            
+
             console.log("profile photo appended @!@!@!@@!@!@!!!!!!!!!!@@@@@@@@@@@@@@@@@@@!!!!!!!!!!!!!!!!!!!!!!@@@@@@@@");
         }
         if (bankDetailsEdit) payload.append("bankDetailsEdit", bankDetailsEdit);
@@ -313,6 +313,7 @@ const Users = () => {
         }));
     };
 
+
     const roles = useAppSelector((state) => state.roles.list);
     const loggedInuserRole = useSelector((state: RootState) => state.auth.user?.role);
     const loggedInRoleId = roles.find(role => role.name === loggedInuserRole)?.id;
@@ -332,6 +333,7 @@ const Users = () => {
     const shiftsList = useSelector((state: RootState) => state.shifts.shifts);
     const leaveTemplateList = useAppSelector((state) => state.leaveTemplate.templates);
     const companyUserList = useSelector((state: RootState) => state.companysEmployees.list);
+
 
     useEffect(() => {
         if (payrollTemplates.length > 0) {
@@ -560,7 +562,7 @@ const Users = () => {
 
         setFormErrors(newErrors);
         console.log(newErrors);
-        
+
         if (Object.keys(newErrors).length > 0) return;
 
         const payload = new FormData();
@@ -851,38 +853,7 @@ const Users = () => {
                             </nav> */}
                         </div>
                         <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-                            <div className="me-2">
-                                <div className="dropdown">
-                                    <Link
-                                        to="#"
-                                        className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                                        data-bs-toggle="dropdown"
-                                    >
-                                        <i className="ti ti-file-export me-1" />
-                                        Export
-                                    </Link>
-                                    <ul className="dropdown-menu  dropdown-menu-end p-3">
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                <i className="ti ti-file-type-pdf me-1" />
-                                                Export as PDF
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                <i className="ti ti-file-type-xls me-1" />
-                                                Export as Excel{" "}
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+
                             <div className="d-flex flex-row gap-2">
                                 <label
                                     className="btn d-flex align-items-center mb-0"
@@ -992,10 +963,7 @@ const Users = () => {
                                         <i className='fas fa-search' style={{ padding: '0 0 0 12px' }}></i>
                                         <input style={{ minWidth: "320px", border: 'none', fontSize: '16px' }} type="text" value={employeeSearch} className="form-control me-2" placeholder="Search Employees..." onChange={(e) => setEmployeeSearch(e.target.value)} />
                                         {employeeSearch && <i className='fas fa-times' style={{ padding: '0 20px 0 0', cursor: 'pointer' }} onClick={() => setEmployeeSearch("")}></i>}
-                                        <span style={{ borderLeft: '1px solid rgba(0, 0, 0, 0.8)', height: '30px' }}></span>
-                                        <div>
-                                            <i className='fas fa-sliders-h' style={{ padding: '0 15px', color: 'rgba(0, 0, 0, 0.5)', cursor: 'pointer' }} data-bs-toggle="modal" data-inert={true} data-bs-target="#search_filters"></i>
-                                        </div>
+
                                     </div>
                                 </div>
 
@@ -1284,7 +1252,11 @@ const Users = () => {
                 <div className="modal-dialog modal-dialog-centered modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h4 className="modal-title">Add User</h4>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h4 className="modal-title">Add User</h4>
+                                <h5 style={{color:'red'}} className="modal-title mx-2">NOTE: All fields in <strong>Personal Info</strong> tab are mendatory</h5>
+                            </div>
+
                             <button
                                 type="button"
                                 className="btn-close custom-btn-close"
@@ -2245,7 +2217,7 @@ const Users = () => {
                                                 <input
                                                     type="date"
                                                     className="form-control"
-                                                    value={editUserData?.joiningDate ?? ""}
+                                                    value={editUserData?.joiningDate ? editUserData.joiningDate.split("T")[0] : ""}
                                                     onChange={(e) =>
                                                         setEditUserData({ ...editUserData, joiningDate: e.target.value })
                                                     }
@@ -2256,7 +2228,7 @@ const Users = () => {
                                                 <input
                                                     type="date"
                                                     className="form-control"
-                                                    value={editUserData?.birthDate ?? ""}
+                                                    value={editUserData?.birthDate ? editUserData.birthDate.split("T")[0] : ""}
                                                     onChange={(e) =>
                                                         setEditUserData({ ...editUserData, birthDate: e.target.value })
                                                     }

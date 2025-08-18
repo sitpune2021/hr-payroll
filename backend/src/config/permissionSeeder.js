@@ -1613,10 +1613,12 @@ const seedPermissions = async (models) => {
     { name: 'AddShift', description: 'Permission to add new shift/shift settings' },
     { name: 'EditShift', description: 'Permission to edit shift' },
     { name: 'Payroll Templates', description: 'Permission access payroll page' },
-    { name: 'Employee', description: 'Permission to access user details' },
+    { name: 'Employee Master', description: 'Permission to access user details' },
     { name: 'Attendance', description: 'Permission to access user details' },
     { name: 'Leave Templates', description: 'Permission access leave page' },
     { name: 'Holiday Group', description: 'Permission access Holiday Group page' },
+    { name: 'Birthday & Work Anniversaries', description: 'Permission to open Birthdays page' },
+
 
 
 

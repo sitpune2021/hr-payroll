@@ -8,6 +8,6 @@ const router =  Router();
 router.route("/addnewholidaygroup").post(verifyToken, createHolidayGroup );
 router.route("/listall").get(verifyToken, listHolidayGroups );
 
-router.delete('/holiday-groups/:id', deleteHolidayGroup);
+router.route('/holiday-groups/:id').delete([verifyToken],deleteHolidayGroup);
 
 export default router;

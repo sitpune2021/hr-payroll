@@ -34,6 +34,8 @@ export const all_routes = {
   leaveTemplate: '/leavetemplate',
   holidayGroup: '/holidaygroup',
 
+  // todos
+  birthdayWorkAnniversary:'/birthdayworkanniversary',
 
 
 
@@ -345,17 +347,11 @@ export const all_routes = {
   contactGrid: "/contact-grid",
   contactList: "/contact-list",
   contactDetails: "/contact-details",
-  companiesGrid: "/companies-grid",
   companiesList: "/companies-list",
-  companiesDetails: "/companies-details",
   dealsGrid: "/deals-grid",
   dealsList: "/deals-list",
   dealsDetails: "/deals-details",
-  leadsList: "/leads-list",
-  leadsGrid: "/leads-grid",
-  leadsDetails: "/leads-details",
   pipeline: "/pipeline",
-  analytics: "/analytics",
   activities: "/",
 
   //HRM

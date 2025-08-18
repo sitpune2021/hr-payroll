@@ -218,7 +218,7 @@ const Sidebar = () => {
               <p className="fs-10">System Admin</p>
             </div>
           </div>
-          <div className="input-group input-group-flat d-inline-flex mb-4">
+          {/* <div className="input-group input-group-flat d-inline-flex mb-4">
             <span className="input-icon-addon">
               <i className="ti ti-search"></i>
             </span>
@@ -226,7 +226,7 @@ const Sidebar = () => {
             <span className="input-group-text">
               <kbd>CTRL + / </kbd>
             </span>
-          </div>
+          </div> */}
           <div
             className="d-flex align-items-center justify-content-between menu-item mb-3"
           >

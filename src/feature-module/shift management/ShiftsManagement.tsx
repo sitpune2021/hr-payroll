@@ -37,28 +37,31 @@ function ShiftsManagement() {
 
     useEffect(() => {
         if (companyList.length > 0) {
-            const loggedUsersCompany = companyList.filter(
-                (company) => company.id === user?.companyId
-            );
-
-            if (loggedUsersCompany.length > 0) {
-                setUserCompanies(loggedUsersCompany);
-            } else {
+            if (user?.role === "SUPER_ADMIN") {
+                // Super admin sees all companies
                 setUserCompanies(companyList);
-            }
-        }
-        if (allShifts.length > 0) {
-            const loggedUserShifts = allShifts.filter(
-                (shift) => shift.companyId === user?.companyId
-            );
-
-            if (loggedUserShifts.length > 0) {
-                setTableShifts(loggedUserShifts);
             } else {
-                setTableShifts(allShifts);
+                // Company admin / other roles see only their company
+                const loggedUsersCompany = companyList.filter(
+                    (company) => company.id === user?.companyId
+                );
+                setUserCompanies(loggedUsersCompany);
             }
         }
-    }, [branchList, allShifts])
+
+        if (allShifts.length > 0) {
+            if (user?.role === "SUPER_ADMIN") {
+                // Super admin sees all shifts
+                setTableShifts(allShifts);
+            } else {
+                const loggedUserShifts = allShifts.filter(
+                    (shift) => shift.companyId === user?.companyId
+                );
+                setTableShifts(loggedUserShifts);
+            }
+        }
+    }, [companyList, allShifts, user?.role, user?.companyId]);
+
 
     const [shiftData, setShiftData] = useState({
         shiftName: '',
@@ -384,7 +387,7 @@ function ShiftsManagement() {
                                             </label>
                                             <input
                                                 className="form-control"
-                                                type="time" 
+                                                type="time"
                                                 name="checkInTime"
                                                 value={shiftData.checkInTime}
                                                 onChange={handleChange}

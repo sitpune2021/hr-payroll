@@ -1,11 +1,13 @@
 import { log } from 'console';
 import models from '../models/index.js';
 import { text } from 'stream/consumers';
+import logger from '../config/logger.js';
 
 const { Role, Permission, RolePermission, Company, PayrollTemplate,PayrollComponent } = models
 
 const addNewTemplate = async (req, res) => {
     try {
+        logger.info(`${req.user.id}--add new payroll template controller called`)
         const { templateName, companyId } = req.body;
         const existingComp = await Company.findOne({ where: { id: companyId } });
         if (!existingComp) {
@@ -26,13 +28,14 @@ const addNewTemplate = async (req, res) => {
 
         // Create the new template
         const newTemplate = await PayrollTemplate.create({ templateName, companyId });
-
+        logger.info(`${req.user.id}--new payroll template created`)
         return res.status(201).json({
             message: 'New template added successfully',
             template: newTemplate
         });
 
     } catch (error) {
+        logger.error(`${req.user.id}--error in add new payroll template controller ${error.message}`)
         return res.status(500).json({
             message: 'Error adding new template',
             error: error.message
@@ -42,6 +45,7 @@ const addNewTemplate = async (req, res) => {
 
 const getListOfTemplate = async (req, res) => {
     try {
+        logger.info(`${req.user.id}--list all patroll templates controller called`)
         const { companyId } = req.query;
 
         const whereClause = {};
@@ -51,9 +55,10 @@ const getListOfTemplate = async (req, res) => {
             attributes: ['id', 'templateName', 'companyId'],
             where: whereClause,
         });
-
+        logger.info(`${req.user.id}--payroll templates list fetched successfully`)
         return res.status(200).json(templates);
     } catch (error) {
+        logger.error(`${req.user.id}--error in get list of payroll templates controller ${error.message}`)
         return res.status(500).json({ message: 'Error fetching list of templates', error: error.message });
     }
 };
@@ -62,6 +67,7 @@ const getListOfTemplate = async (req, res) => {
 const editPayrollTemplateWithComponents = async (req, res) => {
 
     try {
+        logger.info(`${req.user.id}--edit payroll template with components`)
         const { templateId } = req.params;
         const {
             templateName,
@@ -120,11 +126,11 @@ const editPayrollTemplateWithComponents = async (req, res) => {
                 });
             }
         }
-
+        logger.info(`${req.user.id}--payroll templates and components updated sucessfully`)
         res.status(200).json({ message: 'Payroll template and components updated successfully.' });
 
     } catch (error) {
-        console.error('Error updating payroll template and components:', error);
+        logger.error(`${req.user.id}--${error.message}--error while updating payroll template and components`)
         res.status(500).json({ message: 'Internal server error.', error: error.message });
     }
 
@@ -132,14 +138,17 @@ const editPayrollTemplateWithComponents = async (req, res) => {
 
 const getTempletesComponentList = async (req,res)=>{
     try {
+        logger.info(`${req.user.id}--get payroll component list by template controller called`)
         const { templateId } = req.params;
         const components = await PayrollComponent.findAll({
             attributes: ['id', 'type', 'name', 'amountType', 'value', 'templateId'],
             where: { templateId },
         });
+        logger.info(`${req.user.id}--component by template fetched successfully`)
         return res.status(200).json(components);
         
     } catch (error) {
+        console.error(`Error fetching payroll component list by template: --${error}`);
         return res.status(500).json({ message: 'Error fetching list of components', error: error.message })
     }
 

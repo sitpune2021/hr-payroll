@@ -11,7 +11,7 @@ router.route('/addcompany').post([verifyToken, checkPermission('AddCompany'),upl
 router.route('/getList').get([verifyToken], fetchListOfCompanies); 
 router.route('/updatecompany/:companyId').put([verifyToken, checkPermission('EditCompany'),upload.single('companyImage')], updatecompany) 
 
-router.route('/profile/:companyId').get(companyProfile)
+router.route('/profile/:companyId').get([verifyToken],companyProfile)
 
 
  
