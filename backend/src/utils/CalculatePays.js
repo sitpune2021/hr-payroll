@@ -1,13 +1,19 @@
+import logger from '../config/logger.js';
 import models from '../models/index.js';
 import { getAttendanceSummary } from './GetAttendanceSummary.js';
 
-const { User, PayrollComponent, PayrollTemplate } = models;
+const { User, PayrollComponent,Company,Branch, PayrollTemplate } = models;
 
 export const calculatePay = async (userId, startDate, endDate) => {
+  logger.info(`calclulate pay method called----`)
   const summary = await getAttendanceSummary(userId, startDate, endDate);
 
-  const user = await User.findByPk(userId, {
-    include: [{ model: PayrollTemplate, include: [PayrollComponent] }],
+ const user = await User.findByPk(userId, {
+    include: [
+      { model: PayrollTemplate, include: [PayrollComponent] },
+      { model: Company },   // include company details
+      { model: Branch },    // include branch details
+    ],
   });
 
   if (!user) throw new Error('User not found');
@@ -104,6 +110,26 @@ Final Pay = Gross Pay + Allowances + Bonuses - Deductions = ${finalPay.toFixed(2
     payrollComponentsBreakdown,
     calculationDescription,
     ...summary,
+    company: user.Company
+      ? {
+          name: user.Company.name,
+          address: user.Company.address,
+          phone: user.Company.phone,
+          companyImage: user.Company.companyImage,
+          email: user.Company.email,
+        }
+      : null,
+
+    branch: user.Branch
+      ? {
+          name: user.Branch.name,
+          address: user.Branch.address,
+          contact: user.Branch.phone,
+          email: user.Branch.email,
+          nameOfSalarySlip: user.Branch.nameOfSalarySlip,
+          branchLogoFileName: user.Branch.branchLogoFileName
+        }
+      : null,
   };
 };
 

@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import models from '../models/index.js';
+import logger from '../config/logger.js';
 
 const {
     User,
@@ -11,6 +12,7 @@ const {
 } = models;
 
 export const getAttendanceSummary = async (userId, startDate, endDate) => {
+    logger.info(`Fetching attendance summary for user ${userId} from ${startDate} to ${endDate}`);
     console.log('Fetching attendance summary for:', { userId, startDate, endDate });
 
     const user = await User.findByPk(userId);
@@ -178,7 +180,7 @@ export const getAttendanceSummary = async (userId, startDate, endDate) => {
             }
         }
     }
-
+    logger.info('attendance sumary fetched successfully')
     return {
         userId,
         startDate,

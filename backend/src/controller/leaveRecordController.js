@@ -1,12 +1,12 @@
 import models from '../models/index.js';
 const { LeaveRecord, UserLeaveQuota, User, LeaveTemplate } = models;
 import { Op } from 'sequelize';
+import logger from '../config/logger.js';
 
 const applyLeave = async (req, res) => {
     try {
+      logger.info(`${req.user.id}-- apply leave controller entry`)
         const { userId, leaveType, fromDate, toDate, reason } = req.body;
-
-
 
         const user = await User.findByPk(userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
@@ -34,11 +34,11 @@ const applyLeave = async (req, res) => {
             reason,
             status: 'Applied',
         });
-
+        logger.info(`${req.user.id}--leave applied successfully`)
         return res.status(201).json({ message: 'Leave applied successfully', leave });
 
     } catch (error) {
-        console.error('Apply Leave Error:', error);
+      logger.error(`${req.user.id}--error in apply leave controller ${error.message}`)
         return res.status(500).json({ message: 'Error applying leave', error: error.message });
     }
 };
@@ -46,7 +46,7 @@ const applyLeave = async (req, res) => {
 
 const updateLeaveStatus = async (req, res) => {
     try {
-
+        logger.info(`${req.user.id}--update leave status`)
         const { leaveId, status, approverId, remarks } = req.body;
 
 
@@ -57,8 +57,7 @@ const updateLeaveStatus = async (req, res) => {
             return res.status(400).json({ message: 'Invalid status' });
         }
 
-        console.log("approver id",approverId);
-        console.log("approver id",leave.approverId);
+       
 
         leave.status = status;
         leave.approverId = approverId;
@@ -90,17 +89,18 @@ const updateLeaveStatus = async (req, res) => {
 
             await quota.save();
         }
-
+        logger.info(`${req.user.id}--leave status updated `)
         return res.status(200).json({ message: `Leave ${status.toLowerCase()} successfully`, leave });
 
     } catch (error) {
-        console.error('Update Leave Status Error:', error);
+      logger.error(`${req.user.id}--${error.message}--error while updating leave status`)
         return res.status(500).json({ message: 'Error updating leave status', error: error.message });
     }
 };
 
 const fetchUsersLeaveRecordStats = async (req, res) => {
   try {
+        logger.info(`${req.user.id}-- fetch users leave record stats controller called`)
     const { userId } = req.params;
 
     // 1. Validate User
@@ -140,6 +140,7 @@ const fetchUsersLeaveRecordStats = async (req, res) => {
       casualLeaveBalance: leaveTemplate.casualLeaveQuota - taken.casualLeavesTaken,
     };
 
+        logger.info(`${req.user.id}-- user leave stats record fetched successfully`)
     // 6. Return consistent response
     return res.status(200).json({
       userId,
@@ -158,7 +159,7 @@ const fetchUsersLeaveRecordStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Fetch Leave Stats Error:', error);
+        logger.error(`${req.user.id}--${error.message}-- error while fetching user leave stats `)
     return res.status(500).json({ message: "Internal Server error" });
   }
 };
@@ -167,6 +168,7 @@ const fetchUsersLeaveRecordStats = async (req, res) => {
 
 const getCompanyLeaveRecords = async (req, res) => {
   try {
+        logger.info(`${req.user.id}--get company leave records controller called `)
     const { companyId, fromDate, toDate } = req.query;
 
     if (!companyId || !fromDate || !toDate) {
@@ -204,10 +206,10 @@ const getCompanyLeaveRecords = async (req, res) => {
       },
       order: [['createdAt', 'DESC']],
     });
-
+        logger.info(`${req.user.id}--company leave records fetched successfully`)
     return res.status(200).json(leaveRecords);
   } catch (error) {
-    console.error("Error fetching leave records:", error);
+        logger.error(`${req.user.id}--${error}-- error while fetching company leave records `)
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -215,6 +217,7 @@ const getCompanyLeaveRecords = async (req, res) => {
 
 const userLeaveDetailsController = async (req, res) => {
   try {
+        logger.info(`${req.user.id}--user leave record controller called `)
     const { userId, fromDate, toDate } = req.query;
 
     if (!userId || !fromDate || !toDate) {
@@ -251,14 +254,16 @@ const userLeaveDetailsController = async (req, res) => {
       order: [['createdAt', 'DESC']],
     });
 
+    logger.info(`${req.user.id}--user leave records fetched successfully`)
     return res.status(200).json(leaveRecords);
   } catch (error) {
-    console.error("Error fetching user leave records:", error);
+    logger.error(`${req.user.id}--${error}-- error while fetching user leave records `)
     return res.status(500).json({ message: "Internal server error" });
   }
 };
 const getLeaveById = async (req, res) => {
   try {
+    logger.info(`${req.user.id}--get leave by id controller called `)
     const { leaveId } = req.params;
 
     if (!leaveId) {
@@ -284,9 +289,10 @@ const getLeaveById = async (req, res) => {
       return res.status(404).json({ message: "Leave not found" });
     }
 
+    logger.info(`${req.user.id}--leave by id fetched successfully`)
     return res.status(200).json(leave);
   } catch (error) {
-    console.error("Error fetching leave by ID:", error);
+    logger.error(`${req.user.id}--${error}-- error while fetching leave by id `)
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -294,6 +300,7 @@ const getLeaveById = async (req, res) => {
 
 const editLeaveIfApplied = async (req, res) => {
   try {
+    logger.info(`${req.user.id}--edit leave if applied controller called `)
     const { leaveId } = req.params;
     const { leaveType, fromDate, toDate, reason } = req.body;
 
@@ -330,11 +337,11 @@ const editLeaveIfApplied = async (req, res) => {
     leave.reason = reason;
 
     await leave.save();
-
+    logger.info(`${req.user.id}--leave edited successfully`)
     return res.status(200).json({ message: 'Leave updated successfully', leave });
 
   } catch (error) {
-    console.error('Edit Leave Error:', error);
+    logger.error(`${req.user.id}--${error}-- error while editing leave if applied `)
     return res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 };

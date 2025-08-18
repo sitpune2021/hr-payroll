@@ -6,7 +6,7 @@ const routes = all_routes;
 
 export const SidebarDataTest = (userRole: string) => [
   {
-    tittle: 'Dashboard main',
+    // tittle: 'Dashboard main',
     icon: 'airplay',
     showAsTab: false,
     separateRoute: false,
@@ -34,33 +34,13 @@ export const SidebarDataTest = (userRole: string) => [
         base: 'attendance-employee',
       }),
       {
-        label: 'Features',
-        icon: 'layout-grid-add',
-        link: routes.adminFeatures,
-        base: 'ranches',
+        label: 'Employee Master',
+        icon: 'user-star',
+        link: routes.users,
+        base: 'users',
       },
       {
-        label: 'Roles',
-        icon: 'layout-grid-add',
-        link: routes.rolePermission,
-        base: 'roles-permissions',
-      },
-      {
-        label: 'Permission',
-        icon: 'layout-grid-add',
-        link: routes.permissionpage,
-        base: 'roles-permissions',
-      },
-    ]
-  },
-  {
-    tittle: 'Master Section',
-    icon: 'file',
-    showAsTab: false,
-    separateRoute: false,
-    submenuItems: [
-      {
-        label: 'Master',
+        label: 'Sub Master',
         link: routes.employeeList,
         submenu: true,
         showSubRoute: false,
@@ -76,23 +56,28 @@ export const SidebarDataTest = (userRole: string) => [
             base: 'ranches',
           },
           {
-            label: 'Employee',
-            icon: 'user-star',
-            link: routes.users,
-            base: 'users',
+            label: 'Departments',
+            icon: 'layout-grid-add',
+            link: routes.departments,
+            base: 'ranches',
           },
+          {
+            label: 'Roles',
+            icon: 'layout-grid-add',
+            link: routes.rolePermission,
+            base: 'roles-permissions',
+          },
+          {
+            label: 'Features',
+            icon: 'layout-grid-add',
+            link: routes.adminFeatures,
+            base: 'ranches',
+          },
+
         ],
-      }
-    ],
-  },
-  {
-    tittle: 'Utils Section',
-    icon: 'file',
-    showAsTab: false,
-    separateRoute: false,
-    submenuItems: [
+      },
       {
-        label: 'Utils',
+        label: 'Utility',
         submenu: true,
         showSubRoute: false,
         icon: 'users',
@@ -124,15 +109,68 @@ export const SidebarDataTest = (userRole: string) => [
             base: 'ranches',
           },
           {
-            label: 'Departments',
+            label: 'Permission',
             icon: 'layout-grid-add',
-            link: routes.departments,
-            base: 'ranches',
+            link: routes.permissionpage,
+            base: 'roles-permissions',
+          },
+          {
+            label: 'Leaves',
+            link: routes.leaveadmin,
+            submenu: false,
+            showSubRoute: false,
           },
         ],
-      }
-    ],
+      },
+
+
+      // {
+      //   label: 'Leaves',
+      //   customSubmenuTwo: true,
+      //   submenu: true,
+      //   showSubRoute: false,
+      //   link: routes.leaveadmin,
+      //   base: 'leaves',
+      //   submenuItems: [
+      //     {
+      //       label: 'Leaves (Employee)',
+      //       link: routes.leaveemployee,
+      //       submenu: false,
+      //       showSubRoute: false,
+      //     },
+      //     {
+      //       label: 'Leave Settings',
+      //       link: routes.leavesettings,
+      //       submenu: false,
+      //       showSubRoute: false,
+      //     },
+      //   ],
+      // },
+    ]
   },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // {
   //   tittle: 'Main Menu',
   //   icon: 'airplay',

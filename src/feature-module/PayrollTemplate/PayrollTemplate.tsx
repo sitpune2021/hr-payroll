@@ -165,38 +165,7 @@ function PayrollTemplate() {
                             </nav>
                         </div>
                         <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-                            <div className="me-2 mb-2">
-                                <div className="dropdown">
-                                    <Link
-                                        to="#"
-                                        className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                                        data-bs-toggle="dropdown"
-                                    >
-                                        <i className="ti ti-file-export me-1" />
-                                        Export
-                                    </Link>
-                                    <ul className="dropdown-menu  dropdown-menu-end p-3">
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                <i className="ti ti-file-type-pdf me-1" />
-                                                Export as PDF
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                <i className="ti ti-file-type-xls me-1" />
-                                                Export as Excel{" "}
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                           
                             <div className="mb-2">
                                 <Link
                                     to="#"

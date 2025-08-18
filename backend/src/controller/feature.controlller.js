@@ -1,19 +1,22 @@
 import models from "../models/index.js";
+import logger from '../config/logger.js';
 
 const { Permission,Role } = models;
 
 const addNewFeature = async (req, res) => {
 
     try {
+        logger.info(`${req.user.id}-- add new feature controller called`);
         const { name, description } = req.body;
         const existingFeature = await Permission.findOne({ where: { name } });
         if (existingFeature) {
             return res.status(400).json({ message: "Feature already exists" });
         }
         const newFeature = await Permission.create({ name, description });
-
+        logger.info(`${req.user.id}-- feature added successfully`);
         return res.status(201).json({ message: "Feature added successfully", feature: newFeature });
     } catch (error) {
+        logger.error(`${req.user.id}-- error adding feature ${error}-- error while adding feature`);
         return res.status(500).json({ message: "Error adding feature", error: error.message });
 
     }
@@ -22,18 +25,22 @@ const addNewFeature = async (req, res) => {
 
 const getAllFeatures = async (req, res) => {
     try {
+        logger.info(`${req.user.id}-- fetch all features controller called`);
         const featuresList = await Permission.findAll({
             attributes: ["id", "name", "description"],
         });
+        logger.info(`${req.user.id}-- fetch all features successfully`);
         return res.status(200).json(featuresList);
 
     } catch (error) {
-        return res.status(500).json({ message: "Error fetching features", error: error.message });
+        logger.error(`${req.user.id}-- error fetching features ${error}-- error while fetching all features list`);
+        return res.status(500).json({ message: "Error fetching features", error: error.message })
 
     }
 }
 
 const getFeaturesByRole = async (req, res) => {
+        logger.info(`${req.user.id}-- get feature by role controller called`);
     const roleName= req.user.role;
     const companyId= req.user.companyId;
 
@@ -58,15 +65,18 @@ const getFeaturesByRole = async (req, res) => {
             return res.status(404).json({ message: 'Role not found' });
         }
 
+        logger.info(`${req.user.id}-- get feature by role controller responded successfully`);
         return res.status(200).json(role.Permissions);
 
     } catch (error) {
+        logger.error(`${req.user.id}--${error}--get feature by role controller failed`);
         return res.status(500).json({ message: "Error fetching role features", error: error.message });
     }
 };
 
 const editFeatureCOntroller = async (req,res) => {
     try {
+        logger.info(`${req.user.id}-- edit feature controller called`);
         const id=req.params.featureId;
         const {name, description} = req.body;
         console.log(id);
@@ -81,9 +91,11 @@ const editFeatureCOntroller = async (req,res) => {
 
         feature.description=description;
          await feature.save(); 
+         logger.info(`${req.user.id}-- edit feature controller responded successfully`);
          return res.status(200).json(feature);
         
     } catch (error) {
+        logger.error(`${req.user.id}--${error}--edit feature controller failed`);
         return res.status(500).json({message:error.message})
     }
 

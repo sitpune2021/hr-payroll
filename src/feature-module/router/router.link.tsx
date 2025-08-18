@@ -119,7 +119,6 @@ import BanIpAddress from "../settings/otherSettings/banIpaddress";
 import BlogCategories from "../content/blog/blogCategories";
 import BlogComments from "../content/blog/blogComments";
 import BlogTags from "../content/blog/blogTags";
-import Faq from "../content/faq";
 import Cities from "../content/location/cities";
 import States from "../content/location/states";
 import Testimonials from "../content/testimonials";
@@ -230,24 +229,16 @@ import Backup from "../settings/otherSettings/backup";
 import Clearcache from "../settings/otherSettings/clearCache";
 import Languageweb from "../settings/websiteSettings/language-web";
 import Addlanguage from "../settings/websiteSettings/add-language";
-import EmployeeList from "../hrm/employees/employeesList";
-import EmployeesGrid from "../hrm/employees/employeesGrid";
 import Department from "../hrm/employees/deparment";
 import Designations from "../hrm/employees/designations";
 import Policy from "../hrm/employees/policy";
-import CompaniesGrid from "../crm/companies/companiesGrid";
 import ContactDetails from "../crm/contacts/contactDetails";
 import ContactList from "../crm/contacts/contactList";
 import ContactGrid from "../crm/contacts/contactGrid";
-import CompaniesDetails from "../crm/companies/companiesDetails";
-import LeadsGrid from "../crm/leads/leadsGrid";
-import LeadsList from "../crm/leads/leadsList";
-import LeadsDetails from "../crm/leads/leadsDetails";
 import DealsGrid from "../crm/deals/dealsGrid";
 import DealsList from "../crm/deals/dealsList";
 import DealsDetails from "../crm/deals/dealsDetails";
 import Pipeline from "../crm/pipeline/pipeline";
-import Analytics from "../crm/analytics/analytics";
 import Holidays from "../hrm/holidays";
 import PerformanceReview from "../performance/performanceReview";
 import PerformanceAppraisal from "../performance/performanceAppraisal";
@@ -286,6 +277,7 @@ import DynamicAttendance from "../hrm/attendance/DynamicAttendance";
 import LeaveTemplate from "../leaveTemplate/LeaveTemplate";
 import HolidayGroup from "../HolidayGroup/HolidayGroup";
 import HolidayGroups from "../HolidayGroup/HolidayGroup";
+import BirthdayAndWorkAnniversaries from "../TodosComponents/BirthdayAndWorkAnniversaries";
 const routes = all_routes;
 
 export const publicRoutes = [
@@ -307,6 +299,13 @@ export const publicRoutes = [
     element: <DynamicDashboard />,
     route: Route,
     label: "Dashboard"
+  },
+  
+  {
+    path: routes.birthdayWorkAnniversary,
+    element: <BirthdayAndWorkAnniversaries />,
+    route: Route,
+    label: "Birthday & Work Anniversaries"
   },
   {
     path: routes.employeeDashboard,
@@ -719,13 +718,6 @@ export const publicRoutes = [
     element: <FileManager />,
     route: Route,
   },
-  {
-    label: 'FAQ’S',
-    path: routes.faq,
-    element: <Faq />,
-    route: Route,
-  },
-
   {
     label: 'States',
     path: routes.states,
@@ -1605,18 +1597,6 @@ export const publicRoutes = [
     route: Route,
   },
   {
-    label: 'Employees',
-    path: routes.employeeList,
-    element: <EmployeeList />,
-    route: Route,
-  },
-  {
-    label: 'Employees Grid',
-    path: routes.employeeGrid,
-    element: <EmployeesGrid />,
-    route: Route,
-  },
-  {
     path: routes.departments,
     element: <Department />,
     route: Route,
@@ -1707,33 +1687,6 @@ export const publicRoutes = [
     route: Route,
   },
   {
-    label: 'Companies',
-    path: routes.companiesGrid,
-    element: <CompaniesGrid />,
-    route: Route,
-  },
-  {
-    path: routes.companiesDetails,
-    element: <CompaniesDetails />,
-    route: Route,
-  },
-  {
-    label: 'Leads',
-    path: routes.leadsGrid,
-    element: <LeadsGrid />,
-    route: Route,
-  },
-  {
-    path: routes.leadsList,
-    element: <LeadsList />,
-    route: Route,
-  },
-  {
-    path: routes.leadsDetails,
-    element: <LeadsDetails />,
-    route: Route,
-  },
-  {
     label: 'Deals',
     path: routes.dealsGrid,
     element: <DealsGrid />,
@@ -1753,12 +1706,6 @@ export const publicRoutes = [
     label: 'Pipeline',
     path: routes.pipeline,
     element: <Pipeline />,
-    route: Route,
-  },
-  {
-    label: 'Analytics',
-    path: routes.analytics,
-    element: <Analytics />,
     route: Route,
   },
   {

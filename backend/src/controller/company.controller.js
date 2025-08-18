@@ -1,11 +1,13 @@
 import models, { sequelize } from "../models/index.js";
 import bcrypt from 'bcryptjs';
+import logger from '../config/logger.js';
 import { deleteImageFile, saveImageFile } from "../utils/imageUtils.js";
 
 const { Company, User, Role, Department } = models;
 
 
 const addnewcompany = async (req, res) => {
+  logger.info(`${req.user.id}-- add new company controller entry`);
   const {
     companyName,
     companyAddress,
@@ -97,7 +99,7 @@ const addnewcompany = async (req, res) => {
       firstName: firstName || "Admin",
       lastName: lastName || "User",
       roleId: companyAdminRole.id,
-      designation:"company admin",
+      designation: "company admin",
       companyId: company.id,
       departmentId: department2.id,
       joiningDate: new Date()
@@ -106,7 +108,7 @@ const addnewcompany = async (req, res) => {
 
 
     await transaction.commit();
-
+    logger.info(`${req.user.id}-- company and commpany admin created successfully`);
     res.status(201).json({
       message: "Company and Company Admin User created successfully",
       company,
@@ -114,16 +116,19 @@ const addnewcompany = async (req, res) => {
     });
   } catch (error) {
     await transaction.rollback();
-    console.error("Company creation failed:", error);
+    logger.error(`${req.user.id}--${error}-- error while creating company}`);
     res.status(500).json({ message: error.message });
   }
 };
 
 const fetchListOfCompanies = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- fetching list of company controller called`);
     const companies = await Company.findAll();
+    logger.info(`${req.user.id}-- company list fetched successfully`);
     res.status(200).json(companies);
   } catch (error) {
+    logger.error(`${req.user.id}-- ${error}--error while fetching list of company`);
     return res.status(500).json({ message: error.message });
   }
 }
@@ -132,6 +137,7 @@ const fetchListOfCompanies = async (req, res) => {
 
 const updatecompany = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- update company controller entry`);
     const { companyId } = req.params;
     const {
       name,
@@ -172,27 +178,30 @@ const updatecompany = async (req, res) => {
     }
 
     await company.save();
-
+    logger.info(`${req.user.id}-- company details updated successfully`);
     return res.status(200).json({ message: 'Company updated successfully', company });
 
   } catch (err) {
-    console.error(err);
+    logger.error(`${req.user.id}--${err}-- error while updating company details `);
     res.status(500).json({ message: 'Something went wrong', error: err.message });
   }
 };
 
-const companyProfile = async (req,res) =>{
+const companyProfile = async (req, res) => {
   try {
+    logger.info(`${req.user.id}-- fetch company profile controller entry`);
     const { companyId } = req.params;
 
     const company = await Company.findByPk(companyId);
     if (!company) return res.status(404).json({ message: 'Company not found' });
-  res.status(200).json(company)
-    
+    logger.info(`${req.user.id}-- company profile fetched successfully`);
+    res.status(200).json(company)
+
   } catch (error) {
-    res.status(500).json({message:"internal server error"})
+    logger.error(`${req.user.id}--${error}-- error while fetching company profile `);
+    res.status(500).json({ message: "internal server error" })
   }
 }
 
 
-export { addnewcompany, updatecompany, fetchListOfCompanies,companyProfile }
+export { addnewcompany, updatecompany, fetchListOfCompanies, companyProfile }

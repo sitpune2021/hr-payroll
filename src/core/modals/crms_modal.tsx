@@ -13,7 +13,6 @@ import EditLeads from './edit_leads';
 import EditPipeline from './edit_pipeline';
 import EditStage from './edit_stage';
 import PipelineAccess from './pipeline_access';
-import SuccesContacts from './success_contacts';
 
 const CrmsModal = () => {
 
@@ -34,7 +33,6 @@ const CrmsModal = () => {
             <PipelineAccess />
             <AddStage />
             <EditStage />
-            <SuccesContacts />
         </>
 
 

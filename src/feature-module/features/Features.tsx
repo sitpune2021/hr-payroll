@@ -87,7 +87,7 @@ function Features() {
                             </nav>
                         </div>
                         <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-                            <div className="me-2 mb-2">
+                            {/* <div className="me-2 mb-2">
                                 <div className="dropdown">
                                     <Link
                                         to="#"
@@ -118,8 +118,8 @@ function Features() {
                                         </li>
                                     </ul>
                                 </div>
-                            </div>
-                            <div className="mb-2">
+                            </div> */}
+                            {/* <div className="mb-2">
                                 <Link
                                     to="#"
                                     data-bs-toggle="modal"
@@ -129,7 +129,7 @@ function Features() {
                                     <i className="ti ti-circle-plus me-2" />
                                     Add Feature
                                 </Link>
-                            </div>
+                            </div> */}
                             <div className="ms-2 head-icons">
                                 <CollapseHeader />
                             </div>
@@ -140,7 +140,7 @@ function Features() {
                     <div className="card">
                         <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
                             <h5>Features List</h5>
-                            <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+                            {/* <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
                                 <div className="me-3">
                                     <div className="input-icon-end position-relative">
                                         <PredefinedDateRanges />
@@ -262,7 +262,7 @@ function Features() {
                                         </li>
                                     </ul>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                         <div className="card-body p-2">
                             <div className="table-responsive p-2" style={{ height: '300px' }}>
@@ -294,9 +294,9 @@ function Features() {
                                                             >
                                                                 <i className="ti ti-edit" />
                                                             </Link>
-                                                            <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
+                                                            {/* <Link to="#" data-bs-toggle="modal" data-inert={true} data-bs-target="#delete_modal">
                                                                 <i className="ti ti-trash" />
-                                                            </Link>
+                                                            </Link> */}
                                                         </div>
                                                     </td>
                                                 </tr>

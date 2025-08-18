@@ -113,21 +113,42 @@ const PermissionPage = () => {
                                 </ol>
                             </nav>
                         </div>
-                        <div className="col-md-6 mb-3">
+                        <div className="col-md-4 mb-3">
                             <label className="form-label">Select Company</label>
-                            <select
-                                className="form-control"
-                                value={selectedCompanyId}
-                                onChange={(e) => setSelectedCompanyId(Number(e.target.value))}
-                            >
-                                <option value="">Select</option>
-                                {allcompany.map((company) => (
-                                    <option value={company.id} key={company.id}>
-                                        {company.name}
-                                    </option>
-                                ))}
-                            </select>
+                            <div style={{ position: "relative", width: "100%" }}>
+                                <select
+                                    className="form-control"
+                                    value={selectedCompanyId}
+                                    onChange={(e) => setSelectedCompanyId(Number(e.target.value))}
+                                    style={{
+                                        appearance: "none",
+                                        WebkitAppearance: "none",
+                                        MozAppearance: "none",
+                                        paddingRight: "2rem",
+                                    }}
+                                >
+                                    <option value="">Select</option>
+                                    {allcompany.map((company) => (
+                                        <option value={company.id} key={company.id}>
+                                            {company.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <i
+                                    className="bi bi-chevron-down"
+                                    style={{
+                                        position: "absolute",
+                                        right: "12px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        pointerEvents: "none",
+                                        fontSize: "1rem",
+                                        color: "#555",
+                                    }}
+                                ></i>
+                            </div>
                         </div>
+
                         {selectedCompanyId ? (
                             <div className="mb-3" style={{ border: '1px solid red' }}>
                                 <div className="dropdown">

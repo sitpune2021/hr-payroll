@@ -26,29 +26,49 @@ const RolesPermission = () => {
     const roles = useSelector((state: RootState) => state.roles.list)
     const companyList = useAppSelector((state) => state.companies.list);
     const user = useSelector((state: RootState) => state.auth.user);
+    const [nameError, setNameError] = useState("");
+    const [companyError, setCompanyError] = useState("");
 
 
 
     const handleAddRoleSubmit = async (e: any) => {
         e.preventDefault();
-        if (!name) {
-            toast('Info', 'Name is required.', 'danger')
-            return;
+        let valid = true;
+
+        if (!name.trim()) {
+            setNameError("Role name is required");
+            valid = false;
+        } else {
+            setNameError("");
         }
-          if (!companySelectedAddRole) {
-            toast('Info', 'Company selection is required.', 'danger')
-            return;
+
+        if (!companySelectedAddRole) {
+            setCompanyError("Please select a company");
+            valid = false;
+        } else {
+            setCompanyError("");
         }
+
+        if (!valid) return; // stop if validation fails
+
         try {
-            const response = await axiosClient.post(ADD_NEW_ROLES, { name,companyId:companySelectedAddRole })
+            const response = await axiosClient.post(ADD_NEW_ROLES, {
+                name,
+                companyId: companySelectedAddRole,
+            });
             if (response.status === 201) {
-                toast('Success', 'Role added Successfully', 'success')
+                toast("Success", "Role added Successfully", "success");
                 await dispatch(fetchRoles());
+
+                // close modal manually after success
+                const closeBtn = document.querySelector('[data-bs-dismiss="modal"]') as HTMLElement;
+        closeBtn?.click();
             }
         } catch (error) {
-            toast('Info', "Error while adding Role", 'danger')
+            toast("Info", "Error while adding Role", "danger");
         }
-    }
+    };
+
 
     const getCompanyNameById = (companyId: number | null | undefined): string => {
         const company = companyList.find((comp) => comp.id === companyId);
@@ -74,12 +94,12 @@ const RolesPermission = () => {
             } else {
                 setAllCompany([]);
             }
-        }else if(user && !user.companyId){
+        } else if (user && !user.companyId) {
             setAllRoles(roles);
         }
 
-        
-    }, [user, companyList,roles]);
+
+    }, [user, companyList, roles]);
 
     return (
         <>
@@ -105,38 +125,6 @@ const RolesPermission = () => {
                             </nav>
                         </div>
                         <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-                            <div className="me-2 mb-2">
-                                <div className="dropdown">
-                                    <Link
-                                        to="#"
-                                        className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                                        data-bs-toggle="dropdown"
-                                    >
-                                        <i className="ti ti-file-export me-1" />
-                                        Export
-                                    </Link>
-                                    <ul className="dropdown-menu  dropdown-menu-end p-3">
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                <i className="ti ti-file-type-pdf me-1" />
-                                                Export as PDF
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                to="#"
-                                                className="dropdown-item rounded-1"
-                                            >
-                                                <i className="ti ti-file-type-xls me-1" />
-                                                Export as Excel{" "}
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
                             <div className="mb-2">
                                 <Link
                                     to="#"
@@ -218,23 +206,28 @@ const RolesPermission = () => {
                                                 type="text"
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
-                                                className="form-control" />
+                                                className={`form-control ${nameError ? "is-invalid" : ""}`}
+                                            />
+                                            {nameError && <div className="invalid-feedback">{nameError}</div>}
                                         </div>
                                     </div>
                                     <div className="col-md-12 mb-3">
                                         <label className="form-label">Select Company</label>
                                         <select
-                                            className="form-control"
+                                            className={`form-control ${companyError ? "is-invalid" : ""}`}
                                             value={companySelectedAddRole}
-                                            onChange={(e) => setCompanySelectedAddRole(Number(e.target.value))}
+                                            onChange={(e) =>
+                                                setCompanySelectedAddRole(Number(e.target.value))
+                                            }
                                         >
                                             <option value="">Select</option>
-                                            {
-                                                allcompany.map(company => (
-                                                    <option value={company.id} key={company.id}>{company.name}</option>
-                                                ))
-                                            }
+                                            {allcompany.map((company) => (
+                                                <option value={company.id} key={company.id}>
+                                                    {company.name}
+                                                </option>
+                                            ))}
                                         </select>
+                                        {companyError && <div className="invalid-feedback">{companyError}</div>}
                                     </div>
                                 </div>
                             </div>
@@ -246,11 +239,12 @@ const RolesPermission = () => {
                                 >
                                     Cancel
                                 </button>
-                                <button type="submit" data-bs-dismiss="modal" className="btn btn-primary">
+                                <button type="submit" className="btn btn-primary">
                                     Add Role
                                 </button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>

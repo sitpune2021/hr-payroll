@@ -10,13 +10,9 @@ const { User, Role } = models;
 
 const loginController = async (req, res) => {
   const { emailOrContact, password } = req.body;
-  logger.info(`login request--${emailOrContact,password}`)
-
-  console.log(emailOrContact, password, "@@@@@@@@@@@@");
-
+  logger.info(`login request--${emailOrContact}--${password}`)
 
   try {
-    console.log("1111111111111");
     
     const user = await User.findOne({
       where: {
@@ -27,7 +23,6 @@ const loginController = async (req, res) => {
       },
     });
     if (!user) {
-      console.log("222222222222");
       
       return res.status(404).json({ message: 'User not found' });
     }
@@ -59,7 +54,7 @@ const loginController = async (req, res) => {
       sameSite: 'Lax',
       maxAge: 8 * 60 * 60 * 1000,
     });
-
+    logger.info(`login successfully--userID:${user.id}`)
     res.status(200).json({
       message: 'Login successful',
       user: {
@@ -76,7 +71,7 @@ const loginController = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error logging in:', error);
+    logger.error(`Error in login controller: ${error}`)
     res.status(500).json({ message: 'Something went wrong' });
   }
 };
@@ -117,11 +112,13 @@ const registerController = async (req, res) => {
 const getUserDataController = async (req, res) => {
 
   try {
+    logger.info(`get user data--userID:${req.user.id}`)
     const user = await User.findByPk(req.user.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' }); 
     }
 
+    logger.info(`${req.user.id}--user data ftched successfully`)
     return res.status(200).json(
       {
         id: user.id,
@@ -140,11 +137,13 @@ const getUserDataController = async (req, res) => {
 
 
   } catch (error) {
+    logger.error(`${req.user.id}--error while fetching user data --${error}`)
     return res.status(500).json({ message: 'Something went wrong' });
   }
 
 }
 const logoutController = (req, res) => {
+  logger.info(`Logout request`)
   res.clearCookie('token', {
     httpOnly: true,
     secure: false,     // same as in your login

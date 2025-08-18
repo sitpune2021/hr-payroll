@@ -362,29 +362,14 @@ export const HorizontalSidebarData = [
                     base: 'contact',
                   },
                   {
-                    menuValue: 'Companies',
-                    route: routes.companiesGrid,
-                    base: 'company',
-                  },
-                  {
                     menuValue: 'Deals',
                     route: routes.dealsGrid,
                     base: 'deals',
                   },
                   {
-                    menuValue: 'Leads',
-                    route: routes.leadsGrid,
-                    base: 'leads',
-                  },
-                  {
                     menuValue: ' Pipeline',
                     route: routes.pipeline,
                     base: 'pipeline',
-                  },
-                  {
-                    menuValue: 'Analytics',
-                    route: routes.analytics,
-                    base: 'analytics',
                   },
                   {
                     menuValue: 'Activities',

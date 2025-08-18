@@ -1,5 +1,6 @@
 import models, { sequelize } from "../models/index.js";
 import { deleteImageFile, saveImageFile } from "../utils/imageUtils.js";
+import logger from '../config/logger.js';
 
 const { Company, User, Role, Department } = models;
 
@@ -7,6 +8,7 @@ const { Company, User, Role, Department } = models;
 const AdminDashboard = async (req, res) => {
 
     try {
+      logger.info(`${req.user.id}--admin dashboard data fetch controller entry`)
     const { companyId } = req.query;
     const date = req.query.date || new Date().toISOString().split('T')[0];
     const branchId = req.query.branchId || null;
@@ -55,7 +57,7 @@ const AdminDashboard = async (req, res) => {
       if (a.isLate) counts.lateComers++;
       if (a.isEarlyLeave) counts.earlyLeaving++;
     });
-
+    logger.info(`${req.user.id}-- admin dashboard data fetched successfully`)
     return res.status(200).json({
       date,
       branchId,
@@ -63,7 +65,7 @@ const AdminDashboard = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error in getAttendanceSummary:", error);
+    logger.error(`${req.user.id}--${error.message}--error in admin dashboard data fetching`)
     return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 

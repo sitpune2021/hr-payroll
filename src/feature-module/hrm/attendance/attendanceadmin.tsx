@@ -311,14 +311,6 @@ const AttendanceAdmin = () => {
                 <table className="table datanew table-bordered bg-white">
                   <thead>
                     <tr>
-                      <th>
-                        <input
-                          className="form-check-input me-1"
-                          type="checkbox"
-                          defaultValue=""
-                          id="user-5"
-                        />
-                      </th>
                       <th>Employee</th>
                       <th>Status</th>
                       <th>Check In</th>
@@ -338,14 +330,6 @@ const AttendanceAdmin = () => {
                       const attendance = attendanceList.find(a => a.employeeId === emp.id);
                       return (
                         <tr key={emp.id}>
-                          <td>
-                            <input
-                              className="form-check-input me-1"
-                              type="checkbox"
-                              defaultValue=""
-                              id="user-5"
-                            />
-                          </td>
                           <td>{emp.firstName} {emp.lastName}</td>
                           <td>{attendance?.status || 'No Record'}</td>
                           <td>
@@ -412,35 +396,14 @@ const AttendanceAdmin = () => {
           <div className="d-flex align-items-center flex-wrap">
             <input style={{ width: '120px' }} type="date" value={selectedDate} className="form-control me-2"
               onChange={(e) => setSelectedDate(e.target.value)} />
-            <div className="dropdown me-2 mb-2">
-              <Link to="#" className="btn btn-white"><i className="ti ti-file-export me-1" /> Import</Link>
-            </div>
-            <div className="dropdown me-2 mb-2">
-              <Link to="#" className="btn btn-white dropdown-toggle" data-bs-toggle="dropdown">
-                <i className="ti ti-file-export me-1" /> Export
-              </Link>
-              <ul className="dropdown-menu dropdown-menu-end p-3">
-                <li><Link to="#" className="dropdown-item"><i className="ti ti-file-type-pdf me-1" />Export as PDF</Link></li>
-                <li><Link to="#" className="dropdown-item"><i className="ti ti-file-type-xls me-1" />Export as Excel</Link></li>
-              </ul>
-            </div>
-            {/* <div className="mb-2">
-              <Link to="#" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#attendance_report">
-                <i className="ti ti-file-analytics me-2" /> Report
-              </Link>
-            </div> */}
-
-            {/* <div className="ms-2">
-              <CollapseHeader />
-            </div> */}
           </div>
         </div>
 
         {renderContent()}
       </div>
       <div className="footer d-sm-flex align-items-center justify-content-between border-top bg-white p-3">
-        <p className="mb-0">2014 - 2025 © SmartHR.</p>
-        <p>Designed &amp; Developed by <Link to="#" className="text-primary">Dreams</Link></p>
+        <p className="mb-0">2025 © PayBook</p>
+        <p>Designed &amp; Developed by <Link to="#" className="text-primary">PayBook</Link></p>
       </div>
 
 
