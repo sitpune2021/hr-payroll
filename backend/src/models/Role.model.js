@@ -10,7 +10,6 @@ export default (sequelize) => {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-      // remove global uniqueness constraint if roles are company-scoped
     },
     companyId: {
       type: DataTypes.INTEGER,

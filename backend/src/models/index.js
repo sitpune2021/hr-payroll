@@ -32,6 +32,7 @@ import HolidayModel from './Holiday.model.js';
 import HolidayGroupModel from './HolidayGroup.model.js';
 import UserLeaveQuotaModel from './UserLeaveQuota.model.js';
 import LeaveRecordModel from './LeaveRecord.model.js';
+import AnnouncementModel from './Announcements.js'
 
 // dotenv.config();
 
@@ -80,6 +81,7 @@ const models = {
   Holiday: HolidayModel(sequelize),
   UserLeaveQuota: UserLeaveQuotaModel(sequelize),
   LeaveRecord: LeaveRecordModel(sequelize),
+  Announcement: AnnouncementModel(sequelize),
 };
 
 // Function to seed roles

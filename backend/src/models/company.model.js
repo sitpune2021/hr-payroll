@@ -65,6 +65,9 @@ export default (sequelize) => {
     Company.hasMany(models.User, { foreignKey: 'companyId' });
     Company.belongsTo(models.User, { foreignKey: 'userId', as: 'adminUser' });
     Company.hasMany(models.AttendanceSetting, { foreignKey: 'companyId' });
+
+    // ✅ Added Announcements relation
+    Company.hasMany(models.Announcement, { foreignKey: 'companyId' });
   };
 
   return Company;
