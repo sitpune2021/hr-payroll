@@ -4,7 +4,8 @@ import { where, Op, Sequelize } from 'sequelize';
 import * as XLSX from 'xlsx'
 import { validateUsersFromExcel } from '../utils/validateUsersFromExcelUpload.js';
 import { deleteImageFile, saveImageFile } from '../utils/imageUtils.js';
-import logger from '../config/logger.js'
+import logger from '../config/logger.js';
+import { addEmployee } from "../utils/smartOfficeIntegration.js";
 
 const { Permission, Role, User, Branch, Company, Department, UserLeaveQuota } = models;
 
@@ -139,6 +140,8 @@ const addNewUser = async (req, res) => {
     await transaction.commit();
     logger.info(`${req.user.id}-- user added successfully`)
     return res.status(201).json({ message: "User added successfully", user: newUser });
+
+    // addEmployee(newUser.id, firstName, gender, "active");
 
   } catch (error) {
     await transaction.rollback();
